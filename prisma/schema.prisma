@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ── UTILIZADORES ──────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  plan      Plan     @default(FREE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  portfolio   Portfolio?
+  aiUsageLogs AIUsageLog[]
+
+  @@map("users")
+}
+
+enum Plan {
+  FREE
+  PRO
+
+  @@map("plan")
+}
+
+// ── EMPRESAS ──────────────────────────────────
+model Company {
+  id          String  @id @default(cuid())
+  ticker      String  @unique
+  name        String
+  cik         String? @unique
+  exchange    String
+  sector      String?
+  industry    String?
+  country     String  @default("US")
+  currency    String  @default("USD")
+  logoUrl     String?
+  description String? @db.Text
+  website     String?
+  employees   Int?
+  isActive    Boolean @default(true)
+
+  lastFundamentalsUpdate DateTime?
+  lastPriceUpdate        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fundamentals   Fundamental[]
+  prices         Price[]
+  aiInsightCache AIInsightCache?
+  portfolioItems PortfolioItem[]
+
+  @@index([ticker])
+  @@index([exchange])
+  @@index([sector])
+  @@map("companies")
+}
+
+// ── FUNDAMENTAIS ──────────────────────────────
+model Fundamental {
+  id        String @id @default(cuid())
+  companyId String
+
+  periodType    PeriodType
+  fiscalYear    Int
+  fiscalQuarter Int?
+  periodEnd     DateTime
+  filedAt       DateTime?
+
+  // Income Statement
+  revenue           Decimal? @db.Decimal(20, 4)
+  costOfRevenue     Decimal? @db.Decimal(20, 4)
+  grossProfit       Decimal? @db.Decimal(20, 4)
+  operatingExpenses Decimal? @db.Decimal(20, 4)
+  operatingIncome   Decimal? @db.Decimal(20, 4)
+  interestExpense   Decimal? @db.Decimal(20, 4)
+  taxExpense        Decimal? @db.Decimal(20, 4)
+  netIncome         Decimal? @db.Decimal(20, 4)
+  epsDiluted        Decimal? @db.Decimal(10, 4)
+  sharesOutstanding Decimal? @db.Decimal(20, 4)
+
+  // Cash Flow
+  operatingCashFlow Decimal? @db.Decimal(20, 4)
+  capex             Decimal? @db.Decimal(20, 4)
+  freeCashFlow      Decimal? @db.Decimal(20, 4)
+
+  // Balance Sheet
+  totalAssets      Decimal? @db.Decimal(20, 4)
+  totalCurrentLiab Decimal? @db.Decimal(20, 4)
+  longTermDebt     Decimal? @db.Decimal(20, 4)
+  totalDebt        Decimal? @db.Decimal(20, 4)
+  cash             Decimal? @db.Decimal(20, 4)
+  totalEquity      Decimal? @db.Decimal(20, 4)
+
+  // Métricas calculadas (ex: 0.430000 = 43%)
+  grossMargin     Decimal? @db.Decimal(8, 6)
+  operatingMargin Decimal? @db.Decimal(8, 6)
+  netMargin       Decimal? @db.Decimal(8, 6)
+  roic            Decimal? @db.Decimal(8, 6)
+  returnOnEquity  Decimal? @db.Decimal(8, 6)
+
+  // Dividendos
+  dividendPerShare Decimal? @db.Decimal(10, 4)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, periodType, fiscalYear, fiscalQuarter])
+  @@index([companyId, periodEnd])
+  @@index([companyId, periodType, fiscalYear])
+  @@map("fundamentals")
+}
+
+enum PeriodType {
+  QUARTERLY
+  ANNUAL
+
+  @@map("period_type")
+}
+
+// ── PREÇOS EOD (PostgreSQL, NÃO R2) ───────────
+model Price {
+  ticker String
+  date   DateTime @db.Date
+  open   Decimal? @db.Decimal(12, 4)
+  high   Decimal? @db.Decimal(12, 4)
+  low    Decimal? @db.Decimal(12, 4)
+  close  Decimal  @db.Decimal(12, 4)
+  volume BigInt?
+
+  company Company @relation(fields: [ticker], references: [ticker])
+
+  @@id([ticker, date])
+  @@map("prices")
+}
+
+// ── PORTFÓLIO / WATCHLIST ─────────────────────
+model Portfolio {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  name      String   @default("O Meu Portfólio")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items PortfolioItem[]
+
+  @@map("portfolios")
+}
+
+model PortfolioItem {
+  id          String   @id @default(cuid())
+  portfolioId String
+  companyId   String
+  addedAt     DateTime @default(now())
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  company   Company   @relation(fields: [companyId], references: [id])
+
+  @@unique([portfolioId, companyId])
+  @@index([portfolioId])
+  @@map("portfolio_items")
+}
+
+// ── AI INSIGHTS (CACHE) ───────────────────────
+model AIInsightCache {
+  id        String @id @default(cuid())
+  companyId String @unique
+
+  executiveSummary String @db.Text
+  moat             String @db.Text
+  catalysts        String @db.Text
+  risks            String @db.Text
+
+  modelVersion String
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("ai_insight_cache")
+}
+
+// ── CONTROLO DE USO DE AI ─────────────────────
+model AIUsageLog {
+  id     String   @id @default(cuid())
+  userId String
+  ticker String
+  usedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+  @@map("ai_usage_logs")
+}
