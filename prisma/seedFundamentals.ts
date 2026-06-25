@@ -14,8 +14,8 @@ async function main() {
     return
   }
 
-  // Generate 10 years (2014 to 2023)
-  const years = Array.from({ length: 10 }, (_, i) => 2014 + i)
+  // Generate 12 years (2014 to 2025)
+  const years = Array.from({ length: 12 }, (_, i) => 2014 + i)
   const quarters = [1, 2, 3, 4]
 
   for (const company of companies) {
