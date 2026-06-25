@@ -46,14 +46,17 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
     
-    // For Y-axis, compact notation is best (e.g. 1.2B, 400M, 5K)
-    const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
-    const formatted = formatter.format(Math.abs(num))
+    const isMillions = config.isCurrency || config.dataKeys.some(k => k.key === 'sharesOutstanding')
+    const absVal = Math.abs(num)
     
-    if (config.isCurrency) {
-      return num < 0 ? `-$${formatted}` : `$${formatted}`
+    if (isMillions) {
+      const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
+      const formatted = formatter.format(absVal * 1_000_000)
+      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      return num < 0 ? `-${formatted}` : formatted
     }
-    return num < 0 ? `-${formatted}` : formatted
+    
+    return num < 0 ? `-${absVal.toFixed(2)}` : absVal.toFixed(2)
   }
 
   const formatTooltipValue = (val: any) => {
@@ -61,25 +64,21 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
     
+    const isMillions = config.isCurrency || config.dataKeys.some(k => k.key === 'sharesOutstanding')
     const absVal = Math.abs(num)
-    let formatted = ""
-    if (absVal >= 1000) {
-      formatted = `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
-    } else {
-      formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
-    }
-
-    if (config.isCurrency) {
-      // Not all charts use M/B suffix for currency, but since we assume base is M:
-      // Wait, EPS is not isCurrency, so it goes to fallback.
-      return num < 0 ? `-$${formatted}` : `$${formatted}`
+    
+    if (isMillions) {
+      let formatted = ""
+      if (absVal >= 1000) {
+        formatted = `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+      } else {
+        formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+      }
+      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      return num < 0 ? `-${formatted}` : formatted
     }
     
-    // Fallback for non-currency (like EPS, Shares)
-    if (absVal >= 1000) {
-      return num < 0 ? `-${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B` : `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
-    }
-    return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    return num < 0 ? `-${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -123,14 +122,14 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               dataKey="label" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} 
+              tick={{ fill: '#a1a1aa', fontSize: 11 }} 
               dy={15}
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
               tickFormatter={formatValue}
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+              tick={{ fill: '#a1a1aa', fontSize: 11 }}
               width={55}
             />
             <Tooltip 
