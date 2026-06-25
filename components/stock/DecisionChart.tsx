@@ -14,9 +14,11 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   CartesianGrid,
-  Legend
+  Legend,
+  Cell
 } from "recharts"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useTranslations } from "next-intl"
 
 export type ChartConfig = {
   dataKeys: { key: string; color: string; type: 'bar' | 'line'; stackId?: string; name?: string }[]
@@ -35,6 +37,7 @@ interface DecisionChartProps {
 }
 
 export function DecisionChart({ title, data, type, config, cagr }: DecisionChartProps) {
+  const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -65,7 +68,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
   }
 
   const renderChart = (height: number | string = "100%") => {
-    if (data.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">No data</div>
+    if (data.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
 
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
 
@@ -105,7 +108,24 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               if (k.type === 'line' || type === 'LINE') {
                 return <Line key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
               }
-              return <Bar key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]} />
+              return (
+                <Bar key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
+                  {data.map((entry, index) => {
+                    let cellColor = k.color
+                    if (config.inverseColors) {
+                      if (index > 0) {
+                        const prev = Number(data[index - 1][k.key]) || 0
+                        const curr = Number(entry[k.key]) || 0
+                        if (curr < prev) cellColor = '#10b981'
+                        else if (curr > prev) cellColor = '#f43f5e'
+                      } else {
+                        cellColor = '#a1a1aa'
+                      }
+                    }
+                    return <Cell key={`cell-${index}`} fill={cellColor} />
+                  })}
+                </Bar>
+              )
             })}
           </ChartComponent>
         </ResponsiveContainer>
@@ -118,7 +138,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
       <table className="w-full text-sm text-left">
         <thead className="sticky top-0 bg-muted/80 backdrop-blur text-muted-foreground text-xs uppercase">
           <tr>
-            <th className="px-4 py-2 font-medium">Period</th>
+            <th className="px-4 py-2 font-medium">{t('period')}</th>
             {config.dataKeys.map(k => (
               <th key={k.key} className="px-4 py-2 font-medium text-right">{k.name || k.key}</th>
             ))}
@@ -155,21 +175,21 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
           <button 
             onClick={() => setViewMode('chart')}
             className={`p-1.5 rounded-sm transition-colors ${viewMode === 'chart' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            title="Chart View"
+            title={t('chartView')}
           >
             <BarChart3 className="w-4 h-4" />
           </button>
           <button 
             onClick={() => setViewMode('table')}
             className={`p-1.5 rounded-sm transition-colors ${viewMode === 'table' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            title="Table View"
+            title={t('tableView')}
           >
             <Table2 className="w-4 h-4" />
           </button>
           <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
             <DialogTrigger 
               className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors ml-1"
-              title="Full Screen"
+              title={t('fullScreen')}
             >
               <Maximize2 className="w-4 h-4" />
             </DialogTrigger>

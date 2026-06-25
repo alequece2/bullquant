@@ -72,6 +72,11 @@
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Histórico de Preços",
+      "noData": "Sem dados",
+      "period": "Período",
+      "chartView": "Vista de Gráfico",
+      "tableView": "Vista de Tabela",
+      "fullScreen": "Ecrã Inteiro",
       "tabs": {
         "1d": "1D",
         "1m": "1M",

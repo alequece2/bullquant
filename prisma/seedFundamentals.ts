@@ -85,7 +85,8 @@ async function main() {
         annualCapex += capex
         annualDividends += dividendPerShare
 
-        const qDate = new Date(`${year}-${q * 3}-30`)
+        const month = String(q * 3).padStart(2, '0')
+        const qDate = new Date(`${year}-${month}-28T00:00:00Z`)
 
         dataToInsert.push({
           companyId: company.id,

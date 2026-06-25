@@ -31,11 +31,12 @@ export async function GET(
 
     // Convert Decimals to numbers for frontend processing
     const serialized = fundamentals.map(f => {
-      // Create a shallow copy and serialize all Decimal properties
-      const obj: any = { ...f }
-      for (const key in obj) {
-        if (obj[key] !== null && typeof obj[key] === 'object' && obj[key].constructor.name === 'Decimal') {
-          obj[key] = Number(obj[key])
+      const obj: Record<string, unknown> = {}
+      for (const [key, val] of Object.entries(f)) {
+        if (val !== null && typeof val === 'object' && 'toNumber' in val && typeof (val as any).toNumber === 'function') {
+          obj[key] = (val as any).toNumber()
+        } else {
+          obj[key] = val
         }
       }
       return obj

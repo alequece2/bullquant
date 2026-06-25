@@ -141,7 +141,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
   return (
     <div className="mt-12 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold tracking-tight">{t('engineTitle', { fallback: 'Financials & Decision Engine' })}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t('engineTitle')}</h2>
         <div className="flex bg-muted/50 p-1 rounded-lg border border-border/40 w-fit">
           {(["QUARTERLY", "TTM", "ANNUAL"] as PeriodType[]).map(p => (
             <button
@@ -151,7 +151,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
                 period === p ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {t(`periods.${p.toLowerCase()}`, { fallback: p })}
+              {t(`periods.${p.toLowerCase()}`)}
             </button>
           ))}
         </div>
@@ -159,7 +159,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <DecisionChart 
-          title={t('charts.revenue', { fallback: 'Revenue' })} 
+          title={t('charts.revenue')} 
           data={chartData} 
           type="BAR" 
           config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: '#3b82f6', type: 'bar' }] }} 
@@ -168,7 +168,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
 
         {segmentKeys.length > 0 && (
           <DecisionChart 
-            title={t('charts.revenueBySegment', { fallback: 'Revenue by Segment' })} 
+            title={t('charts.revenueBySegment')} 
             data={chartData} 
             type="STACKED_BAR" 
             config={{ 
@@ -179,7 +179,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         )}
 
         <DecisionChart 
-          title={t('charts.epsDiluted', { fallback: 'EPS Diluted' })} 
+          title={t('charts.epsDiluted')} 
           data={chartData} 
           type="BAR" 
           config={{ dataKeys: [{ key: 'epsDiluted', color: '#8b5cf6', type: 'bar' }] }} 
@@ -187,7 +187,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.freeCashFlow', { fallback: 'Free Cash Flow' })} 
+          title={t('charts.freeCashFlow')} 
           data={chartData} 
           type="COMPOSED" 
           config={{ 
@@ -201,7 +201,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.netIncome', { fallback: 'Net Income' })} 
+          title={t('charts.netIncome')} 
           data={chartData} 
           type="BAR" 
           config={{ isCurrency: true, dataKeys: [{ key: 'netIncome', color: '#14b8a6', type: 'bar' }] }} 
@@ -209,7 +209,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.ebitda', { fallback: 'EBITDA' })} 
+          title={t('charts.ebitda')} 
           data={chartData} 
           type="BAR" 
           config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: '#f59e0b', type: 'bar' }] }} 
@@ -217,7 +217,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.expenses', { fallback: 'Expenses' })} 
+          title={t('charts.expenses')} 
           data={chartData} 
           type="STACKED_BAR" 
           config={{ 
@@ -231,7 +231,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.cashDebt', { fallback: 'Cash & Debt' })} 
+          title={t('charts.cashDebt')} 
           data={chartData} 
           type="BAR" 
           config={{ 
@@ -244,7 +244,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.sharesOutstanding', { fallback: 'Shares Outstanding' })} 
+          title={t('charts.sharesOutstanding')} 
           data={chartData} 
           type="BAR" 
           config={{ dataKeys: [{ key: 'sharesOutstanding', color: '#6366f1', type: 'bar' }], inverseColors: true }} 
@@ -252,7 +252,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
         />
 
         <DecisionChart 
-          title={t('charts.dividends', { fallback: 'Dividends' })} 
+          title={t('charts.dividends')} 
           data={chartData} 
           type="BAR" 
           config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: '#ec4899', type: 'bar' }] }} 
@@ -270,15 +270,15 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
                   ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {t(`ratios.${tab.toLowerCase()}`, { fallback: tab })}
+                {t(`ratios.${tab.toLowerCase()}`)}
               </button>
             ))}
           </div>
           <div className="h-full w-full -m-4 p-4">
-            {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic', { fallback: 'ROIC' })} data={chartData} type="BAR" config={{ isPercentage: true, referenceLine: { y: 0.15, label: "15% Target", color: "#10b981" }, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }] }} />}
-            {ratioTab === "GROSS" && <DecisionChart title={t('charts.grossMargin', { fallback: 'Gross Margin' })} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
-            {ratioTab === "OPERATING" && <DecisionChart title={t('charts.operatingMargin', { fallback: 'Operating Margin' })} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
-            {ratioTab === "PROFIT" && <DecisionChart title={t('charts.profitMargin', { fallback: 'Net Profit Margin' })} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
+            {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic')} data={chartData} type="BAR" config={{ isPercentage: true, referenceLine: { y: 0.15, label: "15% Target", color: "#10b981" }, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }] }} />}
+            {ratioTab === "GROSS" && <DecisionChart title={t('charts.grossMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
+            {ratioTab === "OPERATING" && <DecisionChart title={t('charts.operatingMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
+            {ratioTab === "PROFIT" && <DecisionChart title={t('charts.profitMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
           </div>
         </div>
 
