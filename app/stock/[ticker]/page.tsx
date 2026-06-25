@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
 import { StockPriceChart } from '@/components/stock/StockPriceChart'
+import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 
 export default async function StockPage({
   params,
@@ -55,10 +56,8 @@ export default async function StockPage({
       {/* 3. Price History Chart */}
       <StockPriceChart ticker={company.ticker} />
 
-      {/* Placeholders for future phases */}
-      <div className="pt-8 opacity-40 border-t border-border border-dashed">
-        <p className="text-sm font-medium text-center">Gráfico Histórico & Motor de Decisão (em breve na S4/S5) 🚧</p>
-      </div>
+      {/* 4. Financials & Decision Engine */}
+      <FinancialsEngine ticker={company.ticker} />
     </div>
   )
 }
