@@ -37,23 +37,16 @@ export async function POST(request: Request) {
       }
     })
 
-    // Check if already in portfolio
-    const existingItem = await prisma.portfolioItem.findUnique({
+    // Add to portfolio using upsert to prevent race conditions (double-click)
+    const item = await prisma.portfolioItem.upsert({
       where: {
         portfolioId_companyId: {
           portfolioId: portfolio.id,
           companyId: company.id
         }
-      }
-    })
-
-    if (existingItem) {
-      return NextResponse.json({ error: "Company already in portfolio" }, { status: 400 })
-    }
-
-    // Add to portfolio
-    const item = await prisma.portfolioItem.create({
-      data: {
+      },
+      update: {},
+      create: {
         portfolioId: portfolio.id,
         companyId: company.id
       }

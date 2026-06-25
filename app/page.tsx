@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { TrendingUp, TrendingDown, Clock, Search, Briefcase, Loader2, ArrowRight } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
@@ -27,6 +27,7 @@ type PriceData = {
 
 export default function Home() {
   const t = useTranslations("portfolio") 
+  const locale = useLocale()
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
   const [isLoading, setIsLoading] = useState(true)
@@ -281,7 +282,7 @@ export default function Home() {
       {lastUpdate && items.length > 0 && (
         <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground mt-4 font-medium">
           <Clock className="w-3.5 h-3.5" />
-          <span>{t('lastUpdate')} {lastUpdate.toLocaleTimeString('pt-PT')}</span>
+          <span>{t('lastUpdate')} {lastUpdate.toLocaleTimeString(locale)}</span>
           {isPricesLoading && <Loader2 className="w-3 h-3 animate-spin ml-2" />}
         </div>
       )}

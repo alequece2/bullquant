@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { TrendingUp, TrendingDown, Clock, Check, Plus } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 
 type CompanyProp = {
   ticker: string;
@@ -19,6 +19,7 @@ type PriceData = {
 
 export function StockHeader({ company }: { company: CompanyProp }) {
   const t = useTranslations("stock")
+  const locale = useLocale()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
@@ -173,7 +174,7 @@ export function StockHeader({ company }: { company: CompanyProp }) {
             {lastUpdate && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-3 font-medium">
                 <Clock className="w-3 h-3" />
-                <span>{t('updatedAt')} {lastUpdate.toLocaleTimeString('pt-PT')}</span>
+                <span>{t('updatedAt')} {lastUpdate.toLocaleTimeString(locale)}</span>
               </div>
             )}
           </>
