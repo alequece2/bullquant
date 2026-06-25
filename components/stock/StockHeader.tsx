@@ -66,10 +66,6 @@ export function StockHeader({ company }: { company: CompanyProp }) {
             <span className="bg-muted px-2 py-0.5 rounded-md border border-border/60">{company.ticker}</span>
             <span>·</span>
             <span>{company.exchange}</span>
-            <span>·</span>
-            <button className="text-primary hover:underline hover:text-primary/80 transition-colors">
-              + Adicionar ao Portfólio
-            </button>
           </div>
         </div>
       </div>
