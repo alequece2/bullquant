@@ -132,6 +132,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
   // Flatten segments into main object for Recharts
   const chartData = processedData.map(d => ({
     ...d,
+    profitMargin: d.profitMargin !== undefined ? d.profitMargin : d.netMargin,
     ...d.revenueSegments,
     capexInv: d.capex ? -d.capex : 0 // Negative capex for composed chart
   }))
