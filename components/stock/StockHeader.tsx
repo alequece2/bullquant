@@ -48,11 +48,10 @@ export function StockHeader({ company }: { company: CompanyProp }) {
 
   const fetchPortfolioState = async () => {
     try {
-      const res = await fetch('/api/portfolio')
+      const res = await fetch(`/api/portfolio/check?ticker=${company.ticker}`)
       if (res.ok) {
         const data = await res.json()
-        const exists = data.items?.some((item: any) => item.company.ticker === company.ticker)
-        setIsFollowing(!!exists)
+        setIsFollowing(data.isFollowing)
       } else if (res.status === 401) {
         // User not logged in
         setIsFollowing(null)
@@ -131,16 +130,16 @@ export function StockHeader({ company }: { company: CompanyProp }) {
                 }`}
               >
                 {isUpdatingFollow ? (
-                  <span className="animate-pulse">A atualizar...</span>
+                  <span className="animate-pulse">{t('header.updating')}</span>
                 ) : isFollowing ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    Seguido
+                    {t('header.followed')}
                   </>
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5" />
-                    Adicionar ao Portfólio
+                    {t('header.addToPortfolio')}
                   </>
                 )}
               </button>

@@ -27,19 +27,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
-    // Find or create portfolio
-    let portfolio = await prisma.portfolio.findUnique({
-      where: { userId: user.id }
+    // Find or create portfolio using upsert to prevent race conditions
+    const portfolio = await prisma.portfolio.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        name: "O Meu Portfólio",
+      }
     })
-
-    if (!portfolio) {
-      portfolio = await prisma.portfolio.create({
-        data: {
-          userId: user.id,
-          name: "O Meu Portfólio",
-        }
-      })
-    }
 
     // Check if already in portfolio
     const existingItem = await prisma.portfolioItem.findUnique({

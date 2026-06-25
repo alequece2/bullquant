@@ -63,12 +63,44 @@
     "premiumSoonTitle": "🚀 Funcionalidades Premium em breve!",
     "premiumSoonDesc": "Alertas de preço, screener avançado e relatórios em PDF estão a ser desenvolvidos."
   },
+  "portfolio": {
+    "loginRequired": "Precisas de iniciar sessão para aceder à tua Watchlist.",
+    "loginButton": "Iniciar Sessão",
+    "title": "O Meu Portfólio",
+    "subtitle": "Acompanha as tuas empresas favoritas em tempo real.",
+    "positions": "Posições",
+    "upToday": "Em Alta",
+    "emptyState": {
+      "title": "A tua Watchlist está vazia",
+      "description": "Começa a adicionar empresas para acompanhar o seu desempenho em tempo real, ou explora algumas das opções populares abaixo.",
+      "quickAdd": "Adicionar",
+      "adding": "A adicionar..."
+    },
+    "suggestions": {
+      "title": "Sugestões para adicionares"
+    },
+    "landing": {
+      "title": "BullQuant Alpha",
+      "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
+      "testExample": "Testar Exemplo",
+      "createAccount": "Criar Conta Grátis"
+    },
+    "card": {
+      "currentPrice": "Preço Atual"
+    },
+    "lastUpdate": "Última atualização:"
+  },
   "stock": {
     "underConstruction": "Em construção",
     "buildingMessage": "A página da empresa vai nascer aqui.",
     "backHome": "Voltar ao Início",
     "updatedAt": "Atualizado às",
     "priceUnavailable": "Preço indisponível",
+    "header": {
+      "followed": "Seguido",
+      "addToPortfolio": "Adicionar ao Portfólio",
+      "updating": "A atualizar..."
+    },
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Histórico de Preços",

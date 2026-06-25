@@ -11,9 +11,14 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get the user's portfolio and items
-    const portfolio = await prisma.portfolio.findUnique({
+    // Find or create the user's portfolio with upsert to prevent race conditions
+    const portfolio = await prisma.portfolio.upsert({
       where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        name: "O Meu Portfólio",
+      },
       include: {
         items: {
           include: {
@@ -33,22 +38,6 @@ export async function GET() {
         }
       }
     })
-
-    if (!portfolio) {
-      // If portfolio doesn't exist, create it (fallback if trigger failed)
-      const newPortfolio = await prisma.portfolio.create({
-        data: {
-          userId: user.id,
-          name: "O Meu Portfólio",
-        },
-        include: {
-          items: {
-            include: { company: true }
-          }
-        }
-      })
-      return NextResponse.json(newPortfolio)
-    }
 
     return NextResponse.json(portfolio)
   } catch (error) {

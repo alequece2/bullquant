@@ -26,7 +26,7 @@ type PriceData = {
 }
 
 export default function Home() {
-  const t = useTranslations("stock") 
+  const t = useTranslations("portfolio") 
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
   const [isLoading, setIsLoading] = useState(true)
@@ -118,17 +118,17 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center flex-1 py-20 px-4 text-center mt-12">
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl mb-6">
-          BullQuant Alpha
+          {t('landing.title')}
         </h1>
         <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8 mb-8">
-          Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.
+          {t('landing.description')}
         </p>
         <div className="flex gap-4">
           <Link href="/stock/AAPL" className={buttonVariants({ size: "lg", variant: "outline" })}>
-            Testar Exemplo AAPL <ArrowRight className="ml-2 h-4 w-4" />
+            {t('landing.testExample')} <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
           <Link href="/register" className={buttonVariants({ size: "lg" })}>
-            Criar Conta Grátis
+            {t('landing.createAccount')}
           </Link>
         </div>
       </div>
@@ -145,20 +145,20 @@ export default function Home() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-primary" />
-            O Meu Portfólio
+            {t('title')}
           </h1>
-          <p className="text-muted-foreground mt-1">Acompanha as tuas empresas favoritas em tempo real.</p>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
         
         {items.length > 0 && (
           <div className="flex items-center gap-6 bg-card border border-border p-3 px-5 rounded-2xl shadow-sm">
             <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Posições</span>
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t('positions')}</span>
               <span className="text-xl font-bold">{items.length}</span>
             </div>
             <div className="w-px h-8 bg-border"></div>
             <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Em Alta</span>
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t('upToday')}</span>
               <span className="text-xl font-bold text-emerald-500 flex items-center gap-1">
                 <TrendingUp className="w-4 h-4" /> {upToday}
               </span>
@@ -172,9 +172,9 @@ export default function Home() {
           <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="w-8 h-8 text-primary" />
           </div>
-          <h3 className="text-xl font-bold mb-2">A tua Watchlist está vazia</h3>
+          <h3 className="text-xl font-bold mb-2">{t('emptyState.title')}</h3>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Começa a adicionar empresas para acompanhar o seu desempenho em tempo real, ou explora algumas das opções populares abaixo.
+            {t('emptyState.description')}
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
@@ -188,9 +188,9 @@ export default function Home() {
                 <span className="font-extrabold text-lg group-hover:text-primary transition-colors">{ticker}</span>
                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1 mt-1">
                   {addingTicker === ticker ? (
-                    <><Loader2 className="w-3 h-3 animate-spin" /> A adicionar...</>
+                    <><Loader2 className="w-3 h-3 animate-spin" /> {t('emptyState.adding')}</>
                   ) : (
-                    <>Adicionar <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" /></>
+                    <>{t('emptyState.quickAdd')} <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" /></>
                   )}
                 </span>
               </button>
@@ -224,7 +224,7 @@ export default function Home() {
                   
                   <div className="mt-auto pt-4 border-t border-border/40 flex items-end justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground font-medium mb-1">Preço Atual</p>
+                      <p className="text-sm text-muted-foreground font-medium mb-1">{t('card.currentPrice')}</p>
                       {price ? (
                         <div className="flex items-baseline gap-1">
                           <span className="text-2xl font-extrabold">${price.currentPrice.toFixed(2)}</span>
@@ -254,7 +254,7 @@ export default function Home() {
       {items.length > 0 && items.length < 4 && suggestedTickers.length > 0 && (
         <div className="mt-12 pt-8 border-t border-border/40">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            Sugestões para adicionares
+            {t('suggestions.title')}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
             {suggestedTickers.map(ticker => (
@@ -267,9 +267,9 @@ export default function Home() {
                 <span className="font-extrabold text-lg group-hover:text-primary transition-colors">{ticker}</span>
                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1 mt-1">
                   {addingTicker === ticker ? (
-                    <><Loader2 className="w-3 h-3 animate-spin" /> A adicionar...</>
+                    <><Loader2 className="w-3 h-3 animate-spin" /> {t('emptyState.adding')}</>
                   ) : (
-                    <>Adicionar <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" /></>
+                    <>{t('emptyState.quickAdd')} <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" /></>
                   )}
                 </span>
               </button>
@@ -281,7 +281,7 @@ export default function Home() {
       {lastUpdate && items.length > 0 && (
         <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground mt-4 font-medium">
           <Clock className="w-3.5 h-3.5" />
-          <span>Última atualização: {lastUpdate.toLocaleTimeString('pt-PT')}</span>
+          <span>{t('lastUpdate')} {lastUpdate.toLocaleTimeString('pt-PT')}</span>
           {isPricesLoading && <Loader2 className="w-3 h-3 animate-spin ml-2" />}
         </div>
       )}
