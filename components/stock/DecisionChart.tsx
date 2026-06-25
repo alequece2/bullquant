@@ -93,8 +93,9 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
             />
             <Tooltip 
               formatter={(value: unknown, name: string | number | undefined) => [formatTooltipValue(value), String(name ?? '')]}
-              labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '8px' }}
-              contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+              labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '8px', fontSize: '13px' }}
+              contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', padding: '12px', whiteSpace: 'nowrap' }}
+              itemStyle={{ fontSize: '13px', padding: '2px 0', textTransform: 'capitalize' }}
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
