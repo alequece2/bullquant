@@ -41,6 +41,20 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set())
+  const [timeFilter, setTimeFilter] = useState<'ALL' | '10Y' | '5Y' | '3Y' | '1Y'>('ALL')
+
+  const displayData = useMemo(() => {
+    if (timeFilter === 'ALL' || data.length === 0) return data;
+    const isQuarterly = data[0]?.label?.includes('Q') || false;
+    let items = data.length;
+    switch(timeFilter) {
+      case '1Y': items = isQuarterly ? 4 : 1; break;
+      case '3Y': items = isQuarterly ? 12 : 3; break;
+      case '5Y': items = isQuarterly ? 20 : 5; break;
+      case '10Y': items = isQuarterly ? 40 : 10; break;
+    }
+    return data.slice(-items);
+  }, [data, timeFilter])
 
   const formatValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
@@ -139,14 +153,14 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
   }
 
   const renderChart = (height: number | `${number}%` = "100%") => {
-    if (data.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
+    if (displayData.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
 
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
 
     return (
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
         <ResponsiveContainer width="100%" height={height} className="outline-none focus:outline-none">
-          <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
+          <ChartComponent data={displayData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis 
               dataKey="label" 
@@ -181,11 +195,11 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               }
               return (
                 <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
-                  {data.map((entry, index) => {
+                  {displayData.map((entry, index) => {
                     let cellColor = k.color
                     if (config.inverseColors) {
                       if (index > 0) {
-                        const prev = Number(data[index - 1][k.key]) || 0
+                        const prev = Number(displayData[index - 1][k.key]) || 0
                         const curr = Number(entry[k.key]) || 0
                         if (curr < prev) cellColor = '#10b981'
                         else if (curr > prev) cellColor = '#f43f5e'
@@ -216,7 +230,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
           </tr>
         </thead>
         <tbody className="divide-y divide-border/40">
-          {data.map((row, i) => (
+          {displayData.map((row, i) => (
             <tr key={i} className="hover:bg-muted/30 transition-colors">
               <td className="px-4 py-2 font-medium whitespace-nowrap">{row.label}</td>
               {config.dataKeys.map(k => (
@@ -265,7 +279,20 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               <Maximize2 className="w-4 h-4" />
             </DialogTrigger>
             <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
-              <DialogTitle className="text-xl">{title}</DialogTitle>
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl">{title}</DialogTitle>
+                <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40 mr-6">
+                  {['ALL', '10Y', '5Y', '3Y', '1Y'].map(tf => (
+                    <button
+                      key={tf}
+                      onClick={() => setTimeFilter(tf as any)}
+                      className={`px-3 py-1 text-xs rounded-sm transition-colors font-medium ${timeFilter === tf ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="flex-1 mt-4 min-h-0">
                 {viewMode === 'chart' ? renderChart("100%") : renderTable()}
               </div>
