@@ -131,6 +131,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               tickFormatter={formatValue}
               tick={{ fill: '#a1a1aa', fontSize: 11 }}
               width={55}
+              domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
             />
             <Tooltip 
               content={<CustomTooltip />}
