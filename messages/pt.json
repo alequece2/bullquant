@@ -66,6 +66,13 @@
   "stock": {
     "underConstruction": "Em construção",
     "buildingMessage": "A página da empresa vai nascer aqui.",
-    "backHome": "Voltar à Início"
+    "backHome": "Voltar ao Início",
+    "snapshot": {
+      "valuation": "Valuation",
+      "cashFlow": "Cash Flow",
+      "margins": "Margens & Crescimento",
+      "balance": "Balanço (Liquidez)",
+      "dividend": "Dividendos"
+    }
   }
 }

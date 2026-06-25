@@ -1,0 +1,108 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { TrendingUp, TrendingDown, Clock } from "lucide-react"
+
+type CompanyProp = {
+  ticker: string;
+  name: string;
+  exchange: string;
+  logoUrl: string | null;
+}
+
+type PriceData = {
+  currentPrice: number;
+  change: number;
+  changePercent: number;
+}
+
+export function StockHeader({ company }: { company: CompanyProp }) {
+  const [priceData, setPriceData] = useState<PriceData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+
+  const fetchPrice = async () => {
+    try {
+      const res = await fetch(`/api/price/${company.ticker}`)
+      if (res.ok) {
+        const data = await res.json()
+        setPriceData({
+          currentPrice: data.currentPrice,
+          change: data.change,
+          changePercent: data.changePercent,
+        })
+        setLastUpdate(new Date())
+      }
+    } catch (error) {
+      console.error("Failed to fetch price:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Initial fetch & Polling every 60 seconds
+  useEffect(() => {
+    fetchPrice()
+    const interval = setInterval(fetchPrice, 60000)
+    return () => clearInterval(interval)
+  }, [company.ticker])
+
+  const isPositive = priceData ? priceData.change >= 0 : true
+
+  return (
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
+      {/* Left side: Company Info */}
+      <div className="flex items-center gap-4">
+        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16">
+          {company.logoUrl ? (
+            <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
+          ) : (
+            <span className="font-extrabold text-2xl text-primary">{company.ticker[0]}</span>
+          )}
+        </div>
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight">{company.name}</h1>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mt-1">
+            <span className="bg-muted px-2 py-0.5 rounded-md border border-border/60">{company.ticker}</span>
+            <span>·</span>
+            <span>{company.exchange}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side: Real-time Price */}
+      <div className="flex flex-col md:items-end bg-card p-4 rounded-xl border border-border shadow-sm min-w-[200px]">
+        {isLoading ? (
+          <div className="animate-pulse flex flex-col items-end gap-2 w-full">
+            <div className="h-8 bg-muted rounded w-32"></div>
+            <div className="h-4 bg-muted rounded w-24"></div>
+          </div>
+        ) : priceData ? (
+          <>
+            <div className="flex items-end gap-3">
+              <span className="text-4xl font-extrabold tracking-tighter">
+                ${priceData.currentPrice.toFixed(2)}
+              </span>
+              <span className="text-sm text-muted-foreground mb-1.5 font-medium">USD</span>
+            </div>
+            
+            <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+              {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+              <span>{isPositive ? '+' : ''}{priceData.change.toFixed(2)}</span>
+              <span>({isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%)</span>
+            </div>
+            
+            {lastUpdate && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-3 font-medium">
+                <Clock className="w-3 h-3" />
+                <span>Atualizado às {lastUpdate.toLocaleTimeString('pt-PT')}</span>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-sm text-muted-foreground">Preço indisponível</div>
+        )}
+      </div>
+    </div>
+  )
+}

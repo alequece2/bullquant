@@ -66,6 +66,13 @@
   "stock": {
     "underConstruction": "Under construction",
     "buildingMessage": "The stock page will be built here.",
-    "backHome": "Back Home"
+    "backHome": "Back Home",
+    "snapshot": {
+      "valuation": "Valuation",
+      "cashFlow": "Cash Flow",
+      "margins": "Margins & Growth",
+      "balance": "Balance Sheet",
+      "dividend": "Dividend"
+    }
   }
 }
