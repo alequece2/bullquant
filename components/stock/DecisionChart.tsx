@@ -40,6 +40,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set())
 
   const formatValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
@@ -101,6 +102,35 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     return null
   }
 
+  const renderCustomLegend = () => {
+    return (
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-5 pb-1 select-none">
+        {config.dataKeys.map((k) => {
+          const isHidden = hiddenKeys.has(k.key)
+          return (
+            <button
+              key={k.key}
+              onClick={() => {
+                setHiddenKeys(prev => {
+                  const next = new Set(prev)
+                  if (next.has(k.key)) next.delete(k.key)
+                  else next.add(k.key)
+                  return next
+                })
+              }}
+              className={`flex items-center gap-2 text-[13px] transition-all duration-200 outline-none focus:outline-none ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
+            >
+              <div className="w-3 h-3 rounded-[2px] shrink-0" style={{ backgroundColor: k.color }} />
+              <span className={`font-medium text-foreground ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                {k.name || k.key}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   const getBarColor = (val: number, defaultColor: string) => {
     if (config.inverseColors) {
       return val < 0 ? '#10b981' : '#f43f5e'
@@ -138,18 +168,19 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
-              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+              <Legend content={renderCustomLegend} />
             )}
             {config.referenceLine && (
               <ReferenceLine y={config.referenceLine.y} stroke={config.referenceLine.color} strokeDasharray="3 3" label={{ position: 'top', value: config.referenceLine.label, fill: config.referenceLine.color, fontSize: 11 }} />
             )}
             
             {config.dataKeys.map((k, i) => {
+              const isHidden = hiddenKeys.has(k.key)
               if (k.type === 'line' || type === 'LINE') {
-                return <Line key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                return <Line hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
               }
               return (
-                <Bar key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
+                <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
                   {data.map((entry, index) => {
                     let cellColor = k.color
                     if (config.inverseColors) {
