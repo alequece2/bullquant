@@ -26,6 +26,30 @@ export type ChartConfig = {
   isCurrency?: boolean
   isPercentage?: boolean
   inverseColors?: boolean
+  isLargeNumber?: boolean
+}
+
+const TIME_FILTERS = ['ALL', '10Y', '5Y', '3Y', '1Y'] as const
+type TimeFilter = typeof TIME_FILTERS[number]
+
+const CustomTooltip = ({ active, payload, label, formatTooltipValue }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl p-3 text-white min-w-[140px] z-50">
+        <p className="font-bold mb-2 text-[13px] text-gray-200">{label}</p>
+        <div className="flex flex-col gap-1.5">
+          {payload.map((entry: any, index: number) => (
+            <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
+              <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
+              <span className="capitalize text-gray-300">{entry.name}:</span>
+              <span className="font-semibold ml-auto pl-4">{formatTooltipValue ? formatTooltipValue(entry.value) : entry.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  return null
 }
 
 interface DecisionChartProps {
@@ -41,7 +65,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set())
-  const [timeFilter, setTimeFilter] = useState<'ALL' | '10Y' | '5Y' | '3Y' | '1Y'>('ALL')
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('ALL')
 
   const displayData = useMemo(() => {
     if (timeFilter === 'ALL' || data.length === 0) return data;
@@ -61,7 +85,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
     
-    const isMillions = config.isCurrency || config.dataKeys.some(k => k.key === 'sharesOutstanding')
+    const isMillions = config.isCurrency || config.isLargeNumber
     const absVal = Math.abs(num)
     
     if (isMillions) {
@@ -79,7 +103,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
     
-    const isMillions = config.isCurrency || config.dataKeys.some(k => k.key === 'sharesOutstanding')
+    const isMillions = config.isCurrency || config.isLargeNumber
     const absVal = Math.abs(num)
     
     if (isMillions) {
@@ -96,25 +120,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     return num < 0 ? `-${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl p-3 text-white min-w-[140px] z-50">
-          <p className="font-bold mb-2 text-[13px] text-gray-200">{label}</p>
-          <div className="flex flex-col gap-1.5">
-            {payload.map((entry: any, index: number) => (
-              <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
-                <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
-                <span className="capitalize text-gray-300">{entry.name}:</span>
-                <span className="font-semibold ml-auto pl-4">{formatTooltipValue(entry.value)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
-    return null
-  }
+
 
   const renderCustomLegend = () => {
     return (
@@ -178,7 +184,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
             />
             <Tooltip 
-              content={<CustomTooltip />}
+              content={(props: any) => <CustomTooltip {...props} formatTooltipValue={formatTooltipValue} />}
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
@@ -282,10 +288,10 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-xl">{title}</DialogTitle>
                 <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40 mr-6">
-                  {['ALL', '10Y', '5Y', '3Y', '1Y'].map(tf => (
+                  {TIME_FILTERS.map(tf => (
                     <button
                       key={tf}
-                      onClick={() => setTimeFilter(tf as any)}
+                      onClick={() => setTimeFilter(tf)}
                       className={`px-3 py-1 text-xs rounded-sm transition-colors font-medium ${timeFilter === tf ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                       {tf}

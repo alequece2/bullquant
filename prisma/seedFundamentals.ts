@@ -44,7 +44,7 @@ async function main() {
       let annualCash = 0
       let annualDebt = 0
 
-      const annualSegments = company.ticker === 'AAPL' 
+      const annualSegments: Record<string, number> = company.ticker === 'AAPL' 
         ? { "iPhone": 0, "Mac": 0, "iPad": 0, "Wearables": 0, "Services": 0 }
         : { "Intelligent Cloud": 0, "Productivity & Business": 0, "More Personal Computing": 0 }
 
@@ -110,7 +110,6 @@ async function main() {
         annualDebt = totalDebt
 
         for (const [key, val] of Object.entries(revenueSegments)) {
-          // @ts-ignore
           annualSegments[key] += val
         }
 
