@@ -73,7 +73,9 @@
     "chart": {
       "title": "Price History",
       "tabs": {
+        "1d": "1D",
         "1m": "1M",
+        "3m": "3M",
         "6m": "6M",
         "1y": "1Y",
         "5y": "5Y",
@@ -83,9 +85,39 @@
     "snapshot": {
       "valuation": "Valuation",
       "cashFlow": "Cash Flow",
-      "margins": "Margins & Growth",
+      "marginAndGrowth": "Margins & Growth",
       "balance": "Balance Sheet",
-      "dividend": "Dividend"
+      "dividend": "Dividends"
+    }
+  },
+  "financials": {
+    "engineTitle": "Financials & Decision Engine",
+    "periods": {
+      "quarterly": "Quarterly",
+      "ttm": "TTM",
+      "annual": "Annual"
+    },
+    "charts": {
+      "revenue": "Revenue",
+      "revenueBySegment": "Revenue by Segment",
+      "epsDiluted": "EPS Diluted",
+      "freeCashFlow": "Free Cash Flow",
+      "netIncome": "Net Income",
+      "ebitda": "EBITDA",
+      "expenses": "Expenses",
+      "cashDebt": "Cash & Debt",
+      "sharesOutstanding": "Shares Outstanding",
+      "dividends": "Dividends (DPS)",
+      "roic": "Return on Capital (ROIC)",
+      "grossMargin": "Gross Margin",
+      "operatingMargin": "Operating Margin",
+      "profitMargin": "Profit Margin"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "GROSS",
+      "operating": "OPERAT.",
+      "profit": "PROFIT"
     }
   }
 }
