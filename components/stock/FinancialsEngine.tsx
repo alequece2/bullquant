@@ -248,7 +248,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
           title={t('charts.sharesOutstanding')} 
           data={chartData} 
           type="BAR" 
-          config={{ dataKeys: [{ key: 'sharesOutstanding', color: '#6366f1', type: 'bar' }], inverseColors: true }} 
+          config={{ dataKeys: [{ key: 'sharesOutstanding', color: '#6366f1', type: 'bar' }], inverseColors: true, isLargeNumber: true }} 
           cagr={calcCAGR('sharesOutstanding')}
         />
 
@@ -276,7 +276,7 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
             ))}
           </div>
           <div className="h-full w-full -m-4 p-4">
-            {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic')} data={chartData} type="BAR" config={{ isPercentage: true, referenceLine: { y: 0.15, label: "15% Target", color: "#10b981" }, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }] }} />}
+            {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic')} data={chartData} type="COMPOSED" config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }], referenceLine: { y: 0.15, color: '#10b981', label: '15%' } }} />}
             {ratioTab === "GROSS" && <DecisionChart title={t('charts.grossMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
             {ratioTab === "OPERATING" && <DecisionChart title={t('charts.operatingMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
             {ratioTab === "PROFIT" && <DecisionChart title={t('charts.profitMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
