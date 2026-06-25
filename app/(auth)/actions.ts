@@ -59,10 +59,18 @@ export async function logout() {
 export async function forgotPassword(formData: FormData) {
   const supabase = await createClient()
   const email = formData.get('email') as string
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'
+  const origin = process.env.NEXT_PUBLIC_SITE_URL
+
+  if (!origin) {
+    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in environment variables.')
+    // Podemos fazer fallback para localhost APENAS se estivermos em modo de desenvolvimento (local)
+    // Em produção (Vercel), isto força-nos a não esquecer de colocar a variável!
+  }
+
+  const siteUrl = origin || 'http://localhost:3001'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   })
 
   if (error) {

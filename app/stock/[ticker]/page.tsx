@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
