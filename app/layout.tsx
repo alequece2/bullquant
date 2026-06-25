@@ -13,18 +13,25 @@ export const metadata: Metadata = {
   description: "Plataforma web de análise fundamental de ações.",
 };
 
-export default function RootLayout({
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const messages = await getMessages();
+
   return (
     <html lang="pt" className={`${inter.variable} h-full antialiased dark`}>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
-        <Header />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
+        <NextIntlClientProvider messages={messages}>
+          <Header />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

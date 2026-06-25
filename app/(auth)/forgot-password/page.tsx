@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { forgotPassword } from '../actions'
 import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@/components/ui/input'
+import { getTranslations } from 'next-intl/server'
 
 export default async function ForgotPasswordPage({
   searchParams,
@@ -9,15 +10,16 @@ export default async function ForgotPasswordPage({
   searchParams: Promise<{ message?: string; error?: string }>
 }) {
   const resolvedParams = await searchParams
+  const t = await getTranslations('forgotPassword')
 
   return (
     <div className="flex flex-1 flex-col justify-center px-6 py-20 lg:px-8 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-3xl font-extrabold tracking-tight text-foreground">
-          Recuperar Password
+          {t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Insere o teu email e enviar-te-emos um link.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -25,7 +27,7 @@ export default async function ForgotPasswordPage({
         <form className="space-y-6" action={forgotPassword}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground mb-2">
-              Email
+              {t('emailLabel')}
             </label>
             <div className="mt-2">
               <Input
@@ -33,7 +35,7 @@ export default async function ForgotPasswordPage({
                 name="email"
                 type="email"
                 required
-                placeholder="nome@email.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
           </div>
@@ -52,17 +54,17 @@ export default async function ForgotPasswordPage({
 
           <div>
             <SubmitButton 
-              label="Enviar Link" 
-              loadingLabel="A enviar..." 
+              label={t('submitButton')} 
+              loadingLabel={t('submitLoading')} 
               className="w-full text-md h-11 font-bold" 
             />
           </div>
         </form>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Lembraste-te da password?{' '}
+          {t('remembered')}{' '}
           <Link href="/login" className="font-semibold leading-6 text-primary hover:text-primary/80">
-            Voltar ao Login
+            {t('backToLogin')}
           </Link>
         </p>
       </div>

@@ -3,9 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { AuthError } from '@supabase/supabase-js'
 
 // Função auxiliar para traduzir erros do Supabase para Português
-function translateError(error: any): string {
+function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
   if (msg.includes('invalid login credentials')) return 'Email ou password incorretos.';
   if (msg.includes('user already registered')) return 'Este email já se encontra registado.';

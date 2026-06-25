@@ -1,0 +1,71 @@
+{
+  "login": {
+    "title": "Sign in to BullQuant",
+    "subtitle": "Access your portfolio and analytics.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "Password",
+    "forgotPasswordLink": "Forgot password?",
+    "submitButton": "Sign in",
+    "submitLoading": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Sign up for free"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Join thousands of investors on BullQuant.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "Password",
+    "submitButton": "Sign up",
+    "submitLoading": "Signing up...",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in"
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your email and we'll send you a link.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@email.com",
+    "submitButton": "Send Link",
+    "submitLoading": "Sending...",
+    "remembered": "Remembered your password?",
+    "backToLogin": "Back to Sign in"
+  },
+  "resetPassword": {
+    "title": "New Password",
+    "subtitle": "Choose your new password.",
+    "passwordLabel": "New Password",
+    "passwordPlaceholder": "******",
+    "submitButton": "Update Password",
+    "submitLoading": "Updating..."
+  },
+  "header": {
+    "settingsTitle": "Account Settings",
+    "logoutTitle": "Sign out",
+    "login": "Sign in",
+    "register": "Sign up"
+  },
+  "search": {
+    "placeholder": "Search ticker (e.g., AAPL)...",
+    "noResults": "No companies found.",
+    "recentTitle": "Recent Searches",
+    "clearAll": "Clear All"
+  },
+  "settings": {
+    "title": "My Account",
+    "subtitle": "Manage your personal data and settings.",
+    "planFree": "FREE Plan",
+    "subscriptionTitle": "Subscription Details",
+    "subscriptionDesc": "You are currently on the BullQuant free tier. This includes access to the search engine and basic fundamental snapshots.",
+    "premiumSoonTitle": "🚀 Premium features coming soon!",
+    "premiumSoonDesc": "Price alerts, advanced screeners, and PDF reports are under development."
+  },
+  "stock": {
+    "underConstruction": "Under construction",
+    "buildingMessage": "The stock page will be built here.",
+    "backHome": "Back Home"
+  }
+}

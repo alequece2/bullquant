@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { login } from '../actions'
 import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@/components/ui/input'
+import { getTranslations } from 'next-intl/server'
 
 export default async function LoginPage({
   searchParams,
@@ -9,15 +10,16 @@ export default async function LoginPage({
   searchParams: Promise<{ message?: string; error?: string }>
 }) {
   const resolvedParams = await searchParams
+  const t = await getTranslations('login')
 
   return (
     <div className="flex flex-1 flex-col justify-center px-6 py-20 lg:px-8 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-3xl font-extrabold tracking-tight text-foreground">
-          Entrar no BullQuant
+          {t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Acede ao teu portfólio e análises.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -25,7 +27,7 @@ export default async function LoginPage({
         <form className="space-y-6" action={login}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground mb-2">
-              Email
+              {t('emailLabel')}
             </label>
             <div className="mt-2">
               <Input
@@ -33,7 +35,7 @@ export default async function LoginPage({
                 name="email"
                 type="email"
                 required
-                placeholder="nome@email.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
           </div>
@@ -41,9 +43,11 @@ export default async function LoginPage({
           <div>
             <div className="flex flex-col space-y-1.5">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium leading-6 text-foreground">Password</label>
+                <label htmlFor="password" className="text-sm font-medium leading-6 text-foreground">
+                  {t('passwordLabel')}
+                </label>
                 <Link href="/forgot-password" className="text-xs text-primary hover:underline font-medium">
-                  Esqueceste-te da password?
+                  {t('forgotPasswordLink')}
                 </Link>
               </div>
               <Input
@@ -70,17 +74,17 @@ export default async function LoginPage({
 
           <div>
             <SubmitButton 
-              label="Entrar" 
-              loadingLabel="A entrar..." 
+              label={t('submitButton')} 
+              loadingLabel={t('submitLoading')} 
               className="w-full text-md h-11 font-bold" 
             />
           </div>
         </form>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Não tens conta?{' '}
+          {t('noAccount')}{' '}
           <Link href="/register" className="font-semibold leading-6 text-primary hover:text-primary/80">
-            Regista-te grátis
+            {t('registerLink')}
           </Link>
         </p>
       </div>

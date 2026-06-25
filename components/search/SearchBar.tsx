@@ -1,19 +1,22 @@
 "use client"
 
 import * as React from "react"
-import { Search } from "lucide-react"
+import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useDebounce } from "@/hooks/useDebounce"
+import { useTranslations } from "next-intl"
 
 type SearchResult = {
   ticker: string;
   name: string;
   exchange: string;
+  logoUrl: string | null;
 };
 
 export function SearchBar() {
   const router = useRouter()
+  const t = useTranslations('search')
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
@@ -75,40 +78,52 @@ export function SearchBar() {
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
       <Input
         type="search"
-        placeholder="Pesquisar ticker (ex: AAPL)..."
+        placeholder={t('placeholder')}
         className="w-full rounded-full bg-white/5 border-white/10 pl-10 md:w-[300px] lg:w-[400px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:bg-white/10 transition-all backdrop-blur-md shadow-inner placeholder:text-muted-foreground/50 h-10"
         value={query}
         onChange={(e) => {
           setQuery(e.target.value)
-          if (e.target.value.length >= 2) setIsOpen(true)
+          if (!isOpen && e.target.value.length >= 2) setIsOpen(true)
         }}
-        onFocus={() => query.length >= 2 && setIsOpen(true)}
-        autoComplete="off"
+        onFocus={() => {
+          if (query.length >= 2) setIsOpen(true)
+        }}
       />
-      
-      {isOpen && (results.length > 0 || isLoading) && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden z-50">
-          {isLoading ? (
-            <div className="p-4 text-sm text-center text-muted-foreground">A pesquisar...</div>
-          ) : results.length > 0 ? (
-            <ul className="py-2">
-              {results.map((result) => (
-                <li key={result.ticker}>
-                  <button
-                    type="button"
-                    onClick={() => handleSelect(result.ticker)}
-                    className="w-full text-left px-4 py-2 hover:bg-white/5 flex items-center justify-between"
-                  >
-                    <div>
-                      <span className="font-bold text-foreground">{result.ticker}</span>
-                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">{result.name}</p>
+      {isLoading && (
+        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+      )}
+
+      {isOpen && results.length > 0 && (
+        <div className="absolute top-full mt-2 w-full bg-popover border border-border/50 rounded-xl shadow-lg overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 backdrop-blur-xl">
+          <ul className="max-h-[300px] overflow-y-auto py-2">
+            {results.map((company) => (
+              <li key={company.ticker}>
+                <button
+                  type="button"
+                  onClick={() => handleSelect(company.ticker)}
+                  className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between group/item"
+                >
+                  <div>
+                    <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
+                      {company.ticker}
                     </div>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-white/5 text-muted-foreground uppercase">{result.exchange}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+                    <div className="text-sm text-muted-foreground line-clamp-1">
+                      {company.name}
+                    </div>
+                  </div>
+                  <div className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                    {company.exchange}
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
+      {isOpen && query.length >= 2 && !isLoading && results.length === 0 && (
+        <div className="absolute top-full mt-2 w-full bg-popover border border-border/50 rounded-xl shadow-lg p-6 text-center z-50 backdrop-blur-xl">
+          <p className="text-muted-foreground text-sm">{t('noResults')}</p>
         </div>
       )}
     </form>
