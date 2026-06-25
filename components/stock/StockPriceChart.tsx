@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import {
   AreaChart,
   Area,
@@ -21,6 +21,7 @@ type TabType = "1m" | "6m" | "1y" | "5y" | "max"
 
 export function StockPriceChart({ ticker }: { ticker: string }) {
   const t = useTranslations("stock.chart")
+  const locale = useLocale()
   const [allData, setAllData] = useState<PricePoint[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>("1y")
@@ -70,12 +71,12 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr)
-    return new Intl.DateTimeFormat('pt-PT', { month: 'short', year: '2-digit' }).format(d)
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: '2-digit' }).format(d)
   }
 
   const formatTooltipDate = (dateStr: string) => {
     const d = new Date(dateStr)
-    return new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' }).format(d)
+    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short', year: 'numeric' }).format(d)
   }
 
   if (isLoading) {
