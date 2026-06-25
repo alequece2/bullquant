@@ -7,6 +7,7 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
+  -- 1. Inserir na tabela de utilizadores
   insert into public.users (id, email, name, plan, "updatedAt")
   values (
     new.id,
@@ -15,6 +16,16 @@ begin
     'FREE',
     now()
   );
+
+  -- 2. Inserir portfólio vazio associado ao novo utilizador
+  insert into public.portfolios (id, "userId", name, "updatedAt")
+  values (
+    gen_random_uuid()::text,
+    new.id,
+    'O Meu Portfólio',
+    now()
+  );
+
   return new;
 end;
 $$;

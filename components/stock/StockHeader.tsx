@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { TrendingUp, TrendingDown, Clock } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Check, Plus } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 type CompanyProp = {
@@ -22,6 +22,10 @@ export function StockHeader({ company }: { company: CompanyProp }) {
   const [priceData, setPriceData] = useState<PriceData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  
+  // Portfolio state
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null)
+  const [isUpdatingFollow, setIsUpdatingFollow] = useState(false)
 
   const fetchPrice = async () => {
     try {
@@ -42,12 +46,56 @@ export function StockHeader({ company }: { company: CompanyProp }) {
     }
   }
 
+  const fetchPortfolioState = async () => {
+    try {
+      const res = await fetch('/api/portfolio')
+      if (res.ok) {
+        const data = await res.json()
+        const exists = data.items?.some((item: any) => item.company.ticker === company.ticker)
+        setIsFollowing(!!exists)
+      } else if (res.status === 401) {
+        // User not logged in
+        setIsFollowing(null)
+      }
+    } catch (err) {
+      console.error("Failed to fetch portfolio state", err)
+    }
+  }
+
   // Initial fetch & Polling every 60 seconds
   useEffect(() => {
     fetchPrice()
+    fetchPortfolioState()
     const interval = setInterval(fetchPrice, 60000)
     return () => clearInterval(interval)
   }, [company.ticker])
+
+  const toggleFollow = async () => {
+    if (isFollowing === null) return // Not logged in (would ideally redirect to login)
+    
+    setIsUpdatingFollow(true)
+    try {
+      if (isFollowing) {
+        const res = await fetch('/api/portfolio/remove', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticker: company.ticker })
+        })
+        if (res.ok) setIsFollowing(false)
+      } else {
+        const res = await fetch('/api/portfolio/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticker: company.ticker })
+        })
+        if (res.ok) setIsFollowing(true)
+      }
+    } catch (err) {
+      console.error("Failed to toggle follow state", err)
+    } finally {
+      setIsUpdatingFollow(false)
+    }
+  }
 
   const isPositive = priceData ? priceData.change >= 0 : true
 
@@ -64,10 +112,39 @@ export function StockHeader({ company }: { company: CompanyProp }) {
         </div>
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">{company.name}</h1>
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mt-1">
-            <span className="bg-muted px-2 py-0.5 rounded-md border border-border/60">{company.ticker}</span>
-            <span>·</span>
-            <span>{company.exchange}</span>
+          <div className="flex items-center gap-4 mt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <span className="bg-muted px-2 py-0.5 rounded-md border border-border/60">{company.ticker}</span>
+              <span>·</span>
+              <span>{company.exchange}</span>
+            </div>
+            
+            {/* Follow Button */}
+            {isFollowing !== null && (
+              <button
+                onClick={toggleFollow}
+                disabled={isUpdatingFollow}
+                className={`px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
+                  isFollowing 
+                    ? 'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20' 
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md'
+                }`}
+              >
+                {isUpdatingFollow ? (
+                  <span className="animate-pulse">A atualizar...</span>
+                ) : isFollowing ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Seguido
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar ao Portfólio
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
