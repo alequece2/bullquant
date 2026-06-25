@@ -70,6 +70,16 @@
     "updatedAt": "Atualizado às",
     "priceUnavailable": "Preço indisponível",
     "snapshotTitle": "Snapshot",
+    "chart": {
+      "title": "Histórico de Preços",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1A",
+        "5y": "5A",
+        "max": "MÁX"
+      }
+    },
     "snapshot": {
       "valuation": "Valuation",
       "cashFlow": "Cash Flow",
