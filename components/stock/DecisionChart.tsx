@@ -114,8 +114,8 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
 
     return (
-      <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none" tabIndex={-1}>
-        <ResponsiveContainer width="100%" height={height}>
+      <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
+        <ResponsiveContainer width="100%" height={height} className="outline-none focus:outline-none">
           <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis 
@@ -233,7 +233,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
             >
               <Maximize2 className="w-4 h-4" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none">
+            <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
               <DialogTitle className="text-xl">{title}</DialogTitle>
               <div className="flex-1 mt-4 min-h-0">
                 {viewMode === 'chart' ? renderChart("100%") : renderTable()}
