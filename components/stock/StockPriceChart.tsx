@@ -54,7 +54,8 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
     if (activeTab === "1y") monthsToSubtract = 12
     if (activeTab === "5y") monthsToSubtract = 60
 
-    const cutoffDate = new Date(now.setMonth(now.getMonth() - monthsToSubtract))
+    const cutoffDate = new Date(now)
+    cutoffDate.setMonth(cutoffDate.getMonth() - monthsToSubtract)
     
     return allData.filter(p => new Date(p.date) >= cutoffDate)
   }, [allData, activeTab])
@@ -96,7 +97,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
           <h2 className="text-lg font-bold text-foreground">{t('title')}</h2>
           <div className="flex items-center gap-2 mt-1">
             <span className={`text-2xl font-extrabold tracking-tight ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
-              {isPositive ? '+' : ''}{changeValue.toFixed(2)}
+              {isPositive ? '+' : '-'}${Math.abs(changeValue).toFixed(2)}
             </span>
             <span className={`flex items-center text-sm font-bold px-2 py-0.5 rounded-full ${isPositive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
               {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}

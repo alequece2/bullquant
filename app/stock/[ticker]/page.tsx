@@ -46,14 +46,14 @@ export default async function StockPage({
         logoUrl: company.logoUrl
       }} />
 
-      {/* 2. Price History Chart */}
-      <StockPriceChart ticker={company.ticker} />
-
-      {/* 3. Fundamentals Snapshot */}
+      {/* 2. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
         <StockSnapshot fundamental={latestFundamental} />
       </div>
+
+      {/* 3. Price History Chart */}
+      <StockPriceChart ticker={company.ticker} />
 
       {/* Placeholders for future phases */}
       <div className="pt-8 opacity-40 border-t border-border border-dashed">
