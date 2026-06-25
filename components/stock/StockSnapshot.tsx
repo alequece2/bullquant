@@ -76,7 +76,7 @@ export async function StockSnapshot({ fundamental }: StockSnapshotProps) {
 
       {/* 3. Margins & Growth */}
       <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
-        <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t('margins')}</h3>
+        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('marginAndGrowth')}</h3>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Gross Margin</span>
           <span className="font-bold">{formatVal(fundamental?.grossMargin, true)}</span>

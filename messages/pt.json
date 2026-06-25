@@ -72,6 +72,11 @@
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Histórico de Preços",
+      "noData": "Sem dados",
+      "period": "Período",
+      "chartView": "Vista de Gráfico",
+      "tableView": "Vista de Tabela",
+      "fullScreen": "Ecrã Inteiro",
       "tabs": {
         "1m": "1M",
         "6m": "6M",
@@ -83,9 +88,39 @@
     "snapshot": {
       "valuation": "Valuation",
       "cashFlow": "Cash Flow",
-      "margins": "Margens & Crescimento",
-      "balance": "Balanço (Liquidez)",
+      "marginAndGrowth": "Margens & Crescimento",
+      "balance": "Balanço",
       "dividend": "Dividendos"
+    }
+  },
+  "financials": {
+    "engineTitle": "Motor de Decisão & Financeiras",
+    "periods": {
+      "quarterly": "Trimestral",
+      "ttm": "TTM",
+      "annual": "Anual"
+    },
+    "charts": {
+      "revenue": "Receitas (Revenue)",
+      "revenueBySegment": "Receitas por Segmento",
+      "epsDiluted": "Lucro por Ação (EPS)",
+      "freeCashFlow": "Free Cash Flow",
+      "netIncome": "Lucro Líquido",
+      "ebitda": "EBITDA",
+      "expenses": "Despesas (Expenses)",
+      "cashDebt": "Caixa & Dívida",
+      "sharesOutstanding": "Ações em Circulação",
+      "dividends": "Dividendos (DPS)",
+      "roic": "Retorno s/ Capital (ROIC)",
+      "grossMargin": "Margem Bruta",
+      "operatingMargin": "Margem Operacional",
+      "profitMargin": "Margem Líquida"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "BRUTA",
+      "operating": "OPERAC.",
+      "profit": "LÍQUIDA"
     }
   }
 }
