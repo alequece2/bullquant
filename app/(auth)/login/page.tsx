@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { login } from '../actions'
-import { Button } from '@/components/ui/button'
+import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@/components/ui/input'
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message: string }>
+  searchParams: Promise<{ message?: string; error?: string }>
 }) {
   const resolvedParams = await searchParams
 
@@ -39,20 +39,28 @@ export default async function LoginPage({
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-foreground">
-                Password
-              </label>
-            </div>
-            <div className="mt-2">
+            <div className="flex flex-col space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium leading-6 text-foreground">Password</label>
+                <Link href="/forgot-password" className="text-xs text-primary hover:underline font-medium">
+                  Esqueceste-te da password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 required
+                minLength={6}
               />
             </div>
           </div>
+
+          {resolvedParams.error && (
+            <div className="text-sm text-center text-destructive p-3 bg-destructive/10 rounded-md font-medium">
+              {resolvedParams.error}
+            </div>
+          )}
 
           {resolvedParams.message && (
             <div className="text-sm text-center text-emerald-400 p-3 bg-emerald-400/10 rounded-md font-medium">
@@ -61,9 +69,11 @@ export default async function LoginPage({
           )}
 
           <div>
-            <Button type="submit" className="w-full text-md h-11 font-bold">
-              Entrar
-            </Button>
+            <SubmitButton 
+              label="Entrar" 
+              loadingLabel="A entrar..." 
+              className="w-full text-md h-11 font-bold" 
+            />
           </div>
         </form>
 

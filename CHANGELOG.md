@@ -11,6 +11,17 @@
   - Páginas de interface exclusivas para criar conta (`/register`) e entrar (`/login`).
   - Middleware global (`middleware.ts`) que gere a persistência e segurança da sessão em todas as rotas.
   - Sincronização automática entre as contas Supabase Auth (`auth.users`) e a tabela `users` do Prisma através de um Trigger SQL.
+- **Recuperação de Password:**
+  - Fluxo "Esqueci-me da password" (`/forgot-password` e `/reset-password`).
+  - Rota de callback segura (PKCE) em `/auth/callback`.
+- **UX e Validações Profissionais:**
+  - Middleware configurado para proteger rotas privadas (`/portfolio`, `/settings`) e redirecionar users logados das rotas de auth.
+  - Componente genérico `SubmitButton` para mostrar feedback de *Loading* (evita duplos-cliques e ansiedade no utilizador).
+  - Validação instantânea no frontend (HTML5 `minLength`) e Backend.
+  - Tradução dos erros nativos do Supabase para português amigável.
+- **Conta de Utilizador:**
+  - Criação da página `/settings` (O Meu Perfil).
+  - O Header agora cumprimenta o utilizador pelo seu nome próprio e possui um atalho visual e clicável (`UserCircle`) para a página da sua conta.
 - **Página de Acão (Base):** Rota `/stock/[ticker]` preparada funcionalmente (esqueleto) para ir buscar a empresa atual à BD e não dar erro 404, pronta para a construção do Dashboard (S3).
 
 ### Removido

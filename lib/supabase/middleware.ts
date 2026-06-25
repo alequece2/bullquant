@@ -27,7 +27,31 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const isAuthRoute = 
+    request.nextUrl.pathname.startsWith('/login') || 
+    request.nextUrl.pathname.startsWith('/register') ||
+    request.nextUrl.pathname.startsWith('/forgot-password') ||
+    request.nextUrl.pathname.startsWith('/reset-password')
+
+  const isPrivateRoute = 
+    request.nextUrl.pathname.startsWith('/portfolio') || 
+    request.nextUrl.pathname.startsWith('/settings')
+
+  // Redirecionar utilizadores autenticados para a página inicial se tentarem aceder a rotas de auth
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
+
+  // Redirecionar utilizadores não autenticados para o login se tentarem aceder a rotas privadas
+  if (!user && isPrivateRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SearchBar } from '@/components/search/SearchBar';
-import { LineChart, LogOut } from 'lucide-react';
+import { LineChart, LogOut, UserCircle } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
@@ -28,11 +28,18 @@ export async function Header() {
           <nav className="flex items-center space-x-2">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-muted-foreground hidden md:inline-block">
-                  {user.email}
-                </span>
+                <Link 
+                  href="/settings" 
+                  className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  title="Definições de Conta"
+                >
+                  <UserCircle className="h-5 w-5" />
+                  <span className="hidden md:inline-block">
+                    {user.user_metadata?.name || user.email?.split('@')[0]}
+                  </span>
+                </Link>
                 <form action={logout}>
-                  <Button variant="ghost" size="icon" title="Logout">
+                  <Button type="submit" variant="ghost" size="icon" title="Logout">
                     <LogOut className="h-5 w-5" />
                   </Button>
                 </form>
