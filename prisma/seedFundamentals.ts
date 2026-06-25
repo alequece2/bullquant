@@ -30,11 +30,23 @@ async function main() {
     for (const year of years) {
       // Annual accumulators
       let annualRevenue = 0
+      let annualCostOfRevenue = 0
+      let annualGrossProfit = 0
+      let annualRAndD = 0
+      let annualSga = 0
+      let annualOperatingExpenses = 0
+      let annualEbitda = 0
       let annualOperatingIncome = 0
       let annualNetIncome = 0
       let annualOcf = 0
       let annualCapex = 0
       let annualDividends = 0
+      let annualCash = 0
+      let annualDebt = 0
+
+      const annualSegments = company.ticker === 'AAPL' 
+        ? { "iPhone": 0, "Mac": 0, "iPad": 0, "Wearables": 0, "Services": 0 }
+        : { "Intelligent Cloud": 0, "Productivity & Business": 0, "More Personal Computing": 0 }
 
       for (const q of quarters) {
         // Grow by ~1.5% per quarter with some random noise
@@ -42,11 +54,15 @@ async function main() {
         baseRevenue *= growth
         baseShares *= 0.995 // 0.5% share buyback per quarter
 
-        const costOfRevenue = baseRevenue * 0.6
+        // Randomize margin ratios to create a jagged chart
+        const costRatio = 0.58 + (Math.random() * 0.04) // between 58% and 62%
+        const costOfRevenue = baseRevenue * costRatio
         const grossProfit = baseRevenue - costOfRevenue
         
-        const rAndD = baseRevenue * 0.05
-        const sga = baseRevenue * 0.07
+        const rAndDRatio = 0.045 + (Math.random() * 0.01)
+        const sgaRatio = 0.065 + (Math.random() * 0.01)
+        const rAndD = baseRevenue * rAndDRatio
+        const sga = baseRevenue * sgaRatio
         const operatingExpenses = rAndD + sga
         
         const ebitda = grossProfit - operatingExpenses + (baseRevenue * 0.02) // Fake D&A added back
@@ -79,11 +95,24 @@ async function main() {
 
         // Accumulate for annual
         annualRevenue += baseRevenue
+        annualCostOfRevenue += costOfRevenue
+        annualGrossProfit += grossProfit
+        annualRAndD += rAndD
+        annualSga += sga
+        annualOperatingExpenses += operatingExpenses
+        annualEbitda += ebitda
         annualOperatingIncome += operatingIncome
         annualNetIncome += netIncome
         annualOcf += operatingCashFlow
         annualCapex += capex
         annualDividends += dividendPerShare
+        annualCash = cash // Usually take end of year for balance sheet
+        annualDebt = totalDebt
+
+        for (const [key, val] of Object.entries(revenueSegments)) {
+          // @ts-ignore
+          annualSegments[key] += val
+        }
 
         const month = String(q * 3).padStart(2, '0')
         const qDate = new Date(`${year}-${month}-28T00:00:00Z`)
@@ -127,12 +156,12 @@ async function main() {
         fiscalQuarter: null,
         periodEnd: new Date(`${year}-12-31`),
         revenue: annualRevenue,
-        costOfRevenue: annualRevenue * 0.6,
-        grossProfit: annualRevenue * 0.4,
-        researchAndDevelopment: annualRevenue * 0.05,
-        sellingGeneralAndAdmin: annualRevenue * 0.07,
-        operatingExpenses: annualRevenue * 0.12,
-        ebitda: (annualRevenue * 0.4) - (annualRevenue * 0.12) + (annualRevenue * 0.02),
+        costOfRevenue: annualCostOfRevenue,
+        grossProfit: annualGrossProfit,
+        researchAndDevelopment: annualRAndD,
+        sellingGeneralAndAdmin: annualSga,
+        operatingExpenses: annualOperatingExpenses,
+        ebitda: annualEbitda,
         operatingIncome: annualOperatingIncome,
         netIncome: annualNetIncome,
         epsDiluted: annualNetIncome / baseShares,
@@ -140,24 +169,14 @@ async function main() {
         operatingCashFlow: annualOcf,
         capex: annualCapex,
         freeCashFlow: annualOcf - annualCapex,
-        cash: annualRevenue * 0.4,
-        totalDebt: annualRevenue * 0.2,
-        grossMargin: 0.4,
+        cash: annualCash,
+        totalDebt: annualDebt,
+        grossMargin: annualGrossProfit / annualRevenue,
         operatingMargin: annualOperatingIncome / annualRevenue,
         netMargin: annualNetIncome / annualRevenue,
-        roic: (annualOperatingIncome * 0.75) / (annualRevenue * 0.6),
+        roic: (annualOperatingIncome * 0.75) / (annualDebt + annualRevenue),
         dividendPerShare: annualDividends,
-        revenueSegments: company.ticker === 'AAPL' ? {
-          "iPhone": annualRevenue * 0.55,
-          "Mac": annualRevenue * 0.1,
-          "iPad": annualRevenue * 0.07,
-          "Wearables": annualRevenue * 0.1,
-          "Services": annualRevenue * 0.18
-        } : {
-          "Intelligent Cloud": annualRevenue * 0.4,
-          "Productivity & Business": annualRevenue * 0.3,
-          "More Personal Computing": annualRevenue * 0.3
-        }
+        revenueSegments: annualSegments
       })
     }
 
