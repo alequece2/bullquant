@@ -25,16 +25,15 @@ export async function GET(
       }
     })
 
-    if (!fundamentals || fundamentals.length === 0) {
+    if (fundamentals.length === 0) {
       return NextResponse.json({ error: "No fundamentals found" }, { status: 404 })
     }
 
-    // Convert Decimals to numbers for frontend processing
     const serialized = fundamentals.map(f => {
       const obj: Record<string, unknown> = {}
       for (const [key, val] of Object.entries(f)) {
-        if (val !== null && typeof val === 'object' && 'toNumber' in val && typeof (val as any).toNumber === 'function') {
-          obj[key] = (val as any).toNumber()
+        if (val !== null && typeof val === 'object' && 'toNumber' in val) {
+          obj[key] = (val as { toNumber(): number }).toNumber()
         } else {
           obj[key] = val
         }

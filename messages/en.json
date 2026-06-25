@@ -78,9 +78,7 @@
       "tableView": "Table View",
       "fullScreen": "Full Screen",
       "tabs": {
-        "1d": "1D",
         "1m": "1M",
-        "3m": "3M",
         "6m": "6M",
         "1y": "1Y",
         "5y": "5Y",
