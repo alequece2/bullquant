@@ -1,9 +1,8 @@
 import { getTranslations } from "next-intl/server"
+import type { Fundamental } from "@prisma/client"
 
-// Temporarily, we use any for fundamental since it's a Prisma model that we'll fetch.
-// In reality it'll be of type Fundamental (from @prisma/client)
 type StockSnapshotProps = {
-  fundamental: any | null
+  fundamental: Fundamental | null
 }
 
 function formatVal(value: any, isPercent = false, isCurrency = false) {

@@ -45,7 +45,7 @@ export default async function StockPage({
 
       {/* 2. Fundamentals Snapshot */}
       <div>
-        <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">Snapshot</h2>
+        <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
         <StockSnapshot fundamental={latestFundamental} />
       </div>
 

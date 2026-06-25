@@ -67,6 +67,9 @@
     "underConstruction": "Em construção",
     "buildingMessage": "A página da empresa vai nascer aqui.",
     "backHome": "Voltar ao Início",
+    "updatedAt": "Atualizado às",
+    "priceUnavailable": "Preço indisponível",
+    "snapshotTitle": "Snapshot",
     "snapshot": {
       "valuation": "Valuation",
       "cashFlow": "Cash Flow",

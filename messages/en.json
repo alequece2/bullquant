@@ -67,6 +67,9 @@
     "underConstruction": "Under construction",
     "buildingMessage": "The stock page will be built here.",
     "backHome": "Back Home",
+    "updatedAt": "Updated at",
+    "priceUnavailable": "Price unavailable",
+    "snapshotTitle": "Snapshot",
     "snapshot": {
       "valuation": "Valuation",
       "cashFlow": "Cash Flow",
