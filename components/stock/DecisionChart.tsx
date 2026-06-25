@@ -43,24 +43,43 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
 
   const formatValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
-    if (config.isPercentage) return `${(val * 100).toFixed(0)}%`
+    const num = Number(val)
+    if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
+    
+    // For Y-axis, compact notation is best (e.g. 1.2B, 400M, 5K)
+    const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
+    const formatted = formatter.format(Math.abs(num))
+    
     if (config.isCurrency) {
-      if (Math.abs(val) >= 1000) return `$${(val / 1000).toFixed(0)}B`
-      return `$${Number(val).toFixed(0)}M`
+      return num < 0 ? `-$${formatted}` : `$${formatted}`
     }
-    if (Math.abs(val) >= 1000) return `${(val / 1000).toFixed(0)}B`
-    return Number(val).toFixed(0)
+    return num < 0 ? `-${formatted}` : formatted
   }
 
   const formatTooltipValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
-    if (config.isPercentage) return `${(val * 100).toFixed(2)}%`
-    if (config.isCurrency) {
-      if (Math.abs(val) >= 1000) return `$${(val / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
-      return `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+    const num = Number(val)
+    if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
+    
+    const absVal = Math.abs(num)
+    let formatted = ""
+    if (absVal >= 1000) {
+      formatted = `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+    } else {
+      formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
     }
-    if (Math.abs(val) >= 1000) return `${(val / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
-    return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+    if (config.isCurrency) {
+      // Not all charts use M/B suffix for currency, but since we assume base is M:
+      // Wait, EPS is not isCurrency, so it goes to fallback.
+      return num < 0 ? `-$${formatted}` : `$${formatted}`
+    }
+    
+    // Fallback for non-currency (like EPS, Shares)
+    if (absVal >= 1000) {
+      return num < 0 ? `-${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B` : `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+    }
+    return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -73,7 +92,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
                 <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
                 <span className="capitalize text-gray-300">{entry.name}:</span>
-                <span className="font-semibold ml-auto">{formatTooltipValue(entry.value)}</span>
+                <span className="font-semibold ml-auto pl-4">{formatTooltipValue(entry.value)}</span>
               </div>
             ))}
           </div>
@@ -98,13 +117,13 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     return (
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none" tabIndex={-1}>
         <ResponsiveContainer width="100%" height={height}>
-          <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 40 }}>
-            <CartesianGrid strokeDasharray="none" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+          <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis 
               dataKey="label" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, angle: -45, textAnchor: 'end' }} 
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} 
               dy={15}
             />
             <YAxis 
@@ -183,7 +202,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
 
   const content = (
     <div className="flex flex-col h-full">
-      <div className="flex items-start justify-between pb-4 border-b border-border/40 mb-4">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
           {cagr !== undefined && cagr !== null && (
