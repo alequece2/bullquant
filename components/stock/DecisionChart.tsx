@@ -67,7 +67,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     return defaultColor
   }
 
-  const renderChart = (height: number | string = "100%") => {
+  const renderChart = (height: number | `${number}%` = "100%") => {
     if (data.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
 
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
@@ -92,7 +92,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               width={65}
             />
             <Tooltip 
-              formatter={(value: any, name: string) => [formatTooltipValue(value), name]}
+              formatter={(value: unknown, name: string | number | undefined) => [formatTooltipValue(value), String(name ?? '')]}
               labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '8px' }}
               contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}

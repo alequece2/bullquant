@@ -155,7 +155,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
                   return (
                     <div className="bg-background border border-border/50 p-3 rounded-lg shadow-xl">
                       <p className="text-muted-foreground text-xs font-medium mb-1">
-                        {formatTooltipDate(label)}
+                        {label != null ? formatTooltipDate(String(label)) : ''}
                       </p>
                       <p className="font-bold text-foreground text-lg">
                         ${Number(payload[0].value).toFixed(2)}
