@@ -43,26 +43,49 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
 
   const formatValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
-    if (config.isPercentage) return `${(val * 100).toFixed(2)}%`
+    if (config.isPercentage) return `${(val * 100).toFixed(0)}%`
     if (config.isCurrency) {
-      if (Math.abs(val) >= 1000) return `$${(val / 1000).toFixed(2)}B`
-      return `$${Number(val).toFixed(2)}M`
+      if (Math.abs(val) >= 1000) return `$${(val / 1000).toFixed(0)}B`
+      return `$${Number(val).toFixed(0)}M`
     }
-    // For numbers like shares
-    if (Math.abs(val) >= 1000) return `${(val / 1000).toFixed(2)}B`
-    return Number(val).toFixed(2)
+    if (Math.abs(val) >= 1000) return `${(val / 1000).toFixed(0)}B`
+    return Number(val).toFixed(0)
   }
 
   const formatTooltipValue = (val: any) => {
     if (val === null || val === undefined) return "N/A"
     if (config.isPercentage) return `${(val * 100).toFixed(2)}%`
-    if (config.isCurrency) return `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+    if (config.isCurrency) {
+      if (Math.abs(val) >= 1000) return `$${(val / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+      return `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+    }
+    if (Math.abs(val) >= 1000) return `${(val / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
     return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl p-3 text-white min-w-[140px] z-50">
+          <p className="font-bold mb-2 text-[13px] text-gray-200">{label}</p>
+          <div className="flex flex-col gap-1.5">
+            {payload.map((entry: any, index: number) => (
+              <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
+                <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
+                <span className="capitalize text-gray-300">{entry.name}:</span>
+                <span className="font-semibold ml-auto">{formatTooltipValue(entry.value)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    return null
   }
 
   const getBarColor = (val: number, defaultColor: string) => {
     if (config.inverseColors) {
-      return val < 0 ? '#10b981' : '#f43f5e' // For shares diff if we did it, but let's stick to default for now or pass dynamic
+      return val < 0 ? '#10b981' : '#f43f5e'
     }
     return defaultColor
   }
@@ -75,28 +98,25 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     return (
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none" tabIndex={-1}>
         <ResponsiveContainer width="100%" height={height}>
-          <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333333" opacity={0.2} />
+          <ChartComponent data={data} margin={{ top: 20, right: 20, left: 10, bottom: 40 }}>
+            <CartesianGrid strokeDasharray="none" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis 
               dataKey="label" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#888888', fontSize: 11 }} 
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, angle: -45, textAnchor: 'end' }} 
               dy={15}
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
               tickFormatter={formatValue}
-              tick={{ fill: '#888888', fontSize: 11 }}
-              width={65}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+              width={55}
             />
             <Tooltip 
-              formatter={(value: unknown, name: string | number | undefined) => [formatTooltipValue(value), String(name ?? '')]}
-              labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '8px', fontSize: '13px' }}
-              contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', padding: '12px', whiteSpace: 'nowrap' }}
-              itemStyle={{ fontSize: '13px', padding: '2px 0', textTransform: 'capitalize' }}
-              cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
+              content={<CustomTooltip />}
+              cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
@@ -163,7 +183,7 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
 
   const content = (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-start justify-between pb-4 border-b border-border/40 mb-4">
         <div>
           <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
           {cagr !== undefined && cagr !== null && (
