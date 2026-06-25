@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { signup } from '../actions'
 import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@/components/ui/input'
+import { getTranslations } from 'next-intl/server'
 
 export default async function RegisterPage({
   searchParams,
@@ -9,15 +10,16 @@ export default async function RegisterPage({
   searchParams: Promise<{ message?: string; error?: string }>
 }) {
   const resolvedParams = await searchParams
+  const t = await getTranslations('register')
 
   return (
     <div className="flex flex-1 flex-col justify-center px-6 py-20 lg:px-8 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-3xl font-extrabold tracking-tight text-foreground">
-          Criar Conta
+          {t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Junta-te a milhares de investidores no BullQuant.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -25,7 +27,7 @@ export default async function RegisterPage({
         <form className="space-y-6" action={signup}>
           <div>
             <label htmlFor="name" className="block text-sm font-medium leading-6 text-foreground mb-2">
-              Nome
+              {t('nameLabel')}
             </label>
             <div className="mt-2">
               <Input
@@ -33,14 +35,14 @@ export default async function RegisterPage({
                 name="name"
                 type="text"
                 required
-                placeholder="O teu nome"
+                placeholder={t('namePlaceholder')}
               />
             </div>
           </div>
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground mb-2">
-              Email
+              {t('emailLabel')}
             </label>
             <div className="mt-2">
               <Input
@@ -48,7 +50,7 @@ export default async function RegisterPage({
                 name="email"
                 type="email"
                 required
-                placeholder="nome@email.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
           </div>
@@ -56,7 +58,7 @@ export default async function RegisterPage({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-foreground">
-                Password
+                {t('passwordLabel')}
               </label>
             </div>
             <div className="mt-2">
@@ -84,17 +86,17 @@ export default async function RegisterPage({
 
           <div>
             <SubmitButton 
-              label="Registar" 
-              loadingLabel="A registar..." 
+              label={t('submitButton')} 
+              loadingLabel={t('submitLoading')} 
               className="w-full text-md h-11 font-bold" 
             />
           </div>
         </form>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Já tens conta?{' '}
+          {t('hasAccount')}{' '}
           <Link href="/login" className="font-semibold leading-6 text-primary hover:text-primary/80">
-            Faz Login
+            {t('loginLink')}
           </Link>
         </p>
       </div>

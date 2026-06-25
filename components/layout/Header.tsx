@@ -4,10 +4,12 @@ import { LineChart, LogOut, UserCircle } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
+import { getTranslations } from 'next-intl/server';
 
 export async function Header() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const t = await getTranslations('header');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -31,7 +33,7 @@ export async function Header() {
                 <Link 
                   href="/settings" 
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  title="Definições de Conta"
+                  title={t('settingsTitle')}
                 >
                   <UserCircle className="h-5 w-5" />
                   <span className="hidden md:inline-block">
@@ -39,7 +41,7 @@ export async function Header() {
                   </span>
                 </Link>
                 <form action={logout}>
-                  <Button type="submit" variant="ghost" size="icon" title="Logout">
+                  <Button type="submit" variant="ghost" size="icon" title={t('logoutTitle')}>
                     <LogOut className="h-5 w-5" />
                   </Button>
                 </form>
@@ -47,10 +49,10 @@ export async function Header() {
             ) : (
               <>
                 <Link href="/login" className={buttonVariants({ variant: "ghost" })}>
-                  Login
+                  {t('login')}
                 </Link>
                 <Link href="/register" className={buttonVariants()}>
-                  Registar
+                  {t('register')}
                 </Link>
               </>
             )}

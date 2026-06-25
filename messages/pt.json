@@ -1,0 +1,71 @@
+{
+  "login": {
+    "title": "Entrar no BullQuant",
+    "subtitle": "Acede ao teu portfólio e análises.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nome@email.com",
+    "passwordLabel": "Password",
+    "forgotPasswordLink": "Esqueceste-te da password?",
+    "submitButton": "Entrar",
+    "submitLoading": "A entrar...",
+    "noAccount": "Não tens conta?",
+    "registerLink": "Regista-te grátis"
+  },
+  "register": {
+    "title": "Criar Conta",
+    "subtitle": "Junta-te a milhares de investidores no BullQuant.",
+    "nameLabel": "Nome",
+    "namePlaceholder": "O teu nome",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nome@email.com",
+    "passwordLabel": "Password",
+    "submitButton": "Registar",
+    "submitLoading": "A registar...",
+    "hasAccount": "Já tens conta?",
+    "loginLink": "Faz Login"
+  },
+  "forgotPassword": {
+    "title": "Recuperar Password",
+    "subtitle": "Insere o teu email e enviar-te-emos um link.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nome@email.com",
+    "submitButton": "Enviar Link",
+    "submitLoading": "A enviar...",
+    "remembered": "Lembraste-te da password?",
+    "backToLogin": "Voltar ao Login"
+  },
+  "resetPassword": {
+    "title": "Nova Password",
+    "subtitle": "Escolhe a tua nova password.",
+    "passwordLabel": "Nova Password",
+    "passwordPlaceholder": "******",
+    "submitButton": "Atualizar Password",
+    "submitLoading": "A atualizar..."
+  },
+  "header": {
+    "settingsTitle": "Definições de Conta",
+    "logoutTitle": "Sair",
+    "login": "Login",
+    "register": "Registar"
+  },
+  "search": {
+    "placeholder": "Pesquisar ticker (ex: AAPL)...",
+    "noResults": "Nenhuma empresa encontrada.",
+    "recentTitle": "Pesquisas Recentes",
+    "clearAll": "Limpar Tudo"
+  },
+  "settings": {
+    "title": "A Minha Conta",
+    "subtitle": "Gere os teus dados pessoais e definições.",
+    "planFree": "Plano FREE",
+    "subscriptionTitle": "Detalhes da Subscrição",
+    "subscriptionDesc": "Atualmente estás a usar a versão gratuita do BullQuant. O plano gratuito inclui acesso ao motor de pesquisa de empresas e snapshots básicos de fundamentais.",
+    "premiumSoonTitle": "🚀 Funcionalidades Premium em breve!",
+    "premiumSoonDesc": "Alertas de preço, screener avançado e relatórios em PDF estão a ser desenvolvidos."
+  },
+  "stock": {
+    "underConstruction": "Em construção",
+    "buildingMessage": "A página da empresa vai nascer aqui.",
+    "backHome": "Voltar à Início"
+  }
+}

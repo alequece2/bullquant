@@ -10,7 +10,7 @@ interface SubmitButtonProps {
   className?: string
 }
 
-export function SubmitButton({ label, loadingLabel = 'A carregar...', className }: SubmitButtonProps) {
+export function SubmitButton({ label, loadingLabel, className }: SubmitButtonProps) {
   const { pending } = useFormStatus()
 
   return (
@@ -20,7 +20,7 @@ export function SubmitButton({ label, loadingLabel = 'A carregar...', className 
       className={className}
     >
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {pending ? loadingLabel : label}
+      {pending ? (loadingLabel || label) : label}
     </Button>
   )
 }

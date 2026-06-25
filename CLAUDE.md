@@ -442,6 +442,7 @@ DATABASE_URL=                     # connection string (pooled)
 DIRECT_URL=                       # connection string direta (migrations)
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SITE_URL=             # url da aplicação para auth redirects (ex: http://localhost:3001)
 SUPABASE_SERVICE_ROLE_KEY=        # só no servidor, NUNCA exposto ao browser
 
 # APIs externas (só no servidor)
