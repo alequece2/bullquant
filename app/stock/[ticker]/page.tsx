@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
@@ -10,6 +11,7 @@ export default async function StockPage({
 }) {
   const resolvedParams = await params
   const { ticker } = resolvedParams
+  const t = await getTranslations('stock')
 
   // Fetch the company
   const company = await prisma.company.findUnique({
