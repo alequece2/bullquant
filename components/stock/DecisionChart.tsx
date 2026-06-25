@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { Maximize2, Table2, BarChart3 } from "lucide-react"
 import {
   BarChart,
