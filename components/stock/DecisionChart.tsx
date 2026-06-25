@@ -151,13 +151,6 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     )
   }
 
-  const getBarColor = (val: number, defaultColor: string) => {
-    if (config.inverseColors) {
-      return val < 0 ? '#10b981' : '#f43f5e'
-    }
-    return defaultColor
-  }
-
   const renderChart = (height: number | `${number}%` = "100%") => {
     if (displayData.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
 
