@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
+import { StockPriceChart } from '@/components/stock/StockPriceChart'
 
 export default async function StockPage({
   params,
@@ -45,7 +46,10 @@ export default async function StockPage({
         logoUrl: company.logoUrl
       }} />
 
-      {/* 2. Fundamentals Snapshot */}
+      {/* 2. Price History Chart */}
+      <StockPriceChart ticker={company.ticker} />
+
+      {/* 3. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
         <StockSnapshot fundamental={latestFundamental} />
