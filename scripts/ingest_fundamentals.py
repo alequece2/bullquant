@@ -308,7 +308,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         else:
             tax_rate = 0.21
         nopat = op_income * (1 - tax_rate)
-        inv_cap = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
+        inv_cap = (total_debt or 0) + (total_equity or 0) - (cash or 0)
         roic = safe_div(nopat, inv_cap) if inv_cap > 0 else None
 
     roe = safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None
