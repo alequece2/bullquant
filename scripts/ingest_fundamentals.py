@@ -75,6 +75,8 @@ DURATION_TAGS = {
     "operatingCashFlow": ["NetCashProvidedByUsedInOperatingActivities"],
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PaymentsToAcquireProductiveAssets",
+        "PaymentsForProceedsFromProductiveAssets",
         "PaymentsForCapitalImprovements",
         "PaymentsForLeasingCostsCommissionsAndTenantImprovements",
     ],
