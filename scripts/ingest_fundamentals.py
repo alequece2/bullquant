@@ -2,12 +2,11 @@
 ingest_fundamentals.py — Ingere fundamentais históricos (10 anos) via SEC EDGAR XBRL.
 Cron semanal (domingo 3h UTC): python scripts/ingest_fundamentals.py
 
-Fontes:
-  https://data.sec.gov/api/xbrl/companyfacts/{CIK}.json
-  User-Agent obrigatório: ≤10 req/s → sleep 0.2s entre empresas.
+https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json
+User-Agent obrigatório pelo SEC; ≤10 req/s → sleep 0.2s entre empresas.
 
-Cada registo em fundamentals = 1 período fiscal (QUARTERLY ou ANNUAL).
-Métricas derivadas (FCF, margens, ROIC, ROE) calculadas aqui e guardadas.
+Cada registo = 1 período fiscal (QUARTERLY ou ANNUAL).
+Métricas derivadas (FCF, margens, ROIC, ROE) calculadas e guardadas.
 """
 
 import os
@@ -17,25 +16,30 @@ import datetime
 import uuid
 import requests
 import psycopg2
-import psycopg2.extras
 from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-load_dotenv(os.path.join(ROOT, ".env.local"))
+ENV_FILE = os.path.join(ROOT, ".env.dev")
+
+if not os.path.exists(ENV_FILE):
+    sys.exit(
+        "ERRO: ficheiro .env.dev não encontrado.\n"
+        "Cria um projeto Supabase de DEV e preenche .env.dev com as suas credenciais.\n"
+        "NUNCA uses .env.local — estes scripts só correm contra a BD de desenvolvimento."
+    )
+
+load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
-    sys.exit("DIRECT_URL não definida no .env.local")
+    sys.exit("DIRECT_URL não definida no .env.dev")
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-# User-Agent obrigatório pelo SEC (formato: "Nome email@dominio.com")
 EDGAR_HEADERS = {"User-Agent": "BullQuant admin@bullocracy.com"}
-SLEEP_BETWEEN = 0.2   # segundos entre empresas (≤10 req/s)
+SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
 
-# ── Mapeamento de tags EDGAR → campos do schema ──────────────────────────────
-# Para cada campo, lista de tags XBRL a tentar por ordem (primeiro match ganha).
-# Itens "duration" têm start+end; itens "instant" só têm end.
+# ── Tags XBRL com fallbacks (ordem = prioridade) ─────────────────────────────
 
 DURATION_TAGS = {
     "revenue": [
@@ -45,53 +49,62 @@ DURATION_TAGS = {
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
     ],
-    "cost_of_revenue": [
+    "costOfRevenue": [
         "CostOfRevenue",
         "CostOfGoodsAndServicesSold",
         "CostOfGoodsSold",
         "CostOfServices",
     ],
-    "gross_profit": ["GrossProfit"],
-    "operating_expenses": ["OperatingExpenses"],
-    "operating_income": ["OperatingIncomeLoss"],
-    "interest_expense": ["InterestExpense", "InterestAndDebtExpense", "InterestExpenseDebt"],
-    "tax_expense": ["IncomeTaxExpenseBenefit"],
-    "net_income": [
+    "grossProfit": ["GrossProfit"],
+    "operatingExpenses": ["OperatingExpenses"],
+    "operatingIncome": ["OperatingIncomeLoss"],
+    "interestExpense": ["InterestExpense", "InterestAndDebtExpense", "InterestExpenseDebt"],
+    "taxExpense": ["IncomeTaxExpenseBenefit"],
+    "netIncome": [
         "NetIncomeLoss",
         "ProfitLoss",
         "NetIncomeLossAvailableToCommonStockholdersBasic",
     ],
-    "eps_diluted": ["EarningsPerShareDiluted"],
-    "shares_outstanding_dur": [
+    "epsDiluted": ["EarningsPerShareDiluted"],
+    "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
         "WeightedAverageNumberOfSharesOutstandingBasic",
     ],
-    "operating_cash_flow": ["NetCashProvidedByUsedInOperatingActivities"],
+    "operatingCashFlow": ["NetCashProvidedByUsedInOperatingActivities"],
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
         "PaymentsForCapitalImprovements",
     ],
-    "dividend_per_share": [
+    "dividendPerShare": [
         "CommonStockDividendsPerShareDeclared",
         "CommonStockDividendsPerShareCashPaid",
     ],
+    "researchAndDevelopment": [
+        "ResearchAndDevelopmentExpense",
+        "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost",
+    ],
+    "sellingGeneralAndAdmin": [
+        "SellingGeneralAndAdministrativeExpense",
+        "GeneralAndAdministrativeExpense",
+    ],
+    "ebitda": ["EarningsBeforeInterestTaxesDepreciationAndAmortization"],
 }
 
 INSTANT_TAGS = {
-    "total_assets": ["Assets"],
-    "total_current_liab": ["LiabilitiesCurrent"],
-    "long_term_debt": ["LongTermDebt", "LongTermDebtNoncurrent"],
-    "total_debt": ["DebtLongtermAndShorttermCombinedAmount", "LongTermDebtAndCapitalLeaseObligations"],
+    "totalAssets": ["Assets"],
+    "totalCurrentLiab": ["LiabilitiesCurrent"],
+    "longTermDebt": ["LongTermDebt", "LongTermDebtNoncurrent"],
+    "totalDebt": ["DebtLongtermAndShorttermCombinedAmount", "LongTermDebtAndCapitalLeaseObligations"],
     "cash": [
         "CashAndCashEquivalentsAtCarryingValue",
         "CashCashEquivalentsAndShortTermInvestments",
         "Cash",
     ],
-    "total_equity": [
+    "totalEquity": [
         "StockholdersEquity",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
     ],
-    "shares_outstanding_inst": ["CommonStockSharesOutstanding"],
+    "sharesOutstandingInst": ["CommonStockSharesOutstanding"],
 }
 
 
@@ -101,18 +114,12 @@ def new_id() -> str:
 
 def get_companies_with_cik(cur) -> list[dict]:
     cur.execute(
-        """
-        SELECT id, ticker, cik
-        FROM companies
-        WHERE is_active = TRUE AND cik IS NOT NULL
-        ORDER BY ticker
-        """
+        'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
     )
     return [{"id": r[0], "ticker": r[1], "cik": r[2]} for r in cur.fetchall()]
 
 
 def fetch_edgar_facts(cik: str) -> dict | None:
-    """Busca o JSON de companyfacts do SEC EDGAR para um CIK."""
     padded = cik.zfill(10)
     url = f"{EDGAR_BASE}/CIK{padded}.json"
     try:
@@ -123,96 +130,84 @@ def fetch_edgar_facts(cik: str) -> dict | None:
             print("    429 rate limit — a aguardar 60s...")
             time.sleep(60)
             r = requests.get(url, headers=EDGAR_HEADERS, timeout=30)
-            r.raise_for_status()
-        else:
-            r.raise_for_status()
+        r.raise_for_status()
         return r.json()
     except Exception as e:
         print(f"    EDGAR error: {e}")
         return None
 
 
-def extract_tag(us_gaap: dict, tag: str) -> list[dict]:
-    """Devolve os entries de um tag XBRL, ou [] se não existir."""
+def extract_tag_entries(us_gaap: dict, tag: str) -> list[dict]:
     node = us_gaap.get(tag)
     if not node:
         return []
-    units = node.get("units") or {}
-    # Suporta USD, shares, USD/shares
-    for unit_entries in units.values():
+    for unit_entries in (node.get("units") or {}).values():
         if isinstance(unit_entries, list):
             return unit_entries
     return []
 
 
-def is_annual_duration(entry: dict) -> bool:
-    """True se o entry cobre ≈ 1 ano (350-380 dias)."""
-    if "start" not in entry:
+def is_annual_duration(e: dict) -> bool:
+    if "start" not in e:
         return False
-    start = datetime.date.fromisoformat(entry["start"])
-    end = datetime.date.fromisoformat(entry["end"])
-    days = (end - start).days
+    days = (datetime.date.fromisoformat(e["end"]) - datetime.date.fromisoformat(e["start"])).days
     return 350 <= days <= 380
 
 
-def is_quarterly_duration(entry: dict) -> bool:
-    """True se o entry cobre ≈ 1 trimestre (80-100 dias)."""
-    if "start" not in entry:
+def is_quarterly_duration(e: dict) -> bool:
+    if "start" not in e:
         return False
-    start = datetime.date.fromisoformat(entry["start"])
-    end = datetime.date.fromisoformat(entry["end"])
-    days = (end - start).days
+    days = (datetime.date.fromisoformat(e["end"]) - datetime.date.fromisoformat(e["start"])).days
     return 80 <= days <= 100
 
 
-def best_value_for_period(entries: list[dict], fy: int, fp: str, is_instant: bool) -> tuple[float | None, str | None]:
-    """
-    De todos os entries para um período (fy, fp), devolve o valor da
-    filing mais recente e a data de filed.
-    """
+def best_for_period(entries: list[dict], fy: int, fp: str) -> float | None:
     matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
     if not matches:
-        return None, None
-    # Ordenar por data de filing mais recente
+        return None
     matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-    best = matches[0]
-    return best.get("val"), best.get("filed")
+    return matches[0].get("val")
 
 
-def extract_metric_map(us_gaap: dict, tags_dict: dict, periods: list[tuple], is_instant: bool) -> dict:
+def extract_all_metrics(us_gaap: dict, periods: list[tuple]) -> tuple[dict, dict]:
+    """Extrai métricas duration e instant para todos os períodos.
+    Devolve (dur_map, inst_map): {(fy, fp): {campo: val}}.
     """
-    Para cada campo e lista de tags XBRL, tenta extrair o valor para cada período.
-    periods = lista de (fy, fp).
-    Devolve dict: {(fy, fp): {campo: valor}}.
-    """
-    result = {p: {} for p in periods}
+    dur_map: dict = {p: {} for p in periods}
+    inst_map: dict = {p: {} for p in periods}
 
-    for field, tags in tags_dict.items():
+    for field, tags in DURATION_TAGS.items():
         for tag in tags:
-            entries = extract_tag(us_gaap, tag)
+            entries = extract_tag_entries(us_gaap, tag)
             if not entries:
                 continue
-            # Filtrar por período adequado
-            if not is_instant:
-                annual_entries = [e for e in entries if is_annual_duration(e)]
-                quarterly_entries = [e for e in entries if is_quarterly_duration(e)]
-                filtered = {"FY": annual_entries, "Q": quarterly_entries}
-            else:
-                filtered = {"all": entries}
-
-            found_any = False
+            annual = [e for e in entries if is_annual_duration(e)]
+            quarterly = [e for e in entries if is_quarterly_duration(e)]
+            found = False
             for (fy, fp) in periods:
-                key = "FY" if fp == "FY" else ("Q" if not is_instant else "all")
-                pool = filtered.get(key) or filtered.get("all") or entries
-                val, _ = best_value_for_period(pool, fy, fp, is_instant)
-                if val is not None and field not in result[(fy, fp)]:
-                    result[(fy, fp)][field] = val
-                    found_any = True
+                pool = annual if fp == "FY" else quarterly
+                val = best_for_period(pool, fy, fp)
+                if val is not None and field not in dur_map[(fy, fp)]:
+                    dur_map[(fy, fp)][field] = val
+                    found = True
+            if found:
+                break
 
-            if found_any:
-                break  # Este tag resolveu o campo — não tentar o próximo
+    for field, tags in INSTANT_TAGS.items():
+        for tag in tags:
+            entries = extract_tag_entries(us_gaap, tag)
+            if not entries:
+                continue
+            found = False
+            for (fy, fp) in periods:
+                val = best_for_period(entries, fy, fp)
+                if val is not None and field not in inst_map[(fy, fp)]:
+                    inst_map[(fy, fp)][field] = val
+                    found = True
+            if found:
+                break
 
-    return result
+    return dur_map, inst_map
 
 
 def safe_div(a, b):
@@ -221,60 +216,58 @@ def safe_div(a, b):
     return round(a / b, 6)
 
 
-def safe_clamp(val, lo, hi):
-    if val is None:
+def safe_clamp(v, lo, hi):
+    if v is None:
         return None
-    return max(lo, min(hi, val))
+    return max(lo, min(hi, v))
 
 
-def build_fundamental_row(company_id: str, fy: int, fp: str, period_end: str,
-                          filed_at: str | None, dur: dict, inst: dict) -> dict:
-    """Constrói o dicionário para inserção na tabela fundamentals."""
+def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | None]:
+    """Devolve (period_end, filed_at) para um período."""
+    for tag in ["Assets", "NetIncomeLoss", "Revenues", "StockholdersEquity"]:
+        entries = extract_tag_entries(us_gaap, tag)
+        matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
+        if matches:
+            matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
+            return matches[0].get("end"), matches[0].get("filed")
+    return None, None
 
-    # Selecionar shares_outstanding: preferir instant, fallback para duration
-    shares = inst.get("shares_outstanding_inst") or dur.get("shares_outstanding_dur")
 
-    # Capex sempre positivo — EDGAR pode devolver negativo para "Payments"
+def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
+              dur: dict, inst: dict) -> dict:
+    shares = inst.get("sharesOutstandingInst") or dur.get("sharesOutstandingDur")
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
-
-    op_cf = dur.get("operating_cash_flow")
+    op_cf = dur.get("operatingCashFlow")
     fcf = (op_cf - capex) if (op_cf is not None and capex is not None) else None
 
     revenue = dur.get("revenue")
-    gross_profit = dur.get("gross_profit")
-    op_income = dur.get("operating_income")
-    net_income = dur.get("net_income")
-    tax_expense = dur.get("tax_expense")
-    total_assets = inst.get("total_assets")
-    curr_liab = inst.get("total_current_liab")
+    gross_profit = dur.get("grossProfit")
+    op_income = dur.get("operatingIncome")
+    net_income = dur.get("netIncome")
+    tax_expense = dur.get("taxExpense")
+    total_assets = inst.get("totalAssets")
+    curr_liab = inst.get("totalCurrentLiab")
     cash = inst.get("cash")
-    total_equity = inst.get("total_equity")
+    total_equity = inst.get("totalEquity")
 
-    # Margens
     gross_margin = safe_div(gross_profit, revenue)
     op_margin = safe_div(op_income, revenue)
     net_margin = safe_div(net_income, revenue)
 
-    # ROIC = NOPAT / Invested Capital
-    # NOPAT = Operating Income × (1 − tax_rate)
-    # Invested Capital = Total Assets − Current Liabilities − Cash
     roic = None
     if op_income is not None and total_assets is not None:
-        # Tax rate aproximada
         if net_income is not None and tax_expense is not None:
             pre_tax = net_income + tax_expense
             tax_rate = safe_clamp(safe_div(tax_expense, pre_tax), 0, 0.5) or 0.21
         else:
             tax_rate = 0.21
         nopat = op_income * (1 - tax_rate)
-        invested_capital = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
-        roic = safe_div(nopat, invested_capital) if invested_capital > 0 else None
+        inv_cap = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
+        roic = safe_div(nopat, inv_cap) if inv_cap > 0 else None
 
-    # ROE
     roe = safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None
 
-    # Tipo de período
     if fp == "FY":
         period_type = "ANNUAL"
         fiscal_quarter = None
@@ -284,83 +277,54 @@ def build_fundamental_row(company_id: str, fy: int, fp: str, period_end: str,
 
     return {
         "id": new_id(),
-        "company_id": company_id,
-        "period_type": period_type,
-        "fiscal_year": fy,
-        "fiscal_quarter": fiscal_quarter,
-        "period_end": period_end,
-        "filed_at": filed_at,
-        "revenue": dur.get("revenue"),
-        "cost_of_revenue": dur.get("cost_of_revenue"),
-        "gross_profit": gross_profit,
-        "operating_expenses": dur.get("operating_expenses"),
-        "operating_income": op_income,
-        "interest_expense": dur.get("interest_expense"),
-        "tax_expense": tax_expense,
-        "net_income": net_income,
-        "eps_diluted": dur.get("eps_diluted"),
-        "shares_outstanding": shares,
-        "operating_cash_flow": op_cf,
+        "companyId": company_id,
+        "periodType": period_type,
+        "fiscalYear": fy,
+        "fiscalQuarter": fiscal_quarter,
+        "periodEnd": period_end,
+        "filedAt": filed_at,
+        "revenue": revenue,
+        "costOfRevenue": dur.get("costOfRevenue"),
+        "grossProfit": gross_profit,
+        "operatingExpenses": dur.get("operatingExpenses"),
+        "operatingIncome": op_income,
+        "interestExpense": dur.get("interestExpense"),
+        "taxExpense": tax_expense,
+        "netIncome": net_income,
+        "epsDiluted": dur.get("epsDiluted"),
+        "sharesOutstanding": shares,
+        "operatingCashFlow": op_cf,
         "capex": capex,
-        "free_cash_flow": fcf,
-        "total_assets": total_assets,
-        "total_current_liab": curr_liab,
-        "long_term_debt": inst.get("long_term_debt"),
-        "total_debt": inst.get("total_debt"),
+        "freeCashFlow": fcf,
+        "totalAssets": total_assets,
+        "totalCurrentLiab": curr_liab,
+        "longTermDebt": inst.get("longTermDebt"),
+        "totalDebt": inst.get("totalDebt"),
         "cash": cash,
-        "total_equity": total_equity,
-        "gross_margin": gross_margin,
-        "operating_margin": op_margin,
-        "net_margin": net_margin,
+        "totalEquity": total_equity,
+        "grossMargin": gross_margin,
+        "operatingMargin": op_margin,
+        "netMargin": net_margin,
         "roic": roic,
-        "return_on_equity": roe,
-        "dividend_per_share": dur.get("dividend_per_share"),
+        "returnOnEquity": roe,
+        "dividendPerShare": dur.get("dividendPerShare"),
+        "researchAndDevelopment": dur.get("researchAndDevelopment"),
+        "sellingGeneralAndAdmin": dur.get("sellingGeneralAndAdmin"),
+        "ebitda": dur.get("ebitda"),
     }
 
 
-def get_filed_at_for_period(us_gaap: dict, fy: int, fp: str) -> str | None:
-    """Tenta inferir a data de filed a partir de qualquer tag do período."""
-    for tag in ["NetIncomeLoss", "Revenues", "Assets"]:
-        entries = extract_tag(us_gaap, tag)
-        matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
-        if matches:
-            matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-            return matches[0].get("filed")
-    return None
-
-
-def get_period_end_for_period(us_gaap: dict, fy: int, fp: str) -> str | None:
-    for tag in ["Assets", "NetIncomeLoss", "Revenues", "StockholdersEquity"]:
-        entries = extract_tag(us_gaap, tag)
-        matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
-        if matches:
-            matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-            return matches[0].get("end")
-    return None
-
-
-def delete_existing_period(cur, company_id: str, period_type: str, fy: int, fq):
-    """Apaga registo existente para o mesmo período (NULL-safe)."""
+def delete_period(cur, company_id: str, period_type: str, fy: int, fq):
     if fq is None:
         cur.execute(
-            """
-            DELETE FROM fundamentals
-            WHERE company_id = %s
-              AND period_type = %s::period_type
-              AND fiscal_year = %s
-              AND fiscal_quarter IS NULL
-            """,
+            """DELETE FROM fundamentals WHERE "companyId" = %s AND "periodType" = %s::"period_type"
+               AND "fiscalYear" = %s AND "fiscalQuarter" IS NULL""",
             (company_id, period_type, fy),
         )
     else:
         cur.execute(
-            """
-            DELETE FROM fundamentals
-            WHERE company_id = %s
-              AND period_type = %s::period_type
-              AND fiscal_year = %s
-              AND fiscal_quarter = %s
-            """,
+            """DELETE FROM fundamentals WHERE "companyId" = %s AND "periodType" = %s::"period_type"
+               AND "fiscalYear" = %s AND "fiscalQuarter" = %s""",
             (company_id, period_type, fy, fq),
         )
 
@@ -369,28 +333,28 @@ def insert_fundamental(cur, row: dict):
     cur.execute(
         """
         INSERT INTO fundamentals (
-            id, company_id, period_type, fiscal_year, fiscal_quarter,
-            period_end, filed_at,
-            revenue, cost_of_revenue, gross_profit, operating_expenses,
-            operating_income, interest_expense, tax_expense,
-            net_income, eps_diluted, shares_outstanding,
-            operating_cash_flow, capex, free_cash_flow,
-            total_assets, total_current_liab, long_term_debt, total_debt,
-            cash, total_equity,
-            gross_margin, operating_margin, net_margin, roic, return_on_equity,
-            dividend_per_share,
-            created_at, updated_at
+            id, "companyId", "periodType", "fiscalYear", "fiscalQuarter",
+            "periodEnd", "filedAt",
+            revenue, "costOfRevenue", "grossProfit", "operatingExpenses",
+            "operatingIncome", "interestExpense", "taxExpense",
+            "netIncome", "epsDiluted", "sharesOutstanding",
+            "operatingCashFlow", capex, "freeCashFlow",
+            "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
+            cash, "totalEquity",
+            "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
+            "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+            "createdAt", "updatedAt"
         ) VALUES (
-            %(id)s, %(company_id)s, %(period_type)s::period_type, %(fiscal_year)s, %(fiscal_quarter)s,
-            %(period_end)s, %(filed_at)s,
-            %(revenue)s, %(cost_of_revenue)s, %(gross_profit)s, %(operating_expenses)s,
-            %(operating_income)s, %(interest_expense)s, %(tax_expense)s,
-            %(net_income)s, %(eps_diluted)s, %(shares_outstanding)s,
-            %(operating_cash_flow)s, %(capex)s, %(free_cash_flow)s,
-            %(total_assets)s, %(total_current_liab)s, %(long_term_debt)s, %(total_debt)s,
-            %(cash)s, %(total_equity)s,
-            %(gross_margin)s, %(operating_margin)s, %(net_margin)s, %(roic)s, %(return_on_equity)s,
-            %(dividend_per_share)s,
+            %(id)s, %(companyId)s, %(periodType)s::"period_type", %(fiscalYear)s, %(fiscalQuarter)s,
+            %(periodEnd)s, %(filedAt)s,
+            %(revenue)s, %(costOfRevenue)s, %(grossProfit)s, %(operatingExpenses)s,
+            %(operatingIncome)s, %(interestExpense)s, %(taxExpense)s,
+            %(netIncome)s, %(epsDiluted)s, %(sharesOutstanding)s,
+            %(operatingCashFlow)s, %(capex)s, %(freeCashFlow)s,
+            %(totalAssets)s, %(totalCurrentLiab)s, %(longTermDebt)s, %(totalDebt)s,
+            %(cash)s, %(totalEquity)s,
+            %(grossMargin)s, %(operatingMargin)s, %(netMargin)s, %(roic)s, %(returnOnEquity)s,
+            %(dividendPerShare)s, %(researchAndDevelopment)s, %(sellingGeneralAndAdmin)s, %(ebitda)s,
             NOW(), NOW()
         )
         """,
@@ -399,8 +363,6 @@ def insert_fundamental(cur, row: dict):
 
 
 def process_company(conn, company: dict) -> int:
-    """Processa uma empresa. Devolve o número de períodos inseridos."""
-    ticker = company["ticker"]
     company_id = company["id"]
     cik = company["cik"]
 
@@ -412,58 +374,51 @@ def process_company(conn, company: dict) -> int:
     if not us_gaap:
         return 0
 
-    # Descobrir todos os períodos disponíveis nos últimos HISTORY_YEARS anos
     min_fy = datetime.date.today().year - HISTORY_YEARS
-    periods = set()
+    periods: set = set()
 
-    for tag in list(DURATION_TAGS.values())[0] + list(INSTANT_TAGS.values())[0]:
-        entries = extract_tag(us_gaap, tag)
-        for e in entries:
-            fy = e.get("fy")
-            fp = e.get("fp")
-            if fy and fp and fy >= min_fy and fp in ("FY", "Q1", "Q2", "Q3", "Q4"):
-                periods.add((fy, fp))
+    # Descobrir todos os (fy, fp) disponíveis nos últimos 10 anos
+    for sample_tags in [["NetIncomeLoss", "Assets", "Revenues"]]:
+        for tag in sample_tags:
+            for e in extract_tag_entries(us_gaap, tag):
+                fy = e.get("fy")
+                fp = e.get("fp")
+                if fy and fp and fy >= min_fy and fp in ("FY", "Q1", "Q2", "Q3", "Q4"):
+                    periods.add((fy, fp))
 
     if not periods:
         return 0
 
-    periods = sorted(periods)
-
-    # Extrair métricas para todos os períodos
-    dur_map = extract_metric_map(us_gaap, DURATION_TAGS, periods, is_instant=False)
-    inst_map = extract_metric_map(us_gaap, INSTANT_TAGS, periods, is_instant=True)
+    periods_list = sorted(periods)
+    dur_map, inst_map = extract_all_metrics(us_gaap, periods_list)
 
     inserted = 0
-    for (fy, fp) in periods:
-        period_end = get_period_end_for_period(us_gaap, fy, fp)
+    for (fy, fp) in periods_list:
+        period_end, filed_at = get_period_info(us_gaap, fy, fp)
         if not period_end:
             continue
-        filed_at = get_filed_at_for_period(us_gaap, fy, fp)
 
         dur = dur_map.get((fy, fp)) or {}
         inst = inst_map.get((fy, fp)) or {}
-
-        # Ignorar períodos completamente vazios
         if not dur and not inst:
             continue
 
-        row = build_fundamental_row(company_id, fy, fp, period_end, filed_at, dur, inst)
+        row = build_row(company_id, fy, fp, period_end, filed_at, dur, inst)
 
         try:
             with conn.cursor() as cur:
-                delete_existing_period(cur, company_id, row["period_type"], fy, row["fiscal_quarter"])
+                delete_period(cur, company_id, row["periodType"], fy, row["fiscalQuarter"])
                 insert_fundamental(cur, row)
             conn.commit()
             inserted += 1
         except Exception as e:
             conn.rollback()
-            print(f"    DB error em {ticker} {fy}/{fp}: {e}")
+            print(f"    DB error {fy}/{fp}: {e}")
 
-    # Atualizar timestamp na empresa
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE companies SET last_fundamentals_update = NOW(), updated_at = NOW() WHERE id = %s",
+                'UPDATE companies SET "lastFundamentalsUpdate" = NOW(), "updatedAt" = NOW() WHERE id = %s',
                 (company_id,),
             )
         conn.commit()
@@ -501,7 +456,7 @@ def main():
         time.sleep(SLEEP_BETWEEN)
 
     conn.close()
-    print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros de empresa.")
+    print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")
 
 
 if __name__ == "__main__":

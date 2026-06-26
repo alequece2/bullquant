@@ -4,9 +4,10 @@ Corre uma vez manualmente: python scripts/seed_companies.py
 
 Fontes:
   - Lista S&P 500: Wikipedia (pandas.read_html) — ticker, nome, sector, industry, CIK
-  - Dados adicionais: Finnhub /stock/profile2 — logo, website, description, employees
+  - Dados adicionais: Finnhub /stock/profile2 — logo, website, exchange
 """
 
+import io
 import os
 import sys
 import time
@@ -16,17 +17,25 @@ import psycopg2
 import pandas as pd
 from dotenv import load_dotenv
 
-# Carrega variáveis do .env.local (raiz do projeto)
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-load_dotenv(os.path.join(ROOT, ".env.local"))
+ENV_FILE = os.path.join(ROOT, ".env.dev")
+
+if not os.path.exists(ENV_FILE):
+    sys.exit(
+        "ERRO: ficheiro .env.dev não encontrado.\n"
+        "Cria scripts/.env.dev.example como referência e preenche com as credenciais do projeto Supabase de DEV.\n"
+        "NUNCA uses .env.local aqui — esses scripts só correm contra a BD de desenvolvimento."
+    )
+
+load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
 
 if not DIRECT_URL:
-    sys.exit("DIRECT_URL não definida no .env.local")
+    sys.exit("DIRECT_URL não definida no .env.dev")
 if not FINNHUB_API_KEY:
-    sys.exit("FINNHUB_API_KEY não definida no .env.local")
+    sys.exit("FINNHUB_API_KEY não definida no .env.dev")
 
 
 def new_id() -> str:
@@ -34,13 +43,13 @@ def new_id() -> str:
 
 
 def fetch_sp500_from_wikipedia() -> pd.DataFrame:
-    """Devolve DataFrame com colunas: ticker, name, sector, industry, cik."""
     print("A obter lista S&P 500 da Wikipedia...")
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    tables = pd.read_html(url, header=0)
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; BullQuant/1.0; +https://bullocracy.com)"}
+    r = requests.get(url, headers=headers, timeout=30)
+    r.raise_for_status()
+    tables = pd.read_html(io.StringIO(r.text), header=0)
     df = tables[0]
-
-    # A tabela da Wikipedia pode mudar de nome nas colunas — normalizar
     df.columns = [c.strip() for c in df.columns]
 
     col_map = {
@@ -51,14 +60,10 @@ def fetch_sp500_from_wikipedia() -> pd.DataFrame:
         "CIK": "cik",
     }
     df = df.rename(columns=col_map)
-
     keep = [c for c in ["ticker", "name", "sector", "industry", "cik"] if c in df.columns]
     df = df[keep].copy()
-
-    # Normalizar ticker (BRK.B → BRK-B para Finnhub; guardar o original para EDGAR)
     df["ticker"] = df["ticker"].str.strip()
 
-    # CIK pode estar em formato int ou string; normalizar para string zero-padded
     if "cik" in df.columns:
         df["cik"] = df["cik"].apply(
             lambda x: str(int(x)).zfill(10) if pd.notna(x) and str(x).strip() != "" else None
@@ -66,13 +71,11 @@ def fetch_sp500_from_wikipedia() -> pd.DataFrame:
     else:
         df["cik"] = None
 
-    print(f"  {len(df)} empresas encontradas na Wikipedia.")
+    print(f"  {len(df)} empresas encontradas.")
     return df
 
 
 def fetch_finnhub_profile(ticker: str) -> dict:
-    """Chama Finnhub e devolve logo, website, description, employees, exchange."""
-    # Finnhub usa '-' para BRK.B → BRK-B
     symbol = ticker.replace(".", "-")
     url = f"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={FINNHUB_API_KEY}"
     try:
@@ -80,10 +83,8 @@ def fetch_finnhub_profile(ticker: str) -> dict:
         r.raise_for_status()
         data = r.json()
         return {
-            "logo_url": data.get("logo") or None,
+            "logoUrl": data.get("logo") or None,
             "website": data.get("weburl") or None,
-            "description": None,  # Finnhub free não devolve description
-            "employees": None,    # Finnhub free não devolve employees
             "exchange": data.get("exchange") or "NYSE",
             "currency": data.get("currency") or "USD",
             "country": data.get("country") or "US",
@@ -94,15 +95,16 @@ def fetch_finnhub_profile(ticker: str) -> dict:
 
 
 def upsert_company(cur, company: dict):
+    # Colunas camelCase — como estão na BD (Prisma sem @map nos campos)
     cur.execute(
         """
         INSERT INTO companies (
             id, ticker, name, cik, exchange, sector, industry,
-            country, currency, logo_url, website, description, employees,
-            is_active, created_at, updated_at
+            country, currency, "logoUrl", website, description, employees,
+            "isActive", "createdAt", "updatedAt"
         ) VALUES (
             %(id)s, %(ticker)s, %(name)s, %(cik)s, %(exchange)s, %(sector)s, %(industry)s,
-            %(country)s, %(currency)s, %(logo_url)s, %(website)s, %(description)s, %(employees)s,
+            %(country)s, %(currency)s, %(logoUrl)s, %(website)s, %(description)s, %(employees)s,
             TRUE, NOW(), NOW()
         )
         ON CONFLICT (ticker) DO UPDATE SET
@@ -111,11 +113,9 @@ def upsert_company(cur, company: dict):
             exchange    = EXCLUDED.exchange,
             sector      = COALESCE(EXCLUDED.sector, companies.sector),
             industry    = COALESCE(EXCLUDED.industry, companies.industry),
-            logo_url    = COALESCE(EXCLUDED.logo_url, companies.logo_url),
+            "logoUrl"   = COALESCE(EXCLUDED."logoUrl", companies."logoUrl"),
             website     = COALESCE(EXCLUDED.website, companies.website),
-            description = COALESCE(EXCLUDED.description, companies.description),
-            employees   = COALESCE(EXCLUDED.employees, companies.employees),
-            updated_at  = NOW()
+            "updatedAt" = NOW()
         """,
         company,
     )
@@ -145,10 +145,10 @@ def main():
             "industry": row.get("industry") or None,
             "country": profile.get("country") or "US",
             "currency": profile.get("currency") or "USD",
-            "logo_url": profile.get("logo_url") or None,
+            "logoUrl": profile.get("logoUrl") or None,
             "website": profile.get("website") or None,
-            "description": profile.get("description") or None,
-            "employees": profile.get("employees") or None,
+            "description": None,
+            "employees": None,
         }
 
         try:
@@ -158,14 +158,26 @@ def main():
             print("ok")
         except Exception as e:
             conn.rollback()
-            print(f"ERRO: {e}")
-            errors += 1
+            # CIK duplicado (ex: GOOG/GOOGL, FOX/FOXA) → tentar sem CIK
+            if "companies_cik_key" in str(e):
+                company["cik"] = None
+                try:
+                    with conn.cursor() as cur:
+                        upsert_company(cur, company)
+                    conn.commit()
+                    print("ok (sem CIK)")
+                except Exception as e2:
+                    conn.rollback()
+                    print(f"ERRO: {e2}")
+                    errors += 1
+            else:
+                print(f"ERRO: {e}")
+                errors += 1
 
-        # Finnhub free tier: 60 req/min → 1s de intervalo é suficiente
         time.sleep(1)
 
     conn.close()
-    print(f"\nConcluído. {total - errors}/{total} empresas inseridas/atualizadas. {errors} erros.")
+    print(f"\nConcluído. {total - errors}/{total} inseridas/atualizadas. {errors} erros.")
 
 
 if __name__ == "__main__":

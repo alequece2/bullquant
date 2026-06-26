@@ -1,9 +1,9 @@
 """
 ingest_prices.py — Ingere preços EOD históricos (10 anos) via Polygon.io.
-Cron diário (6h UTC, pós-fecho US): python scripts/ingest_prices.py
+Cron diário (6h UTC): python scripts/ingest_prices.py
 
-Comportamento incremental: por empresa pede só os dias novos desde o último
-registo na tabela prices. Na primeira corrida pede 10 anos.
+Incremental: por empresa só pede dias novos desde o último registo em prices.
+Na primeira corrida pede 10 anos.
 
 Polygon free tier: 5 req/min → sleep 13s entre empresas.
 """
@@ -18,24 +18,32 @@ import psycopg2.extras
 from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-load_dotenv(os.path.join(ROOT, ".env.local"))
+ENV_FILE = os.path.join(ROOT, ".env.dev")
+
+if not os.path.exists(ENV_FILE):
+    sys.exit(
+        "ERRO: ficheiro .env.dev não encontrado.\n"
+        "Cria um projeto Supabase de DEV e preenche .env.dev com as suas credenciais.\n"
+        "NUNCA uses .env.local — estes scripts só correm contra a BD de desenvolvimento."
+    )
+
+load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY")
 
 if not DIRECT_URL:
-    sys.exit("DIRECT_URL não definida no .env.local")
+    sys.exit("DIRECT_URL não definida no .env.dev")
 if not POLYGON_API_KEY:
-    sys.exit("POLYGON_API_KEY não definida no .env.local")
+    sys.exit("POLYGON_API_KEY não definida no .env.dev")
 
 POLYGON_BASE = "https://api.polygon.io"
-# 10 anos de histórico na primeira corrida
 HISTORY_YEARS = 10
-SLEEP_BETWEEN = 13  # segundos (5 req/min no free tier)
+SLEEP_BETWEEN = 13
 
 
 def get_companies(cur) -> list[dict]:
-    cur.execute("SELECT ticker FROM companies WHERE is_active = TRUE ORDER BY ticker")
+    cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE ORDER BY ticker')
     return [{"ticker": r[0]} for r in cur.fetchall()]
 
 
@@ -46,11 +54,6 @@ def get_max_date(cur, ticker: str) -> datetime.date | None:
 
 
 def fetch_polygon(ticker: str, from_date: str, to_date: str) -> list[dict]:
-    """
-    Chama /v2/aggs/ticker/{ticker}/range/1/day/{from}/{to}.
-    Devolve lista de {date, open, high, low, close, volume}.
-    """
-    # Polygon usa '-' para BRK.B → no S&P 500 usa o ticker normal
     url = (
         f"{POLYGON_BASE}/v2/aggs/ticker/{ticker}/range/1/day"
         f"/{from_date}/{to_date}"
@@ -58,19 +61,14 @@ def fetch_polygon(ticker: str, from_date: str, to_date: str) -> list[dict]:
     )
     try:
         r = requests.get(url, timeout=30)
-        if r.status_code == 403:
-            print(f"    403 — ticker {ticker} não acessível no plano atual")
-            return []
-        if r.status_code == 404:
+        if r.status_code in (403, 404):
             return []
         r.raise_for_status()
         data = r.json()
         results = data.get("results") or []
         rows = []
         for item in results:
-            # timestamp em milissegundos UTC → date
-            ts_s = item["t"] / 1000
-            date = datetime.datetime.utcfromtimestamp(ts_s).date()
+            date = datetime.datetime.utcfromtimestamp(item["t"] / 1000).date()
             rows.append({
                 "ticker": ticker,
                 "date": date,
@@ -116,7 +114,6 @@ def main():
     today = datetime.date.today()
     history_start = today - datetime.timedelta(days=HISTORY_YEARS * 365)
     total = len(companies)
-
     print(f"{total} empresas a processar. Histórico desde {history_start}.")
 
     errors = 0
@@ -139,7 +136,6 @@ def main():
         print(f"[{i+1}/{total}] {ticker} {from_date} → {to_date}...", end=" ", flush=True)
 
         rows = fetch_polygon(ticker, from_date, to_date)
-
         if not rows:
             print("sem dados")
             errors += 1
@@ -150,7 +146,7 @@ def main():
             with conn.cursor() as cur:
                 upsert_prices(cur, rows)
                 cur.execute(
-                    "UPDATE companies SET last_price_update = NOW(), updated_at = NOW() WHERE ticker = %s",
+                    'UPDATE companies SET "lastPriceUpdate" = NOW(), "updatedAt" = NOW() WHERE ticker = %s',
                     (ticker,),
                 )
             conn.commit()
