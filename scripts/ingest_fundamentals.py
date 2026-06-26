@@ -163,15 +163,15 @@ def is_quarterly_duration(e: dict) -> bool:
     return 80 <= days <= 100
 
 
-def best_for_period(entries: list[dict], fy: int, fp: str) -> float | None:
-    matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
+def best_for_period(entries: list[dict], expected_end: str) -> float | None:
+    matches = [e for e in entries if e.get("end") == expected_end]
     if not matches:
         return None
     matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
     return matches[0].get("val")
 
 
-def extract_all_metrics(us_gaap: dict, periods: list[tuple]) -> tuple[dict, dict]:
+def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) -> tuple[dict, dict]:
     """Extrai métricas duration e instant para todos os períodos.
     Devolve (dur_map, inst_map): {(fy, fp): {campo: val}}.
     """
@@ -180,23 +180,29 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple]) -> tuple[dict, dict
 
     for field, tags in DURATION_TAGS.items():
         for (fy, fp) in periods:
+            expected_end = period_ends.get((fy, fp))
+            if not expected_end:
+                continue
             for tag in tags:
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
                     continue
                 pool = [e for e in entries if is_annual_duration(e)] if fp == "FY" else [e for e in entries if is_quarterly_duration(e)]
-                val = best_for_period(pool, fy, fp)
+                val = best_for_period(pool, expected_end)
                 if val is not None:
                     dur_map[(fy, fp)][field] = val
                     break
 
     for field, tags in INSTANT_TAGS.items():
         for (fy, fp) in periods:
+            expected_end = period_ends.get((fy, fp))
+            if not expected_end:
+                continue
             for tag in tags:
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
                     continue
-                val = best_for_period(entries, fy, fp)
+                val = best_for_period(entries, expected_end)
                 if val is not None:
                     inst_map[(fy, fp)][field] = val
                     break
@@ -222,8 +228,18 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
         entries = extract_tag_entries(us_gaap, tag)
         matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
         if matches:
-            matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-            return matches[0].get("end"), matches[0].get("filed")
+            if tag in ["NetIncomeLoss", "Revenues"]:
+                if fp == "FY":
+                    matches = [e for e in matches if is_annual_duration(e)]
+                else:
+                    matches = [e for e in matches if is_quarterly_duration(e)]
+            if not matches:
+                continue
+            matches.sort(key=lambda e: e.get("end") or "", reverse=True)
+            period_end = matches[0].get("end")
+            matches_for_end = [e for e in matches if e.get("end") == period_end]
+            matches_for_end.sort(key=lambda e: e.get("filed") or "", reverse=True)
+            return period_end, matches_for_end[0].get("filed")
     return None, None
 
 
@@ -384,11 +400,20 @@ def process_company(conn, company: dict) -> int:
         return 0
 
     periods_list = sorted(periods)
-    dur_map, inst_map = extract_all_metrics(us_gaap, periods_list)
+    
+    period_ends = {}
+    period_filed = {}
+    for (fy, fp) in periods_list:
+        p_end, p_filed = get_period_info(us_gaap, fy, fp)
+        period_ends[(fy, fp)] = p_end
+        period_filed[(fy, fp)] = p_filed
+
+    dur_map, inst_map = extract_all_metrics(us_gaap, periods_list, period_ends)
 
     inserted = 0
     for (fy, fp) in periods_list:
-        period_end, filed_at = get_period_info(us_gaap, fy, fp)
+        period_end = period_ends.get((fy, fp))
+        filed_at = period_filed.get((fy, fp))
         if not period_end:
             continue
 
