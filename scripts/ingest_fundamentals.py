@@ -180,11 +180,29 @@ def is_annual_duration(e: dict) -> bool:
     return 350 <= days <= 380
 
 
-def is_quarterly_duration(e: dict) -> bool:
-    if "start" not in e:
+def is_quarterly_duration(entry):
+    start = entry.get("start")
+    end = entry.get("end")
+    if not start or not end:
         return False
-    days = (datetime.date.fromisoformat(e["end"]) - datetime.date.fromisoformat(e["start"])).days
-    return 80 <= days <= 100
+    d1 = datetime.date.fromisoformat(start)
+    d2 = datetime.date.fromisoformat(end)
+    return 80 <= (d2 - d1).days <= 100
+
+
+def is_ytd_duration(entry, fp):
+    start = entry.get("start")
+    end = entry.get("end")
+    if not start or not end:
+        return False
+    d1 = datetime.date.fromisoformat(start)
+    d2 = datetime.date.fromisoformat(end)
+    days = (d2 - d1).days
+    if fp == "Q1": return 80 <= days <= 110
+    if fp == "Q2": return 170 <= days <= 200
+    if fp == "Q3": return 260 <= days <= 290
+    if fp in ("Q4", "FY"): return 350 <= days <= 380
+    return False
 
 
 def best_for_period(entries: list[dict], expected_end: str) -> float | None:
@@ -211,11 +229,58 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
                     continue
-                pool = [e for e in entries if is_annual_duration(e)] if fp == "FY" else [e for e in entries if is_quarterly_duration(e)]
+                
+                if fp == "FY":
+                    pool = [e for e in entries if is_annual_duration(e)]
+                elif field in ("operatingCashFlow", "capex"):
+                    pool = [e for e in entries if is_ytd_duration(e, fp)]
+                else:
+                    pool = [e for e in entries if is_quarterly_duration(e)]
+                    
                 val = best_for_period(pool, expected_end)
                 if val is not None:
                     dur_map[(fy, fp)][field] = val
                     break
+
+    # Apply differencing for cash flow metrics
+    original_ytd = {}
+    for (fy, fp) in periods:
+        original_ytd[(fy, fp)] = {
+            "operatingCashFlow": dur_map[(fy, fp)].get("operatingCashFlow"),
+            "capex": dur_map[(fy, fp)].get("capex")
+        }
+    
+    for (fy, fp) in periods:
+        if fp in ("Q1", "FY"): continue
+        dur = dur_map[(fy, fp)]
+        
+        ocf_ytd = original_ytd[(fy, fp)].get("operatingCashFlow")
+        capex_ytd = original_ytd[(fy, fp)].get("capex")
+        
+        ocf_stand = ocf_ytd
+        capex_stand = capex_ytd
+        
+        if fp == "Q2":
+            q1 = original_ytd.get((fy, "Q1"), {})
+            if q1.get("operatingCashFlow") is not None and ocf_stand is not None:
+                ocf_stand -= q1["operatingCashFlow"]
+            if q1.get("capex") is not None and capex_stand is not None:
+                capex_stand -= q1["capex"]
+        elif fp == "Q3":
+            q2 = original_ytd.get((fy, "Q2"), {})
+            if q2.get("operatingCashFlow") is not None and ocf_stand is not None:
+                ocf_stand -= q2["operatingCashFlow"]
+            if q2.get("capex") is not None and capex_stand is not None:
+                capex_stand -= q2["capex"]
+        elif fp == "Q4":
+            q3 = original_ytd.get((fy, "Q3"), {})
+            if q3.get("operatingCashFlow") is not None and ocf_stand is not None:
+                ocf_stand -= q3["operatingCashFlow"]
+            if q3.get("capex") is not None and capex_stand is not None:
+                capex_stand -= q3["capex"]
+                
+        dur["operatingCashFlow"] = ocf_stand
+        dur["capex"] = capex_stand
 
     for field, tags in INSTANT_TAGS.items():
         for (fy, fp) in periods:
@@ -265,6 +330,9 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
             matches_for_end.sort(key=lambda e: e.get("filed") or "", reverse=True)
             return period_end, matches_for_end[0].get("filed")
     return None, None
+
+
+
 
 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
