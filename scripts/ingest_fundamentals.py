@@ -327,7 +327,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "totalAssets": total_assets,
         "totalCurrentLiab": curr_liab,
         "longTermDebt": inst.get("longTermDebt"),
-        "totalDebt": inst.get("totalDebt"),
+        "totalDebt": total_debt,
         "cash": cash,
         "totalEquity": total_equity,
         "grossMargin": gross_margin,
