@@ -85,12 +85,11 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
     
-    const isMillions = config.isCurrency || config.isLargeNumber
     const absVal = Math.abs(num)
     
-    if (isMillions) {
+    if (config.isCurrency || config.isLargeNumber) {
       const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
-      const formatted = formatter.format(absVal * 1_000_000)
+      const formatted = formatter.format(absVal)
       if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
@@ -103,15 +102,16 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
     
-    const isMillions = config.isCurrency || config.isLargeNumber
     const absVal = Math.abs(num)
     
-    if (isMillions) {
+    if (config.isCurrency || config.isLargeNumber) {
       let formatted = ""
-      if (absVal >= 1000) {
-        formatted = `${(absVal / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+      if (absVal >= 1_000_000_000) {
+        formatted = `${(absVal / 1_000_000_000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+      } else if (absVal >= 1_000_000) {
+        formatted = `${(absVal / 1_000_000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
       } else {
-        formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+        formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       }
       if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
       return num < 0 ? `-${formatted}` : formatted

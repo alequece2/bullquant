@@ -179,35 +179,27 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple]) -> tuple[dict, dict
     inst_map: dict = {p: {} for p in periods}
 
     for field, tags in DURATION_TAGS.items():
-        for tag in tags:
-            entries = extract_tag_entries(us_gaap, tag)
-            if not entries:
-                continue
-            annual = [e for e in entries if is_annual_duration(e)]
-            quarterly = [e for e in entries if is_quarterly_duration(e)]
-            found = False
-            for (fy, fp) in periods:
-                pool = annual if fp == "FY" else quarterly
+        for (fy, fp) in periods:
+            for tag in tags:
+                entries = extract_tag_entries(us_gaap, tag)
+                if not entries:
+                    continue
+                pool = [e for e in entries if is_annual_duration(e)] if fp == "FY" else [e for e in entries if is_quarterly_duration(e)]
                 val = best_for_period(pool, fy, fp)
-                if val is not None and field not in dur_map[(fy, fp)]:
+                if val is not None:
                     dur_map[(fy, fp)][field] = val
-                    found = True
-            if found:
-                break
+                    break
 
     for field, tags in INSTANT_TAGS.items():
-        for tag in tags:
-            entries = extract_tag_entries(us_gaap, tag)
-            if not entries:
-                continue
-            found = False
-            for (fy, fp) in periods:
+        for (fy, fp) in periods:
+            for tag in tags:
+                entries = extract_tag_entries(us_gaap, tag)
+                if not entries:
+                    continue
                 val = best_for_period(entries, fy, fp)
-                if val is not None and field not in inst_map[(fy, fp)]:
+                if val is not None:
                     inst_map[(fy, fp)][field] = val
-                    found = True
-            if found:
-                break
+                    break
 
     return dur_map, inst_map
 
