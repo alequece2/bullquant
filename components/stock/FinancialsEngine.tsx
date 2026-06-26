@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { DecisionChart, ChartConfig } from "./DecisionChart"
+import { DecisionChart } from "./DecisionChart"
 import { useTranslations } from "next-intl"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
 
 export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: string | null }) {
   const t = useTranslations("financials")
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<Record<string, unknown>[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [period, setPeriod] = useState<PeriodType>("ANNUAL")
   
@@ -82,7 +82,7 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
         const dividendPerShare = last4.reduce((acc, q) => acc + (q.dividendPerShare || 0), 0)
 
         // Segments
-        let segments: any = {}
+        const segments: Record<string, number> = {}
         last4.forEach(q => {
           if (q.revenueSegments) {
             Object.keys(q.revenueSegments).forEach(k => {

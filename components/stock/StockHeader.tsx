@@ -64,10 +64,14 @@ export function StockHeader({ company }: { company: CompanyProp }) {
 
   // Initial fetch & Polling every 60 seconds
   useEffect(() => {
-    fetchPrice()
-    fetchPortfolioState()
+    const init = async () => {
+      await fetchPrice()
+      await fetchPortfolioState()
+    }
+    init()
     const interval = setInterval(fetchPrice, 60000)
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company.ticker])
 
   const toggleFollow = async () => {
@@ -105,6 +109,7 @@ export function StockHeader({ company }: { company: CompanyProp }) {
       <div className="flex items-center gap-4">
         <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16">
           {company.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
           ) : (
             <span className="font-extrabold text-2xl text-primary">{company.ticker[0]}</span>

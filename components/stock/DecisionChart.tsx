@@ -34,13 +34,20 @@ export type ChartConfig = {
 const TIME_FILTERS = ['ALL', '10Y', '5Y', '3Y', '1Y'] as const
 type TimeFilter = typeof TIME_FILTERS[number]
 
-const CustomTooltip = ({ active, payload, label, formatTooltipValue }: any) => {
+type CustomTooltipProps = {
+  active?: boolean
+  payload?: { name: string; value: number; color: string }[]
+  label?: string
+  formatTooltipValue?: (val: number | string | null) => string
+}
+
+const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl p-3 text-white min-w-[140px] z-50">
         <p className="font-bold mb-2 text-[13px] text-gray-200">{label}</p>
         <div className="flex flex-col gap-1.5">
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
               <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
               <span className="capitalize text-gray-300">{entry.name}:</span>
@@ -56,7 +63,7 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: any) => {
 
 interface DecisionChartProps {
   title: string
-  data: any[]
+  data: Record<string, unknown>[]
   type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR'
   config: ChartConfig
   cagr?: number | null
@@ -84,7 +91,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     return data.slice(-items);
   }, [data, timeFilter])
 
-  const formatValue = (val: any) => {
+  const formatValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
@@ -101,7 +108,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     return num < 0 ? `-${absVal.toFixed(2)}` : absVal.toFixed(2)
   }
 
-  const formatTooltipValue = (val: any) => {
+  const formatTooltipValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
     const num = Number(val)
     if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
@@ -183,7 +190,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
               domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
             />
             <Tooltip 
-              content={(props: any) => <CustomTooltip {...props} formatTooltipValue={formatTooltipValue} />}
+              content={(props) => <CustomTooltip {...props} formatTooltipValue={formatTooltipValue} />}
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
@@ -193,7 +200,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
               <ReferenceLine y={config.referenceLine.y} stroke={config.referenceLine.color} strokeDasharray="3 3" label={{ position: 'top', value: config.referenceLine.label, fill: config.referenceLine.color, fontSize: 11 }} />
             )}
             
-            {config.dataKeys.map((k, i) => {
+            {config.dataKeys.map((k) => {
               const isHidden = hiddenKeys.has(k.key)
               if (k.type === 'line' || type === 'LINE') {
                 return <Line hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />

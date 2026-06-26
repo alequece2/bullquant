@@ -91,13 +91,15 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetchPortfolio()
+    const init = async () => { await fetchPortfolio() }
+    init()
   }, [])
 
   useEffect(() => {
     if (items.length > 0) {
       const tickers = items.map(item => item.company.ticker)
-      fetchPrices(tickers)
+      const initPrices = async () => { await fetchPrices(tickers) }
+      initPrices()
       
       const interval = setInterval(() => {
         fetchPrices(tickers)
@@ -211,6 +213,7 @@ export default function Home() {
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/5 p-2 rounded-lg border border-primary/10 flex items-center justify-center shrink-0 w-12 h-12">
                         {item.company.logoUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img src={item.company.logoUrl} alt={item.company.name} className="w-8 h-8 object-contain rounded bg-white p-0.5" />
                         ) : (
                           <span className="font-bold text-primary">{item.company.ticker[0]}</span>
