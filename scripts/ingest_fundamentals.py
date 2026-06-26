@@ -296,9 +296,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     total_equity = inst.get("totalEquity")
 
-    gross_margin = safe_div(gross_profit, revenue)
-    op_margin = safe_div(op_income, revenue)
-    net_margin = safe_div(net_income, revenue)
+    gross_margin = safe_clamp(safe_div(gross_profit, revenue), -99.0, 99.0)
+    op_margin = safe_clamp(safe_div(op_income, revenue), -99.0, 99.0)
+    net_margin = safe_clamp(safe_div(net_income, revenue), -99.0, 99.0)
 
     roic = None
     if op_income is not None and total_assets is not None:
@@ -309,9 +309,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             tax_rate = 0.21
         nopat = op_income * (1 - tax_rate)
         inv_cap = (total_debt or 0) + (total_equity or 0) - (cash or 0)
-        roic = safe_div(nopat, inv_cap) if inv_cap > 0 else None
+        roic = safe_clamp(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -99.0, 99.0)
 
-    roe = safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None
+    roe = safe_clamp(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -99.0, 99.0)
 
     ebitda_raw = dur.get("ebitda")
     if ebitda_raw is not None:
