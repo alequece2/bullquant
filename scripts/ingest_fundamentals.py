@@ -95,6 +95,12 @@ DURATION_TAGS = {
         "GeneralAndAdministrativeExpense",
     ],
     "ebitda": ["EarningsBeforeInterestTaxesDepreciationAndAmortization"],
+    "depreciationAndAmortization": [
+        "DepreciationDepletionAndAmortization",
+        "DepreciationAndAmortization",
+        "Depreciation",
+        "AmortizationOfIntangibleAssets",
+    ],
 }
 
 INSTANT_TAGS = {
@@ -307,6 +313,16 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     roe = safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None
 
+    ebitda_raw = dur.get("ebitda")
+    if ebitda_raw is not None:
+        ebitda = ebitda_raw
+    else:
+        da = dur.get("depreciationAndAmortization") or 0
+        if op_income is not None:
+            ebitda = op_income + da
+        else:
+            ebitda = None
+
     if fp == "FY":
         period_type = "ANNUAL"
         fiscal_quarter = None
@@ -349,7 +365,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "dividendPerShare": dur.get("dividendPerShare"),
         "researchAndDevelopment": dur.get("researchAndDevelopment"),
         "sellingGeneralAndAdmin": dur.get("sellingGeneralAndAdmin"),
-        "ebitda": dur.get("ebitda"),
+        "ebitda": ebitda,
     }
 
 
