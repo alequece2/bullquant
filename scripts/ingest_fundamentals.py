@@ -106,7 +106,13 @@ INSTANT_TAGS = {
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
     ],
-    "marketableSecuritiesCurrent": ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "ShortTermInvestments"],
+    "marketableSecuritiesCurrent": [
+        "MarketableSecuritiesCurrent", 
+        "AvailableForSaleSecuritiesDebtSecuritiesCurrent", 
+        "AvailableForSaleSecuritiesCurrent",
+        "AvailableForSaleSecurities",
+        "ShortTermInvestments"
+    ],
     "totalEquity": [
         "StockholdersEquity",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
