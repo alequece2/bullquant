@@ -66,3 +66,16 @@ Inicialmente o nosso motor utilizava uma abordagem de **Operating EBITDA** pura 
 No entanto, no sentido de assegurarmos credibilidade standard (tal como a decisão sobre o CapEx na secção 3), **ajustámos a fórmula do EBITDA para a leitura Bottom-up clássica**:
 `EBITDA = Net Income + Income Tax Expense + Interest Expense + D&A`
 Assim, o nosso EBITDA acompanha os valores universais ao cêntimo (os tais $16.13B na Amazon), mantendo todas as rubricas "Other Income/Expense" contabilizadas, garantindo paridade imediata com o resto do mundo financeiro.
+
+---
+
+## 6. ROIC (Return on Invested Capital)
+
+**Cenário de Dúvida:**
+A fórmula do ROIC gerava valores artificialmente elevados em algumas plataformas e no Bullquant.
+
+**A Nossa Metodologia:**
+O Capital Investido (denominador do ROIC) era tradicionalmente calculado deduzindo *todo* o passivo corrente dos ativos totais (`Total Assets - Current Liabilities - Cash`). Esta abordagem "Operating" subtraía erradamente a dívida de curto prazo (Short-Term Debt). A dívida de curto prazo é capital financeiro que os investidores aportam, logo não pode ser retirado da base de investimento.
+O motor foi atualizado para utilizar a abordagem "Financing" estrita:
+`Invested Capital = Total Debt + Total Equity - Cash`
+Isto garante um cálculo de ROIC muito mais robusto, conservador e perfeitamente alinhado com a academia financeira.
