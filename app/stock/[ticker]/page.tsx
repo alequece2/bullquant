@@ -27,15 +27,33 @@ export default async function StockPage({
     notFound()
   }
 
-  // Fetch the latest fundamental record for the snapshot
-  const latestFundamental = await prisma.fundamental.findFirst({
+  // Fetch the latest fundamentals for TTM calculation
+  const latestFundamentals = await prisma.fundamental.findMany({
     where: {
       companyId: company.id,
+      periodType: 'QUARTERLY'
     },
     orderBy: {
       periodEnd: 'desc',
     },
+    take: 4,
   })
+
+  let fundamentalsToPass = latestFundamentals
+
+  if (latestFundamentals.length < 4) {
+    // Fallback to the latest ANNUAL record if we don't have enough quarters
+    const latestAnnual = await prisma.fundamental.findFirst({
+      where: {
+        companyId: company.id,
+        periodType: 'ANNUAL'
+      },
+      orderBy: {
+        periodEnd: 'desc',
+      },
+    })
+    fundamentalsToPass = latestAnnual ? [latestAnnual] : []
+  }
 
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
@@ -50,7 +68,7 @@ export default async function StockPage({
       {/* 2. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-        <StockSnapshot fundamental={latestFundamental} />
+        <StockSnapshot ticker={company.ticker} fundamentals={fundamentalsToPass as any} />
       </div>
 
       {/* 3. Price History Chart */}
