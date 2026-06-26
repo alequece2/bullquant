@@ -264,13 +264,15 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
           <div className="flex items-center gap-1.5">
             <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
             {infoTooltip && (
-              <TooltipProvider delayDuration={100}>
+              <TooltipProvider delay={100}>
                 <UITooltip>
-                  <TooltipTrigger asChild>
-                    <div className="cursor-help text-muted-foreground hover:text-foreground transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    </div>
-                  </TooltipTrigger>
+                  <TooltipTrigger
+                    render={
+                      <span className="cursor-help inline-flex text-muted-foreground hover:text-foreground transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                      </span>
+                    }
+                  />
                   <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 bg-[#18181b] border-[#27272a] text-gray-200 shadow-xl">
                     {infoTooltip}
                   </TooltipContent>

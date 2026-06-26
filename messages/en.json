@@ -46,7 +46,8 @@
     "settingsTitle": "Account Settings",
     "logoutTitle": "Sign out",
     "login": "Sign in",
-    "register": "Sign up"
+    "register": "Sign up",
+    "dcf": "DCF"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -92,6 +93,39 @@
       "balance": "Balance Sheet",
       "dividend": "Dividends"
     }
+  },
+  "dcf": {
+    "title": "DCF Calculator",
+    "subtitle": "Estimate a company's intrinsic value using the discounted cash flow method.",
+    "educationalWarning": "A DCF is a model, not a crystal ball. The output is extremely sensitive to your growth assumptions and discount rate (WACC). Use it as one of several analysis tools — never as investment advice.",
+    "autofillLabel": "Autofill from a company",
+    "autofillPlaceholder": "Search ticker (e.g., AAPL)...",
+    "loadedFor": "Data loaded from:",
+    "loadError": "Could not load data for this company.",
+    "currentPriceInput": "Current Price",
+    "fcf0": "Initial FCF",
+    "shares": "Shares Outstanding",
+    "netDebt": "Net Debt",
+    "millionsSuffix": "Millions",
+    "growth1": "Growth Years 1-5",
+    "growth2": "Growth Years 6-10",
+    "wacc": "WACC (Discount Rate)",
+    "waccHint": "Required return. Higher means a more conservative value.",
+    "terminalGrowth": "Perpetual Growth",
+    "terminalGrowthHint": "Long-term growth after year 10 (typically ≤ inflation).",
+    "fairValue": "Fair Value",
+    "currentPrice": "Current Price",
+    "marginOfSafety": "Margin of Safety",
+    "undervalued": "Potentially undervalued versus the estimated fair value.",
+    "overvalued": "Potentially overvalued versus the estimated fair value.",
+    "enterpriseValue": "Enterprise Value",
+    "equityValue": "Equity Value",
+    "terminalValuePv": "Terminal Value (PV)",
+    "fcfPv": "Discounted FCF (PV)",
+    "disclaimer": "Values are an estimate based on your assumptions. They are not a buy or sell recommendation.",
+    "errorWacc": "WACC must be greater than perpetual growth for the model to be valid. Adjust the sliders.",
+    "errorShares": "Enter the number of shares outstanding to compute value per share.",
+    "errorFcf": "Enter a valid initial Free Cash Flow to start."
   },
   "financials": {
     "engineTitle": "Financials & Decision Engine",

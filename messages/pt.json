@@ -46,7 +46,8 @@
     "settingsTitle": "Definições de Conta",
     "logoutTitle": "Sair",
     "login": "Login",
-    "register": "Registar"
+    "register": "Registar",
+    "dcf": "DCF"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -124,6 +125,39 @@
       "balance": "Balanço",
       "dividend": "Dividendos"
     }
+  },
+  "dcf": {
+    "title": "Calculadora DCF",
+    "subtitle": "Estima o valor intrínseco de uma empresa pelo método dos fluxos de caixa descontados.",
+    "educationalWarning": "Um DCF é um modelo, não uma bola de cristal. O resultado é extremamente sensível aos pressupostos de crescimento e à taxa de desconto (WACC). Usa-o como uma de várias ferramentas de análise — nunca como conselho de investimento.",
+    "autofillLabel": "Autopreencher a partir de uma empresa",
+    "autofillPlaceholder": "Pesquisar ticker (ex: AAPL)...",
+    "loadedFor": "Dados carregados de:",
+    "loadError": "Não foi possível carregar os dados desta empresa.",
+    "currentPriceInput": "Preço Atual",
+    "fcf0": "FCF Inicial",
+    "shares": "Nº de Ações",
+    "netDebt": "Dívida Líquida",
+    "millionsSuffix": "Milhões",
+    "growth1": "Crescimento Anos 1-5",
+    "growth2": "Crescimento Anos 6-10",
+    "wacc": "WACC (Taxa de Desconto)",
+    "waccHint": "Retorno exigido. Quanto maior, mais conservador o valor.",
+    "terminalGrowth": "Crescimento Perpétuo",
+    "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
+    "fairValue": "Valor Justo",
+    "currentPrice": "Preço Atual",
+    "marginOfSafety": "Margem de Segurança",
+    "undervalued": "Potencialmente subavaliada face ao valor justo estimado.",
+    "overvalued": "Potencialmente sobreavaliada face ao valor justo estimado.",
+    "enterpriseValue": "Enterprise Value",
+    "equityValue": "Valor do Capital Próprio",
+    "terminalValuePv": "Valor Terminal (VP)",
+    "fcfPv": "FCF Descontado (VP)",
+    "disclaimer": "Os valores são uma estimativa baseada nos teus pressupostos. Não constituem recomendação de compra ou venda.",
+    "errorWacc": "O WACC tem de ser superior ao crescimento perpétuo para o modelo ser válido. Ajusta os sliders.",
+    "errorShares": "Indica o número de ações em circulação para calcular o valor por ação.",
+    "errorFcf": "Indica um Free Cash Flow inicial válido para começar."
   },
   "financials": {
     "engineTitle": "Motor de Decisão & Financeiras",
