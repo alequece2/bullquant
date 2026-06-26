@@ -80,7 +80,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
 
   const displayData = useMemo(() => {
     if (timeFilter === 'ALL' || data.length === 0) return data;
-    const isQuarterly = data[0]?.label?.includes('Q') || false;
+    const isQuarterly = String(data[0]?.label ?? '').includes('Q');
     let items = data.length;
     switch(timeFilter) {
       case '1Y': items = isQuarterly ? 4 : 1; break;
@@ -189,8 +189,22 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
               width={55}
               domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
             />
-            <Tooltip 
-              content={(props) => <CustomTooltip {...props} formatTooltipValue={formatTooltipValue} />}
+            <Tooltip
+              content={(props) => {
+                const items = (props.payload ?? []).map((p) => ({
+                  name: String(p.name ?? ''),
+                  value: Number(p.value ?? 0),
+                  color: typeof p.color === 'string' ? p.color : '#ffffff',
+                }))
+                return (
+                  <CustomTooltip
+                    active={props.active}
+                    payload={items}
+                    label={props.label != null ? String(props.label) : undefined}
+                    formatTooltipValue={formatTooltipValue}
+                  />
+                )
+              }}
               cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
@@ -244,10 +258,10 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
         <tbody className="divide-y divide-border/40">
           {displayData.map((row, i) => (
             <tr key={i} className="hover:bg-muted/30 transition-colors">
-              <td className="px-4 py-2 font-medium whitespace-nowrap">{row.label}</td>
+              <td className="px-4 py-2 font-medium whitespace-nowrap">{String(row.label ?? '')}</td>
               {config.dataKeys.map(k => (
                 <td key={k.key} className="px-4 py-2 text-right tabular-nums">
-                  {formatTooltipValue(row[k.key])}
+                  {formatTooltipValue(row[k.key] as number | string | null)}
                 </td>
               ))}
             </tr>

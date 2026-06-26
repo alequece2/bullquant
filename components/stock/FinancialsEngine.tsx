@@ -6,9 +6,38 @@ import { useTranslations } from "next-intl"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
 
+// Linha de fundamentais serializada (Decimals do Prisma já convertidos para number).
+type FundamentalRow = {
+  periodType?: string
+  fiscalYear?: number
+  fiscalQuarter?: number | null
+  label?: string
+  revenue?: number | null
+  grossProfit?: number | null
+  operatingIncome?: number | null
+  netIncome?: number | null
+  ebitda?: number | null
+  operatingCashFlow?: number | null
+  capex?: number | null
+  freeCashFlow?: number | null
+  epsDiluted?: number | null
+  researchAndDevelopment?: number | null
+  sellingGeneralAndAdmin?: number | null
+  cash?: number | null
+  totalDebt?: number | null
+  sharesOutstanding?: number | null
+  grossMargin?: number | null
+  operatingMargin?: number | null
+  netMargin?: number | null
+  profitMargin?: number | null
+  roic?: number | null
+  dividendPerShare?: number | null
+  revenueSegments?: Record<string, number> | null
+}
+
 export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: string | null }) {
   const t = useTranslations("financials")
-  const [data, setData] = useState<Record<string, unknown>[]>([])
+  const [data, setData] = useState<FundamentalRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [period, setPeriod] = useState<PeriodType>("ANNUAL")
   
@@ -84,9 +113,10 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
         // Segments
         const segments: Record<string, number> = {}
         last4.forEach(q => {
-          if (q.revenueSegments) {
-            Object.keys(q.revenueSegments).forEach(k => {
-              segments[k] = (segments[k] || 0) + q.revenueSegments[k]
+          const segs = q.revenueSegments
+          if (segs) {
+            Object.keys(segs).forEach(k => {
+              segments[k] = (segments[k] || 0) + segs[k]
             })
           }
         })
@@ -107,8 +137,10 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
 
   const calcCAGR = (key: string) => {
     if (processedData.length < 2) return null
-    const start = processedData[0][key]
-    const end = processedData[processedData.length - 1][key]
+    const row0 = processedData[0] as Record<string, unknown>
+    const rowN = processedData[processedData.length - 1] as Record<string, unknown>
+    const start = Number(row0[key] ?? 0)
+    const end = Number(rowN[key] ?? 0)
     if (!start || !end || start <= 0) return null
     const years = period === "ANNUAL" ? processedData.length - 1 : (processedData.length - 1) / 4
     if (years <= 0) return null
@@ -125,8 +157,9 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
 
   // Pre-process segments for dynamic keys
   let segmentKeys: string[] = []
-  if (processedData.length > 0 && processedData[0].revenueSegments) {
-    segmentKeys = Object.keys(processedData[0].revenueSegments)
+  const firstSegments = processedData[0]?.revenueSegments
+  if (firstSegments) {
+    segmentKeys = Object.keys(firstSegments)
   }
 
   // Flatten segments into main object for Recharts

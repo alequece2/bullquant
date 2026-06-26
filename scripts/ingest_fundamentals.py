@@ -378,7 +378,14 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         else:
             tax_rate = 0.21
         nopat = op_income * (1 - tax_rate)
-        inv_cap = (total_debt or 0) + (total_equity or 0) - (cash or 0)
+        # Abordagem "financing": Dívida Total + Equity − Caixa.
+        # Quando a dívida total não resolve (tag em falta), recorrer à base
+        # "operating" (Ativos − Passivo Corrente − Caixa), que não depende da
+        # dívida — senão o denominador encolhe e o ROIC fica artificialmente alto.
+        if total_debt is not None:
+            inv_cap = total_debt + (total_equity or 0) - (cash or 0)
+        else:
+            inv_cap = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
         roic = safe_clamp(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -99.0, 99.0)
 
     roe = safe_clamp(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -99.0, 99.0)
