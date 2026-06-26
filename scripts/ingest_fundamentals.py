@@ -245,7 +245,7 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict) -> dict:
-    shares = inst.get("sharesOutstandingInst") or dur.get("sharesOutstandingDur")
+    shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")
