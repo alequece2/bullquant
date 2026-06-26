@@ -18,16 +18,19 @@ import pandas as pd
 from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-ENV_FILE = os.path.join(ROOT, ".env.dev")
 
-if not os.path.exists(ENV_FILE):
-    sys.exit(
-        "ERRO: ficheiro .env.dev não encontrado.\n"
-        "Cria scripts/.env.dev.example como referência e preenche com as credenciais do projeto Supabase de DEV.\n"
-        "NUNCA uses .env.local aqui — esses scripts só correm contra a BD de desenvolvimento."
-    )
-
-load_dotenv(ENV_FILE)
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    # Em GitHub Actions as variáveis vêm dos secrets directamente
+    pass
+else:
+    ENV_FILE = os.path.join(ROOT, ".env.dev")
+    if not os.path.exists(ENV_FILE):
+        sys.exit(
+            "ERRO: ficheiro .env.dev não encontrado.\n"
+            "Cria um projeto Supabase de DEV e preenche .env.dev com as suas credenciais.\n"
+            "NUNCA uses .env.local — estes scripts só correm contra a BD de desenvolvimento."
+        )
+    load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")

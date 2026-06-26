@@ -19,20 +19,22 @@ import psycopg2
 from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-ENV_FILE = os.path.join(ROOT, ".env.dev")
 
-if not os.path.exists(ENV_FILE):
-    sys.exit(
-        "ERRO: ficheiro .env.dev não encontrado.\n"
-        "Cria um projeto Supabase de DEV e preenche .env.dev com as suas credenciais.\n"
-        "NUNCA uses .env.local — estes scripts só correm contra a BD de desenvolvimento."
-    )
-
-load_dotenv(ENV_FILE)
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    pass
+else:
+    ENV_FILE = os.path.join(ROOT, ".env.dev")
+    if not os.path.exists(ENV_FILE):
+        sys.exit(
+            "ERRO: ficheiro .env.dev não encontrado.\n"
+            "Cria um projeto Supabase de DEV e preenche .env.dev com as suas credenciais.\n"
+            "NUNCA uses .env.local — estes scripts só correm contra a BD de desenvolvimento."
+        )
+    load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
-    sys.exit("DIRECT_URL não definida no .env.dev")
+    sys.exit("DIRECT_URL não definida")
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
 EDGAR_HEADERS = {"User-Agent": "BullQuant admin@bullocracy.com"}

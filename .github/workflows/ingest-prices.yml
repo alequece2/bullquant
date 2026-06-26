@@ -1,0 +1,29 @@
+name: Ingest Prices
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * 1-5" # dias de semana 23h UTC (pós-fecho US)
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run ingest
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+        run: python scripts/ingest_prices.py
