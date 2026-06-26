@@ -95,13 +95,18 @@ DURATION_TAGS = {
 INSTANT_TAGS = {
     "totalAssets": ["Assets"],
     "totalCurrentLiab": ["LiabilitiesCurrent"],
-    "longTermDebt": ["LongTermDebt", "LongTermDebtNoncurrent"],
+    "totalLiabilities": ["Liabilities"],
+    "longTermDebt": ["LongTermDebtNoncurrent", "LongTermDebt"],
+    "longTermDebtCurrent": ["LongTermDebtCurrent"],
+    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt"],
+    "commercialPaper": ["CommercialPaper"],
     "totalDebt": ["DebtLongtermAndShorttermCombinedAmount", "LongTermDebtAndCapitalLeaseObligations"],
     "cash": [
         "CashAndCashEquivalentsAtCarryingValue",
-        "CashCashEquivalentsAndShortTermInvestments",
+        "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
     ],
+    "marketableSecuritiesCurrent": ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "ShortTermInvestments"],
     "totalEquity": [
         "StockholdersEquity",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
@@ -258,7 +263,20 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     tax_expense = dur.get("taxExpense")
     total_assets = inst.get("totalAssets")
     curr_liab = inst.get("totalCurrentLiab")
+    
+    total_debt = inst.get("totalDebt")
+    if total_debt is None:
+        ltd_nc = inst.get("longTermDebt") or 0
+        ltd_c = inst.get("longTermDebtCurrent") or 0
+        st = inst.get("shortTermDebt") or inst.get("commercialPaper") or 0
+        if ltd_nc > 0 or ltd_c > 0 or st > 0:
+            total_debt = ltd_nc + ltd_c + st
+
     cash = inst.get("cash")
+    if cash is not None:
+        marketable = inst.get("marketableSecuritiesCurrent") or 0
+        cash = cash + marketable
+
     total_equity = inst.get("totalEquity")
 
     gross_margin = safe_div(gross_profit, revenue)
