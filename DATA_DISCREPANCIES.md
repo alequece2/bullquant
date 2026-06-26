@@ -34,13 +34,11 @@ Enquanto outros robôs falham a extração por não encontrarem a linha isolada 
 ## 3. CapEx (Capital Expenditures) e Ativos Intangíveis
 
 **Cenário de Dúvida:**
-O Bullquant mostra um CapEx superior ao puro investimento físico (Property, Plant & Equipment). Exemplo: Apple 2016, o PP&E é $12.73B, mas o Bullquant reporta $13.55B.
+*(Decisão de Produto - Em atualização)*: No passado, o Bullquant mostrava um CapEx superior ao puro investimento físico (Property, Plant & Equipment) porque somava os ativos intangíveis (patentes, licenças de software, etc.). Isto criava uma métrica de "Owner's Earnings" à lá Warren Buffett.
 
-**A Nossa Metodologia:**
-Na ótica puramente financeira, principalmente para empresas tecnológicas (Apple, Microsoft, Software, Biotecnologia), as patentes, licenças de software e propriedade intelectual são investimentos críticos de capital, tão essenciais como tijolos de fábricas. 
-Decidimos que a fórmula do Bullquant soma os ativos físicos aos ativos intangíveis:
-`CapEx Total = PaymentsToAcquirePropertyPlantAndEquipment + PaymentsToAcquireIntangibleAssets`
-Isto reflete um **Free Cash Flow (FCF) mais conservador e realista** para o investidor moderno.
+**A Nossa Metodologia (Atualizada para MVP):**
+Para garantir a credibilidade e paridade com a indústria (Macrotrends, Yahoo Finance), o **CapEx e o FCF (Free Cash Flow)** na capa da empresa retornaram ao *Standard* financeiro (focados apenas em PP&E, ou manutenções imobiliárias para REITs). 
+No entanto, o motor de dados do Bullquant continua a extrair os gastos com Intangíveis no *backend*. Na versão V1 da plataforma, a nossa tese original ("Owner's Earnings") será introduzida como uma métrica secundária e opcional, devidamente etiquetada para utilizadores avançados que desejem analisar empresas tecnológicas de forma mais conservadora.
 
 *(Nota: a exclusão propositada de dados "mock" no passado não está descrita aqui, mas o motor foi limpo em Junho de 2026 para ler exclusivamente dados SEC 100% autênticos).*
 
