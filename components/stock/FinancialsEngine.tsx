@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
 
-export function FinancialsEngine({ ticker }: { ticker: string }) {
+export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: string | null }) {
   const t = useTranslations("financials")
   const [data, setData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -194,11 +194,14 @@ export function FinancialsEngine({ ticker }: { ticker: string }) {
           config={{ 
             isCurrency: true,
             dataKeys: [
-              { key: 'operatingCashFlow', name: 'OCF', color: '#10b981', type: 'bar' },
-              { key: 'capexInv', name: 'CapEx', color: '#f43f5e', type: 'line' }
-            ] 
+              { key: 'freeCashFlow', name: 'FCF', color: '#3b82f6', type: 'bar' },
+              { key: 'operatingCashFlow', name: 'OCF', color: '#10b981', type: 'line' },
+              { key: 'capex', name: 'CapEx', color: '#f43f5e', type: 'line' }
+            ],
+            defaultHiddenKeys: ['operatingCashFlow', 'capex']
           }} 
           cagr={calcCAGR('freeCashFlow')}
+          infoTooltip={sector === 'Real Estate' ? "Para Fundos Imobiliários (REITs), o CapEx reflete apenas os custos de manutenção imobiliária (ex: melhorias para inquilinos e comissões de leasing), oferecendo um FCF preciso (AFFO). Exclui-se a compra de novos edifícios para não distorcer o FCF real de manutenção." : undefined}
         />
 
         <DecisionChart 

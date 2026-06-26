@@ -76,6 +76,11 @@ DURATION_TAGS = {
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
         "PaymentsForCapitalImprovements",
+        "PaymentsForLeasingCostsCommissionsAndTenantImprovements",
+    ],
+    "intangibles": [
+        "PaymentsToAcquireIntangibleAssets",
+        "PaymentsToDevelopSoftware",
     ],
     "dividendPerShare": [
         "CommonStockDividendsPerShareDeclared",
@@ -257,8 +262,9 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict) -> dict:
     shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
-    capex_raw = dur.get("capex")
-    capex = abs(capex_raw) if capex_raw is not None else None
+    capex_base = dur.get("capex") or 0
+    intangibles = dur.get("intangibles") or 0
+    capex = abs(capex_base + intangibles) if (capex_base + intangibles) != 0 else None
     op_cf = dur.get("operatingCashFlow")
     fcf = (op_cf - capex) if (op_cf is not None and capex is not None) else None
 

@@ -57,7 +57,7 @@ export default async function StockPage({
       <StockPriceChart ticker={company.ticker} />
 
       {/* 4. Financials & Decision Engine */}
-      <FinancialsEngine ticker={company.ticker} />
+      <FinancialsEngine ticker={company.ticker} sector={company.sector} />
     </div>
   )
 }

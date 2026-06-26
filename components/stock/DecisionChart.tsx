@@ -18,6 +18,7 @@ import {
   Cell
 } from "recharts"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { useTranslations } from "next-intl"
 
 export type ChartConfig = {
@@ -27,6 +28,7 @@ export type ChartConfig = {
   isPercentage?: boolean
   inverseColors?: boolean
   isLargeNumber?: boolean
+  defaultHiddenKeys?: string[]
 }
 
 const TIME_FILTERS = ['ALL', '10Y', '5Y', '3Y', '1Y'] as const
@@ -58,14 +60,16 @@ interface DecisionChartProps {
   type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR'
   config: ChartConfig
   cagr?: number | null
+  infoTooltip?: React.ReactNode
 }
 
-export function DecisionChart({ title, data, type, config, cagr }: DecisionChartProps) {
+export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: DecisionChartProps) {
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set())
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set(config.defaultHiddenKeys || []))
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('ALL')
+
 
   const displayData = useMemo(() => {
     if (timeFilter === 'ALL' || data.length === 0) return data;
@@ -165,8 +169,10 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
               dataKey="label" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#a1a1aa', fontSize: 11 }} 
+              tick={{ fill: '#a1a1aa', fontSize: 10 }} 
               dy={15}
+              interval={displayData.length > 15 ? "preserveEnd" : 0}
+              height={40}
             />
             <YAxis 
               axisLine={false} 
@@ -248,7 +254,23 @@ export function DecisionChart({ title, data, type, config, cagr }: DecisionChart
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
+            {infoTooltip && (
+              <TooltipProvider delayDuration={100}>
+                <UITooltip>
+                  <TooltipTrigger asChild>
+                    <div className="cursor-help text-muted-foreground hover:text-foreground transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 bg-[#18181b] border-[#27272a] text-gray-200 shadow-xl">
+                    {infoTooltip}
+                  </TooltipContent>
+                </UITooltip>
+              </TooltipProvider>
+            )}
+          </div>
           {cagr !== undefined && cagr !== null && (
             <p className="text-xs font-semibold text-muted-foreground mt-0.5">
               CAGR: <span className={cagr >= 0 ? "text-emerald-500" : "text-rose-500"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
