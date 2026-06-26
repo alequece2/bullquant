@@ -318,7 +318,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         ebitda = ebitda_raw
     else:
         da = dur.get("depreciationAndAmortization") or 0
-        if op_income is not None:
+        interest_exp = dur.get("interestExpense")
+        if net_income is not None and tax_expense is not None and interest_exp is not None:
+            ebitda = net_income + tax_expense + interest_exp + da
+        elif op_income is not None:
             ebitda = op_income + da
         else:
             ebitda = None

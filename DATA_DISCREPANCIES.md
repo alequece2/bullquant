@@ -53,3 +53,16 @@ Comparando a Prologis (PLD) em 2025, outros sites indicam um Net Income de $3.41
 O Bullquant está **correto**. A Prologis opera como um UPREIT, onde a empresa cotada na bolsa (Prologis, Inc.) detém cerca de 97% da parceria principal, sendo os restantes 3% detidos por terceiros (*Non-controlling interests*).
 A métrica oficial de $3.41B inclui os lucros atribuíveis a esses parceiros privados, dinheiro ao qual os acionistas da bolsa **não têm qualquer direito**. 
 O algoritmo do Bullquant extrai a tag oficial `NetIncomeLoss`, que deduz esses interesses minoritários e devolve exatamente **o lucro que pertence à empresa mãe e aos seus acionistas** ($3.33B). Esta abordagem protege os investidores de avaliações (como P/E) inflacionadas.
+
+---
+
+## 5. Cálculo do EBITDA (Operating vs Bottom-up)
+
+**Cenário de Dúvida:**
+O EBITDA da Amazon em 2017 é de $16.13B em algumas plataformas (ex: Macrotrends) mas inicialmente o Bullquant apresentava $15.58B. Além disso, em anos como 2022, a Amazon apresentou oscilações brutais que algumas métricas excluem e outras não.
+
+**A Nossa Metodologia:**
+Inicialmente o nosso motor utilizava uma abordagem de **Operating EBITDA** pura (`Operating Income + Depreciation & Amortization`). Esta visão era espetacular para analisar a performance real e excluir perdas ou ganhos de investimentos isolados (ex: a queda da Amazon no Rivian em 2022). 
+No entanto, no sentido de assegurarmos credibilidade standard (tal como a decisão sobre o CapEx na secção 3), **ajustámos a fórmula do EBITDA para a leitura Bottom-up clássica**:
+`EBITDA = Net Income + Income Tax Expense + Interest Expense + D&A`
+Assim, o nosso EBITDA acompanha os valores universais ao cêntimo (os tais $16.13B na Amazon), mantendo todas as rubricas "Other Income/Expense" contabilizadas, garantindo paridade imediata com o resto do mundo financeiro.
