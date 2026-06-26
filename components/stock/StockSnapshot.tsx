@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
 import type { Fundamental } from "@prisma/client"
-import { Skeleton } from "@/components/ui/skeleton"
 
 type StockSnapshotProps = {
   ticker: string
@@ -117,23 +116,23 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t('valuation')}</h3>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Market Cap</span>
-          {isLoading ? <Skeleton className="h-4 w-16" /> : <span className="font-bold">{formatVal(marketCap, false, true)}</span>}
+          {isLoading ? <div className="h-4 w-16 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(marketCap, false, true)}</span>}
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">P/E (TTM)</span>
-          {isLoading ? <Skeleton className="h-4 w-12" /> : <span className="font-bold">{formatVal(pe, false, false, true)}</span>}
+          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(pe, false, false, true)}</span>}
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">P/Sales</span>
-          {isLoading ? <Skeleton className="h-4 w-12" /> : <span className="font-bold">{formatVal(ps, false, false, true)}</span>}
+          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(ps, false, false, true)}</span>}
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">EV/EBITDA</span>
-          {isLoading ? <Skeleton className="h-4 w-12" /> : <span className="font-bold">{formatVal(evEbitda, false, false, true)}</span>}
+          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(evEbitda, false, false, true)}</span>}
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">P/Book</span>
-          {isLoading ? <Skeleton className="h-4 w-12" /> : <span className="font-bold">{formatVal(pb, false, false, true)}</span>}
+          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(pb, false, false, true)}</span>}
         </div>
       </div>
 
@@ -150,7 +149,7 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">FCF Yield</span>
-          {isLoading ? <Skeleton className="h-4 w-12" /> : <span className="font-bold">{formatVal(fcfYield, true)}</span>}
+          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(fcfYield, true)}</span>}
         </div>
       </div>
 
