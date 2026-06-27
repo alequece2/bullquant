@@ -1,0 +1,220 @@
+"use client"
+
+import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { ChevronLeft, ChevronRight, Sunrise, Moon, Loader2 } from "lucide-react"
+
+interface EarningsItem {
+  id: string
+  date: string // YYYY-MM-DD
+  hour: "BMO" | "AMC" | "DMH" | "UNKNOWN"
+  fiscalYear: number
+  fiscalQuarter: number
+  epsEstimate: number | null
+  epsActual: number | null
+  revenueEstimate: number | null
+  revenueActual: number | null
+  ticker: string
+  name: string
+  logoUrl: string | null
+}
+
+type Scope = "all" | "watchlist"
+
+const fmtDate = (d: Date) => d.toISOString().slice(0, 10)
+const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1)
+const endOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0)
+
+export function EarningsCalendar() {
+  const t = useTranslations("calendar")
+  const [cursor, setCursor] = useState(() => startOfMonth(new Date()))
+  const [scope, setScope] = useState<Scope>("all")
+  const [events, setEvents] = useState<EarningsItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const monthStart = useMemo(() => startOfMonth(cursor), [cursor])
+  const monthEnd = useMemo(() => endOfMonth(cursor), [cursor])
+
+  useEffect(() => {
+    let active = true
+
+    const load = async () => {
+      setLoading(true)
+      const params = new URLSearchParams({ from: fmtDate(monthStart), to: fmtDate(monthEnd) })
+      if (scope === "watchlist") params.set("watchlist", "1")
+      try {
+        const res = await fetch(`/api/earnings?${params.toString()}`)
+        const data: EarningsItem[] = res.ok ? await res.json() : []
+        if (active) setEvents(Array.isArray(data) ? data : [])
+      } catch {
+        if (active) setEvents([])
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      active = false
+    }
+  }, [monthStart, monthEnd, scope])
+
+  const byDay = useMemo(() => {
+    const map = new Map<string, EarningsItem[]>()
+    for (const e of events) {
+      const arr = map.get(e.date) ?? []
+      arr.push(e)
+      map.set(e.date, arr)
+    }
+    return map
+  }, [events])
+
+  // Grelha: semanas começam à Segunda (convenção EU/PT).
+  const cells = useMemo(() => {
+    const firstWeekday = (monthStart.getDay() + 6) % 7 // 0 = Segunda
+    const daysInMonth = monthEnd.getDate()
+    const out: (Date | null)[] = []
+    for (let i = 0; i < firstWeekday; i++) out.push(null)
+    for (let d = 1; d <= daysInMonth; d++) out.push(new Date(cursor.getFullYear(), cursor.getMonth(), d))
+    while (out.length % 7 !== 0) out.push(null)
+    return out
+  }, [monthStart, monthEnd, cursor])
+
+  // Nomes de mês/dias-da-semana via Intl (locale PT) — sem listas hardcoded.
+  const monthLabel = useMemo(
+    () => new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" }).format(cursor),
+    [cursor],
+  )
+  const weekdays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) =>
+        // 1 Jan 2024 foi uma Segunda-feira.
+        new Intl.DateTimeFormat("pt-PT", { weekday: "short" }).format(new Date(2024, 0, 1 + i)),
+      ),
+    [],
+  )
+
+  const todayStr = fmtDate(new Date())
+  const goPrev = () => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))
+  const goNext = () => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))
+  const goToday = () => setCursor(startOfMonth(new Date()))
+
+  const scopeBtn = (value: Scope, label: string) => (
+    <button
+      onClick={() => setScope(value)}
+      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+        scope === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
+  )
+
+  return (
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={goPrev}
+            aria-label={t("prevMonth")}
+            className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="font-bold text-lg capitalize min-w-[11rem] text-center">{monthLabel}</span>
+          <button
+            onClick={goNext}
+            aria-label={t("nextMonth")}
+            className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <button
+            onClick={goToday}
+            className="ml-1 px-3 py-1.5 text-sm font-medium rounded-lg border border-border hover:bg-muted transition-colors"
+          >
+            {t("today")}
+          </button>
+        </div>
+        <div className="inline-flex rounded-lg border border-border p-0.5 bg-card">
+          {scopeBtn("all", t("scopeAll"))}
+          {scopeBtn("watchlist", t("scopeWatchlist"))}
+        </div>
+      </div>
+
+      {/* Grelha */}
+      <div className="rounded-xl border border-border overflow-hidden bg-card">
+        <div className="grid grid-cols-7 bg-muted/50">
+          {weekdays.map(w => (
+            <div key={w} className="p-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {w}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {cells.map((day, idx) => {
+            if (!day) return <div key={`empty-${idx}`} className="min-h-[7rem] border-t border-l border-border bg-muted/20" />
+            const dayStr = fmtDate(day)
+            const dayEvents = byDay.get(dayStr) ?? []
+            const isToday = dayStr === todayStr
+            return (
+              <div key={dayStr} className="min-h-[7rem] border-t border-l border-border p-1.5 flex flex-col">
+                <div
+                  className={`text-xs font-medium mb-1 ${
+                    isToday
+                      ? "self-start rounded-full bg-primary text-primary-foreground w-5 h-5 flex items-center justify-center font-bold"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {day.getDate()}
+                </div>
+                <div className="space-y-0.5">
+                  {dayEvents.slice(0, 4).map(e => (
+                    <EventChip key={e.id} e={e} />
+                  ))}
+                  {dayEvents.length > 4 && (
+                    <div className="text-[10px] text-muted-foreground px-1">+{dayEvents.length - 4} {t("more")}</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {loading && (
+        <div className="flex justify-center py-6 text-muted-foreground">
+          <Loader2 className="animate-spin h-5 w-5" />
+        </div>
+      )}
+      {!loading && events.length === 0 && (
+        <p className="text-center text-muted-foreground py-6">{t("empty")}</p>
+      )}
+    </div>
+  )
+}
+
+function EventChip({ e }: { e: EarningsItem }) {
+  const reported = e.epsActual !== null && e.epsEstimate !== null
+  const beat = reported && e.epsActual! >= e.epsEstimate!
+  const HourIcon = e.hour === "BMO" ? Sunrise : e.hour === "AMC" ? Moon : null
+
+  return (
+    <Link
+      href={`/stock/${e.ticker}`}
+      title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
+      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted ${
+        reported
+          ? beat
+            ? "text-green-600 dark:text-green-400"
+            : "text-red-600 dark:text-red-400"
+          : "text-foreground"
+      }`}
+    >
+      {HourIcon && <HourIcon className="h-3 w-3 shrink-0 opacity-70" />}
+      <span className="truncate">{e.ticker}</span>
+    </Link>
+  )
+}

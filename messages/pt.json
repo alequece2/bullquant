@@ -47,7 +47,8 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
-    "dcf": "DCF"
+    "dcf": "DCF",
+    "calendar": "Calendário"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -188,5 +189,17 @@
       "operating": "OPERAC.",
       "profit": "LÍQUIDA"
     }
+  },
+  "calendar": {
+    "title": "Calendário de Resultados",
+    "subtitle": "Acompanha as datas de apresentação de resultados das empresas que monitorizamos.",
+    "disclaimer": "As datas futuras são estimativas das fontes de dados e podem mudar. Confirma sempre na página de relações com investidores da empresa.",
+    "today": "Hoje",
+    "prevMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte",
+    "scopeAll": "Todas",
+    "scopeWatchlist": "Watchlist",
+    "more": "mais",
+    "empty": "Sem resultados agendados neste período."
   }
 }
