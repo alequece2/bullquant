@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown } from "lucide-react"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 interface EarningsItem {
   id: string
@@ -220,34 +222,105 @@ export function EarningsCalendar() {
 }
 
 function EventChip({ e }: { e: EarningsItem }) {
+  const t = useTranslations("calendar")
   const reported = e.epsActual !== null && e.epsEstimate !== null
   const beat = reported && e.epsActual! >= e.epsEstimate!
   const HourIcon = e.hour === "BMO" ? Sunrise : e.hour === "AMC" ? Moon : null
 
+  const formatCurrency = (val: number | null) => {
+    if (val === null) return "-"
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(val)
+  }
+  
+  const formatCompact = (val: number | null) => {
+    if (val === null) return "-"
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 }).format(val)
+  }
+
   return (
-    <Link
-      href={`/stock/${e.ticker}`}
-      title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
-      className="group flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted"
-    >
-      {e.logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={e.logoUrl}
-          alt=""
-          referrerPolicy="no-referrer"
-          className="h-3.5 w-3.5 rounded-sm object-contain bg-white shrink-0"
-        />
-      ) : HourIcon ? (
-        <HourIcon className="h-3 w-3 shrink-0 opacity-60" />
-      ) : null}
-      <span className="truncate text-foreground">{e.ticker}</span>
-      {reported &&
-        (beat ? (
-          <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
-        ) : (
-          <TrendingDown className="h-3 w-3 shrink-0 text-red-600 dark:text-red-400" />
-        ))}
-    </Link>
+    <Dialog>
+      <DialogTrigger
+        title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
+        className="w-full text-left group flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted"
+      >
+        {e.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={e.logoUrl}
+            alt=""
+            referrerPolicy="no-referrer"
+            className="h-3.5 w-3.5 rounded-sm object-contain bg-white shrink-0"
+          />
+        ) : HourIcon ? (
+          <HourIcon className="h-3 w-3 shrink-0 opacity-60" />
+        ) : null}
+        <span className="truncate text-foreground">{e.ticker}</span>
+        {reported &&
+          (beat ? (
+            <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
+          ) : (
+            <TrendingDown className="h-3 w-3 shrink-0 text-red-600 dark:text-red-400" />
+          ))}
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {e.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={e.logoUrl}
+                alt=""
+                referrerPolicy="no-referrer"
+                className="h-5 w-5 rounded-sm object-contain bg-white shrink-0"
+              />
+            )}
+            {e.name} ({e.ticker})
+          </DialogTitle>
+          <DialogDescription>
+            Q{e.fiscalQuarter} {e.fiscalYear} · {e.hour === "BMO" ? t("legendBmo") : e.hour === "AMC" ? t("legendAmc") : e.hour}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid grid-cols-2 gap-4 py-2">
+          <div className="rounded-xl border border-border p-3 flex flex-col">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">Earnings Per Share</span>
+            <div className="flex justify-between items-center text-sm mb-1">
+              <span className="text-muted-foreground">Estimativa</span>
+              <span className="font-medium">{formatCurrency(e.epsEstimate)}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm border-t border-border/50 pt-1">
+              <span className="text-muted-foreground">Reportado</span>
+              <span className={`font-semibold ${reported ? (beat ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : ""}`}>
+                {formatCurrency(e.epsActual)}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border p-3 flex flex-col">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">Revenue</span>
+            <div className="flex justify-between items-center text-sm mb-1">
+              <span className="text-muted-foreground">Estimativa</span>
+              <span className="font-medium">{formatCompact(e.revenueEstimate)}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm border-t border-border/50 pt-1">
+              <span className="text-muted-foreground">Reportado</span>
+              <span className={`font-semibold ${e.revenueActual !== null && e.revenueEstimate !== null ? (e.revenueActual >= e.revenueEstimate ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : ""}`}>
+                {formatCompact(e.revenueActual)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="sm:justify-between items-center mt-4">
+          <DialogClose render={<Button variant="ghost" />}>
+            Fechar
+          </DialogClose>
+          <Link href={`/stock/${e.ticker}`} prefetch={false}>
+            <Button>Ver {e.ticker} no Terminal</Button>
+          </Link>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

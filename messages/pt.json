@@ -1,4 +1,11 @@
 {
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfólio",
+    "calendar": "Calendário",
+    "dcf": "Calculadora DCF",
+    "aiInsights": "AI Insights"
+  },
   "login": {
     "title": "Entrar no BullQuant",
     "subtitle": "Acede ao teu portfólio e análises.",
