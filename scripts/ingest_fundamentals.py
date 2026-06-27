@@ -604,6 +604,17 @@ def main():
             n = process_company(conn, company)
             print(f"{n} períodos")
             total_periods += n
+        except psycopg2.OperationalError:
+            try:
+                # Supabase drops idle connections after ~10 mins, reconnect and retry
+                conn = psycopg2.connect(DIRECT_URL)
+                conn.autocommit = False
+                n = process_company(conn, company)
+                print(f"{n} períodos (reconectado)")
+                total_periods += n
+            except Exception as e2:
+                print(f"ERRO na reconexão: {e2}")
+                errors += 1
         except Exception as e:
             print(f"ERRO: {e}")
             errors += 1
