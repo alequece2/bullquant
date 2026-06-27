@@ -50,6 +50,9 @@ DURATION_TAGS = {
         "SalesRevenueNet",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
+        "RevenuesNetOfInterestExpense",
+        "InterestAndDividendIncomeOperating",
+        "OperatingLeasesIncomeStatementLeaseRevenue",
     ],
     "costOfRevenue": [
         "CostOfRevenue",
@@ -145,17 +148,20 @@ def get_companies_with_cik(cur) -> list[dict]:
     return [{"id": r[0], "ticker": r[1], "cik": r[2]} for r in cur.fetchall()]
 
 
+session = requests.Session()
+session.headers.update(EDGAR_HEADERS)
+
 def fetch_edgar_facts(cik: str) -> dict | None:
     padded = cik.zfill(10)
     url = f"{EDGAR_BASE}/CIK{padded}.json"
     try:
-        r = requests.get(url, headers=EDGAR_HEADERS, timeout=30)
+        r = session.get(url, timeout=30)
         if r.status_code == 404:
             return None
         if r.status_code == 429:
             print("    429 rate limit — a aguardar 60s...")
             time.sleep(60)
-            r = requests.get(url, headers=EDGAR_HEADERS, timeout=30)
+            r = session.get(url, timeout=30)
         r.raise_for_status()
         return r.json()
     except Exception as e:
@@ -345,6 +351,11 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     revenue = dur.get("revenue")
     gross_profit = dur.get("grossProfit")
+    
+    # ── Level 1 Accounting Integrity ──
+    if revenue is not None and gross_profit is not None and gross_profit > revenue:
+        gross_profit = revenue  # Força a integridade se a extração colidir tags residuais
+
     op_income = dur.get("operatingIncome")
     net_income = dur.get("netIncome")
     tax_expense = dur.get("taxExpense")

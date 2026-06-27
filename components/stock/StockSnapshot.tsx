@@ -71,7 +71,6 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
     const ebitda = sumMetric('ebitda')
     const opCf = sumMetric('operatingCashFlow')
     const fcf = sumMetric('freeCashFlow')
-    const dps = sumMetric('dividendPerShare')
 
     return {
       // Flow metrics (summed if TTM)
@@ -82,7 +81,6 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
       ebitda,
       operatingCashFlow: opCf,
       freeCashFlow: fcf,
-      dividendPerShare: dps,
 
       // Computed Margins
       grossMargin: revenue > 0 ? grossProfit / revenue : null,
@@ -108,9 +106,6 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
   const evEbitda = (ev && ttm?.ebitda && ttm.ebitda > 0) ? ev / ttm.ebitda : null
   const pb = (marketCap && ttm?.totalEquity && ttm.totalEquity > 0) ? marketCap / ttm.totalEquity : null
   const fcfYield = (marketCap && ttm?.freeCashFlow) ? ttm.freeCashFlow / marketCap : null
-  const dividendYield = (price && price > 0 && ttm?.dividendPerShare && ttm.dividendPerShare > 0)
-    ? ttm.dividendPerShare / price
-    : null
 
   if (!ttm) return null
 
@@ -192,20 +187,20 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
         </div>
       </div>
 
-      {/* 5. Dividend */}
+      {/* 5. Health */}
       <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
-        <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t('dividend')}</h3>
+        <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t('health')}</h3>
         <div className="flex justify-between items-center">
-          <span className="text-sm font-medium">Div Yield</span>
-          {isLoading ? <div className="h-4 w-12 bg-muted animate-pulse rounded" /> : <span className="font-bold">{formatVal(dividendYield, true)}</span>}
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm font-medium">DPS (TTM)</span>
-          <span className="font-bold">{ttm.dividendPerShare > 0 ? formatVal(ttm.dividendPerShare, false, true) : "---"}</span>
+          <span className="text-sm font-medium">Total Equity</span>
+          <span className="font-bold">{formatVal(ttm.totalEquity, false, true)}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Net Debt</span>
           <span className="font-bold">{formatVal(ttm.totalDebt - ttm.cash, false, true)}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium">Shares Out.</span>
+          <span className="font-bold">{formatVal(ttm.sharesOutstanding, false, true)}</span>
         </div>
       </div>
     </div>

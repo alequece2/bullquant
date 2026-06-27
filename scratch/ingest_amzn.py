@@ -1,0 +1,27 @@
+import sys
+import os
+import psycopg2
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from scripts.ingest_fundamentals import process_company
+from dotenv import load_dotenv
+
+load_dotenv(".env.dev")
+
+def main():
+    conn = psycopg2.connect(os.getenv("DIRECT_URL"))
+    conn.autocommit = False
+    
+    with conn.cursor() as cur:
+        cur.execute('SELECT id, ticker, cik FROM companies WHERE ticker = %s', ('AMZN',))
+        r = cur.fetchone()
+        company = {"id": r[0], "ticker": r[1], "cik": r[2]}
+    
+    try:
+        n = process_company(conn, company)
+        print(f"AMZN: {n} periodos inseridos")
+    except Exception as e:
+        print(f"ERRO: {e}")
+        
+if __name__ == "__main__":
+    main()

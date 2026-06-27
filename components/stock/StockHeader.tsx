@@ -110,7 +110,7 @@ export function StockHeader({ company }: { company: CompanyProp }) {
         <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16">
           {company.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
+            <img src={`${company.logoUrl}?v=1`} alt={company.name} referrerPolicy="no-referrer" className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
           ) : (
             <span className="font-extrabold text-2xl text-primary">{company.ticker[0]}</span>
           )}
