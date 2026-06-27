@@ -42,14 +42,22 @@ const SEC_TAGS: Record<string, { tags: string[]; unit: 'USD' | 'shares' }> = {
       'Revenues',
       'RevenueFromContractWithCustomerExcludingAssessedTax',
       'SalesRevenueNet',
-      'RevenuesNetOfInterestExpense', // Banca
-      'OperatingLeasesIncomeStatementLeaseRevenue', // REIT
+      'RevenuesNetOfInterestExpense',
+      'OperatingLeasesIncomeStatementLeaseRevenue',
     ],
     unit: 'USD',
   },
+  grossProfit: { tags: ['GrossProfit'], unit: 'USD' },
+  operatingIncome: { tags: ['OperatingIncomeLoss'], unit: 'USD' },
   netIncome: { tags: ['NetIncomeLoss'], unit: 'USD' },
+  operatingCashFlow: { tags: ['NetCashProvidedByUsedInOperatingActivities'], unit: 'USD' },
+  capex: { tags: ['PaymentsToAcquirePropertyPlantAndEquipment', 'PaymentsToAcquireProductiveAssets'], unit: 'USD' },
   totalAssets: { tags: ['Assets'], unit: 'USD' },
+  cash: { tags: ['CashAndCashEquivalentsAtCarryingValue'], unit: 'USD' },
+  totalCurrentLiab: { tags: ['LiabilitiesCurrent'], unit: 'USD' },
+  longTermDebt: { tags: ['LongTermDebtNoncurrent', 'LongTermDebtAndCapitalLeaseObligations'], unit: 'USD' },
   totalEquity: { tags: ['StockholdersEquity'], unit: 'USD' },
+  sharesOutstanding: { tags: ['EntityCommonStockSharesOutstanding', 'CommonStockSharesOutstanding'], unit: 'shares' },
 }
 
 // ── Âncoras "golden" (Camada B) ───────────────────────────────
