@@ -7,64 +7,86 @@ export type ScreenerCompany = {
   sharesOutstanding: number | null;
 };
 
-export async function getCategoryCompanies(category: string, limit = 20): Promise<ScreenerCompany[]> {
-  let whereClause = {};
-  let tickersIn: string[] = [];
+/**
+ * Categorias do dashboard de Insights.
+ *
+ * IMPORTANTE: estas são **listas temáticas curadas**, não um screener por
+ * métricas. Os tickers foram escolhidos à mão e validados contra a tabela
+ * `companies` (universo S&P 500 seeded). NÃO consultam fundamentais para
+ * ranquear por dividend growth / buybacks / crescimento real.
+ *
+ * TODO: substituir por screening real sobre `fundamentals` (CAGR de revenue,
+ * sharesOutstanding decrescente, dividendPerShare crescente) quando a qualidade
+ * dos dados de ingestão estiver verificada — neste momento há revenues por
+ * empresa que vêm com tags XBRL erradas e poluiriam qualquer ranking.
+ */
+export type ScreenerCategory =
+  | "sp500"
+  | "trending"
+  | "growth"
+  | "dividend"
+  | "buyback"
+  | "ai";
 
-  switch (category) {
-    case 'S&P 500':
-      tickersIn = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'GOOGL', 'META', 'BRK.B', 'LLY', 'AVGO', 'JPM', 'TSLA', 'WMT', 'UNH', 'V', 'XOM', 'MA', 'PG', 'JNJ', 'ORCL', 'HD'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    case 'Artificial Intelligence':
-      tickersIn = ['NVDA', 'MSFT', 'GOOGL', 'META', 'AMD', 'AVGO', 'QCOM', 'INTC', 'IBM', 'MU', 'CRM', 'ADBE'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    case 'Dividend Growth':
-      tickersIn = ['JNJ', 'PG', 'KO', 'PEP', 'MMM', 'ABBV', 'TGT', 'WMT', 'CVX', 'XOM', 'MCD', 'CAT', 'CL', 'LOW', 'HD'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    case 'Growth':
-      tickersIn = ['NVDA', 'CRWD', 'PLTR', 'SNOW', 'DDOG', 'MNDY', 'NET', 'ZS', 'NOW', 'UBER', 'DASH', 'ABNB'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    case 'Buyback Machines':
-      tickersIn = ['AAPL', 'GOOGL', 'META', 'MSFT', 'ORCL', 'QCOM', 'BK', 'Lowe\'s', 'HD', 'TXN'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    case 'Most Trending':
-      tickersIn = ['TSLA', 'NVDA', 'AAPL', 'AMD', 'PLTR', 'SMCI', 'GME', 'AMC', 'MSTR', 'COIN'];
-      whereClause = { ticker: { in: tickersIn } };
-      break;
-    default:
-      whereClause = {};
-  }
+export const SCREENER_CATEGORIES: ScreenerCategory[] = [
+  "sp500",
+  "trending",
+  "growth",
+  "dividend",
+  "buyback",
+  "ai",
+];
+
+export const DEFAULT_CATEGORY: ScreenerCategory = "sp500";
+
+// Listas curadas — todos os tickers confirmados presentes na BD (S&P 500 seeded).
+// "sp500" não tem lista: representa o universo inteiro.
+const CURATED_LISTS: Partial<Record<ScreenerCategory, string[]>> = {
+  trending: ["TSLA", "NVDA", "AAPL", "AMD", "PLTR", "SMCI", "COIN", "MSFT", "META", "AMZN"],
+  growth: ["CRWD", "PLTR", "DDOG", "NOW", "UBER", "DASH", "ABNB", "AMD", "NVDA", "CRM"],
+  dividend: ["JNJ", "PG", "KO", "PEP", "MMM", "ABBV", "TGT", "WMT", "CVX", "XOM", "MCD", "CAT", "CL", "LOW", "HD"],
+  buyback: ["AAPL", "GOOGL", "META", "MSFT", "ORCL", "QCOM", "LOW", "HD", "TXN"],
+  ai: ["NVDA", "MSFT", "GOOGL", "META", "AMD", "AVGO", "QCOM", "INTC", "IBM", "MU", "CRM", "ADBE"],
+};
+
+export function isValidCategory(value: string | undefined): value is ScreenerCategory {
+  return !!value && (SCREENER_CATEGORIES as string[]).includes(value);
+}
+
+export async function getCategoryCompanies(
+  category: ScreenerCategory,
+  limit = 20,
+): Promise<ScreenerCompany[]> {
+  const tickersIn = CURATED_LISTS[category];
 
   const companies = await prisma.company.findMany({
-    where: whereClause,
+    // "sp500" = universo inteiro; restantes = lista curada.
+    where: tickersIn ? { ticker: { in: tickersIn } } : {},
     take: limit,
+    orderBy: tickersIn ? undefined : { ticker: "asc" },
     select: {
       ticker: true,
       name: true,
       logoUrl: true,
       fundamentals: {
-        orderBy: { periodEnd: 'desc' },
+        orderBy: { periodEnd: "desc" },
         take: 1,
-        select: { sharesOutstanding: true }
-      }
-    }
+        select: { sharesOutstanding: true },
+      },
+    },
   });
 
-  // Map to a simpler format
-  const mapped = companies.map(c => ({
+  const mapped: ScreenerCompany[] = companies.map((c) => ({
     ticker: c.ticker,
     name: c.name,
     logoUrl: c.logoUrl,
-    sharesOutstanding: c.fundamentals[0]?.sharesOutstanding ? Number(c.fundamentals[0].sharesOutstanding) : null
+    sharesOutstanding: c.fundamentals[0]?.sharesOutstanding
+      ? Number(c.fundamentals[0].sharesOutstanding)
+      : null,
   }));
 
-  // Preserve the exact order requested in tickersIn
-  if (tickersIn.length > 0) {
+  // Preservar a ordem exata da lista curada.
+  if (tickersIn) {
     return mapped.sort((a, b) => tickersIn.indexOf(a.ticker) - tickersIn.indexOf(b.ticker));
   }
 

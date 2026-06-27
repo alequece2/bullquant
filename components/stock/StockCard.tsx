@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { formatLargeNumber } from "@/lib/finance/format";
 
 interface StockCardProps {
@@ -20,6 +23,7 @@ export function StockCard({
   changePercent,
   isLoading,
 }: StockCardProps) {
+  const t = useTranslations("dashboard");
   // Calculate Market Cap
   const marketCap =
     sharesOutstanding && currentPrice
@@ -89,7 +93,7 @@ export function StockCard({
         </div>
 
         <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Market Cap</span>
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t("marketCap")}</span>
           <span className="text-sm font-semibold text-foreground/90">
             {marketCap ? formatLargeNumber(marketCap) : "N/A"}
           </span>

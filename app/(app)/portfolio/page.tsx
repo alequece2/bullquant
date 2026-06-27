@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { TrendingUp, TrendingDown, Clock, Search, Briefcase, Loader2, ArrowRight } from "lucide-react"
-import { buttonVariants } from "@/components/ui/button"
 
 type Company = {
   id: string;
@@ -26,8 +26,9 @@ type PriceData = {
 }
 
 export default function Home() {
-  const t = useTranslations("portfolio") 
+  const t = useTranslations("portfolio")
   const locale = useLocale()
+  const router = useRouter()
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
   const [isLoading, setIsLoading] = useState(true)
@@ -95,6 +96,11 @@ export default function Home() {
     init()
   }, [])
 
+  // Sem sessão → enviar para login (sem side-effect dentro do render).
+  useEffect(() => {
+    if (authError) router.replace("/login")
+  }, [authError, router])
+
   useEffect(() => {
     if (items.length > 0) {
       const tickers = items.map(item => item.company.ticker)
@@ -118,9 +124,7 @@ export default function Home() {
   }
 
   if (authError) {
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-    }
+    // O redirect é tratado no useEffect acima.
     return null;
   }
 

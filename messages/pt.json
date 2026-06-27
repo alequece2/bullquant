@@ -1,4 +1,18 @@
 {
+  "dashboard": {
+    "title": "Insights",
+    "subtitle": "Explora tendências de mercado, descobre oportunidades de crescimento e acompanha as ações mais comentadas de Wall Street.",
+    "empty": "Nenhuma empresa encontrada para esta categoria.",
+    "marketCap": "Capitalização",
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Em Destaque",
+      "growth": "Crescimento",
+      "dividend": "Dividendos",
+      "buyback": "Recompras",
+      "ai": "Inteligência Artificial"
+    }
+  },
   "sidebar": {
     "dashboard": "Dashboard",
     "portfolio": "Portfólio",
