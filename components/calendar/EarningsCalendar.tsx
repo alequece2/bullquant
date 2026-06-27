@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { ChevronLeft, ChevronRight, Sunrise, Moon, Loader2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown } from "lucide-react"
 
 interface EarningsItem {
   id: string
@@ -104,7 +104,7 @@ export function EarningsCalendar() {
     <button
       onClick={() => setScope(value)}
       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-        scope === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+        scope === value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {label}
@@ -144,6 +144,19 @@ export function EarningsCalendar() {
         </div>
       </div>
 
+      {/* Resumo + legenda */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+        <span className="font-medium">{t("summary", { count: events.length })}</span>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <Sunrise className="h-3.5 w-3.5" /> {t("legendBmo")}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Moon className="h-3.5 w-3.5" /> {t("legendAmc")}
+          </span>
+        </div>
+      </div>
+
       {/* Grelha */}
       <div className="rounded-xl border border-border overflow-hidden bg-card">
         <div className="grid grid-cols-7 bg-muted/50">
@@ -159,8 +172,14 @@ export function EarningsCalendar() {
             const dayStr = fmtDate(day)
             const dayEvents = byDay.get(dayStr) ?? []
             const isToday = dayStr === todayStr
+            const isWeekend = day.getDay() === 0 || day.getDay() === 6
             return (
-              <div key={dayStr} className="min-h-[7rem] border-t border-l border-border p-1.5 flex flex-col">
+              <div
+                key={dayStr}
+                className={`min-h-[7rem] border-t border-l border-border p-1.5 flex flex-col transition-colors ${
+                  isWeekend ? "bg-muted/20" : ""
+                } ${isToday ? "ring-1 ring-inset ring-primary/40" : ""}`}
+              >
                 <div
                   className={`text-xs font-medium mb-1 ${
                     isToday
@@ -170,27 +189,31 @@ export function EarningsCalendar() {
                 >
                   {day.getDate()}
                 </div>
-                <div className="space-y-0.5">
-                  {dayEvents.slice(0, 4).map(e => (
-                    <EventChip key={e.id} e={e} />
-                  ))}
-                  {dayEvents.length > 4 && (
-                    <div className="text-[10px] text-muted-foreground px-1">+{dayEvents.length - 4} {t("more")}</div>
-                  )}
-                </div>
+                {loading ? (
+                  <div className="space-y-1">
+                    <div className="h-4 rounded bg-muted animate-pulse" />
+                    {idx % 3 === 0 && <div className="h-4 rounded bg-muted animate-pulse w-2/3" />}
+                  </div>
+                ) : (
+                  <div className="space-y-0.5 overflow-hidden">
+                    {dayEvents.slice(0, 4).map(e => (
+                      <EventChip key={e.id} e={e} />
+                    ))}
+                    {dayEvents.length > 4 && (
+                      <div className="text-[10px] text-muted-foreground px-1">+{dayEvents.length - 4} {t("more")}</div>
+                    )}
+                  </div>
+                )}
               </div>
             )
           })}
         </div>
       </div>
 
-      {loading && (
-        <div className="flex justify-center py-6 text-muted-foreground">
-          <Loader2 className="animate-spin h-5 w-5" />
-        </div>
-      )}
       {!loading && events.length === 0 && (
-        <p className="text-center text-muted-foreground py-6">{t("empty")}</p>
+        <div className="rounded-xl border border-dashed border-border py-12 text-center text-muted-foreground">
+          {t("empty")}
+        </div>
       )}
     </div>
   )
@@ -205,16 +228,26 @@ function EventChip({ e }: { e: EarningsItem }) {
     <Link
       href={`/stock/${e.ticker}`}
       title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
-      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted ${
-        reported
-          ? beat
-            ? "text-green-600 dark:text-green-400"
-            : "text-red-600 dark:text-red-400"
-          : "text-foreground"
-      }`}
+      className="group flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted"
     >
-      {HourIcon && <HourIcon className="h-3 w-3 shrink-0 opacity-70" />}
-      <span className="truncate">{e.ticker}</span>
+      {e.logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={e.logoUrl}
+          alt=""
+          referrerPolicy="no-referrer"
+          className="h-3.5 w-3.5 rounded-sm object-contain bg-white shrink-0"
+        />
+      ) : HourIcon ? (
+        <HourIcon className="h-3 w-3 shrink-0 opacity-60" />
+      ) : null}
+      <span className="truncate text-foreground">{e.ticker}</span>
+      {reported &&
+        (beat ? (
+          <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
+        ) : (
+          <TrendingDown className="h-3 w-3 shrink-0 text-red-600 dark:text-red-400" />
+        ))}
     </Link>
   )
 }

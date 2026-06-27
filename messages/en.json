@@ -168,6 +168,9 @@
     "scopeAll": "All",
     "scopeWatchlist": "Watchlist",
     "more": "more",
-    "empty": "No earnings scheduled in this period."
+    "empty": "No earnings scheduled in this period.",
+    "summary": "{count} earnings in this period",
+    "legendBmo": "Before open",
+    "legendAmc": "After close"
   }
 }

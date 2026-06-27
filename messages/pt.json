@@ -200,6 +200,9 @@
     "scopeAll": "Todas",
     "scopeWatchlist": "Watchlist",
     "more": "mais",
-    "empty": "Sem resultados agendados neste período."
+    "empty": "Sem resultados agendados neste período.",
+    "summary": "{count} resultados neste período",
+    "legendBmo": "Antes da abertura",
+    "legendAmc": "Após o fecho"
   }
 }
