@@ -3,17 +3,23 @@ import fs from 'fs'
 
 const prisma = new PrismaClient()
 
+interface Anomaly {
+  ticker: string
+  type: string
+  details: string
+}
+
 async function main() {
   console.log('A ligar à base de dados para validação...')
-  
+
   const companies = await prisma.company.findMany({
     where: { isActive: true },
     select: { id: true, ticker: true, name: true }
   })
-  
+
   console.log(`Foram encontradas ${companies.length} empresas ativas. A iniciar varrimento...`)
-  
-  const anomalies: any[] = []
+
+  const anomalies: Anomaly[] = []
   
   for (const company of companies) {
     const fundamentals = await prisma.fundamental.findMany({
@@ -93,8 +99,8 @@ async function main() {
     if (!acc[a.ticker]) acc[a.ticker] = []
     acc[a.ticker].push(a)
     return acc
-  }, {} as Record<string, any[]>)
-  
+  }, {} as Record<string, Anomaly[]>)
+
   for (const [ticker, list] of Object.entries(byTicker)) {
     report += `## ${ticker} (${list.length} anomalias)\n`
     const byType = list.reduce((acc, a) => {
