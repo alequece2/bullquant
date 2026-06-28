@@ -20,6 +20,7 @@ model User {
 
   portfolio   Portfolio?
   aiUsageLogs AIUsageLog[]
+  dcfAnalyses DcfAnalysis[]
 
   @@map("users")
 }
@@ -59,6 +60,7 @@ model Company {
   aiInsightCache AIInsightCache?
   portfolioItems PortfolioItem[]
   earnings       EarningsEvent[]
+  dcfAnalyses    DcfAnalysis[]
 
   @@index([ticker])
   @@index([exchange])
@@ -176,6 +178,40 @@ model PortfolioItem {
   @@unique([portfolioId, companyId])
   @@index([portfolioId])
   @@map("portfolio_items")
+}
+
+// ── ANÁLISES DCF GUARDADAS ────────────────────
+// Cada utilizador pode guardar vários cenários DCF por empresa, para revisitar
+// e comparar. Inputs e snapshot do resultado guardados em unidades absolutas /
+// decimais (mesma convenção do motor em lib/finance/dcf.ts).
+model DcfAnalysis {
+  id        String @id @default(cuid())
+  userId    String
+  companyId String
+
+  label String? // nome opcional do cenário (ex: "Conservador")
+
+  // Inputs
+  fcf0           Decimal @db.Decimal(20, 4)
+  growthStage1   Decimal @db.Decimal(8, 6)
+  growthStage2   Decimal @db.Decimal(8, 6)
+  wacc           Decimal @db.Decimal(8, 6)
+  terminalGrowth Decimal @db.Decimal(8, 6)
+  shares         Decimal @db.Decimal(20, 4)
+  netDebt        Decimal @db.Decimal(20, 4)
+
+  // Snapshot dos resultados no momento de guardar
+  fairValue      Decimal  @db.Decimal(20, 4)
+  priceAtSave    Decimal? @db.Decimal(20, 4)
+  marginOfSafety Decimal? @db.Decimal(8, 6)
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, companyId, createdAt])
+  @@map("dcf_analyses")
 }
 
 // ── CALENDÁRIO DE RESULTADOS (EARNINGS) ───────

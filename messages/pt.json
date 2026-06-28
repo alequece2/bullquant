@@ -196,6 +196,16 @@
     "terminalValuePv": "Valor Terminal (VP)",
     "fcfPv": "FCF Descontado (VP)",
     "disclaimer": "Os valores são uma estimativa baseada nos teus pressupostos. Não constituem recomendação de compra ou venda.",
+    "saved": {
+      "title": "As minhas análises",
+      "saveButton": "Guardar",
+      "saveError": "Não foi possível guardar. Tenta novamente.",
+      "labelPlaceholder": "Nome do cenário (opcional)",
+      "empty": "Ainda não guardaste nenhuma análise para esta empresa.",
+      "loadButton": "Carregar",
+      "deleteButton": "Apagar",
+      "fairValueShort": "Justo:"
+    },
     "errorWacc": "O WACC tem de ser superior ao crescimento perpétuo para o modelo ser válido. Ajusta os sliders.",
     "errorShares": "Indica o número de ações em circulação para calcular o valor por ação.",
     "errorFcf": "Indica um Free Cash Flow inicial válido para começar."

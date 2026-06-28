@@ -9,6 +9,7 @@ import { useDebounce } from "@/hooks/useDebounce"
 import { runDcf, type DcfInputs } from "@/lib/finance/dcf"
 import { DcfResults } from "./DcfResults"
 import { Slider } from "./Slider"
+import { SavedAnalyses, type SavedAnalysis } from "./SavedAnalyses"
 
 type SearchResult = {
   ticker: string
@@ -48,6 +49,7 @@ export function DcfCalculator() {
   // --- estado dos inputs ---
   const [currency, setCurrency] = React.useState("$")
   const [loadedName, setLoadedName] = React.useState<string | null>(null)
+  const [loadedTicker, setLoadedTicker] = React.useState<string | null>(null)
   const [currentPrice, setCurrentPrice] = React.useState(DEFAULTS.currentPrice)
   const [fcf0M, setFcf0M] = React.useState(DEFAULTS.fcf0M)
   const [sharesM, setSharesM] = React.useState(DEFAULTS.sharesM)
@@ -114,6 +116,7 @@ export function DcfCalculator() {
       const data: DcfDataResponse = await res.json()
       setCurrency(data.currency === "EUR" ? "€" : "$")
       setLoadedName(data.name)
+      setLoadedTicker(ticker.toUpperCase())
       if (data.currentPrice != null) setCurrentPrice(round2(data.currentPrice))
       if (data.fcf0 != null) setFcf0M(round2(data.fcf0 / MILLION))
       if (data.shares != null) setSharesM(round2(data.shares / MILLION))
@@ -144,6 +147,37 @@ export function DcfCalculator() {
     }
     return runDcf(inputs)
   }, [fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice])
+
+  // Valores atuais a guardar (unidades absolutas / decimais).
+  const currentForSave = React.useMemo(() => {
+    if (!result.valid) return null
+    return {
+      inputs: {
+        fcf0: fcf0M * MILLION,
+        growthStage1: growth1 / 100,
+        growthStage2: growth2 / 100,
+        wacc: wacc / 100,
+        terminalGrowth: terminalGrowth / 100,
+        shares: sharesM * MILLION,
+        netDebt: netDebtM * MILLION,
+      },
+      fairValue: result.fairValue,
+      currentPrice,
+      marginOfSafety: result.marginOfSafety,
+    }
+  }, [result, fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice])
+
+  // Aplicar uma análise guardada de volta aos inputs.
+  const handleLoadSaved = (a: SavedAnalysis) => {
+    setFcf0M(round2(a.fcf0 / MILLION))
+    setSharesM(round2(a.shares / MILLION))
+    setNetDebtM(round2(a.netDebt / MILLION))
+    setGrowth1(round2(a.growthStage1 * 100))
+    setGrowth2(round2(a.growthStage2 * 100))
+    setWacc(round2(a.wacc * 100))
+    setTerminalGrowth(round2(a.terminalGrowth * 100))
+    if (a.priceAtSave != null) setCurrentPrice(round2(a.priceAtSave))
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -194,10 +228,11 @@ export function DcfCalculator() {
           )}
         </div>
 
-        {loadedName && (
-          <p className="text-sm text-muted-foreground">
-            {t("loadedFor")} <span className="font-semibold text-foreground">{loadedName}</span>
-          </p>
+        {loadedTicker && (
+          <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+            <span className="text-xs font-bold text-primary">{loadedTicker}</span>
+            <span className="text-xs text-muted-foreground truncate">{loadedName}</span>
+          </div>
         )}
         {loadError && <p className="text-sm text-red-500">{loadError}</p>}
 
@@ -277,8 +312,15 @@ export function DcfCalculator() {
       </Card>
 
       {/* ── Painel direito: resultados ── */}
-      <div className="space-y-4">
+      <div className="space-y-4 lg:sticky lg:top-6 self-start">
         <DcfResults result={result} currency={currency} />
+        <SavedAnalyses
+          ticker={loadedTicker}
+          currency={currency}
+          current={currentForSave}
+          canSave={result.valid && loadedTicker !== null}
+          onLoad={handleLoadSaved}
+        />
         <p className="text-xs text-muted-foreground leading-relaxed px-1">{t("disclaimer")}</p>
       </div>
     </div>

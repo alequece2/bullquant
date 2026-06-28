@@ -164,6 +164,16 @@
     "terminalValuePv": "Terminal Value (PV)",
     "fcfPv": "Discounted FCF (PV)",
     "disclaimer": "Values are an estimate based on your assumptions. They are not a buy or sell recommendation.",
+    "saved": {
+      "title": "My analyses",
+      "saveButton": "Save",
+      "saveError": "Couldn't save. Please try again.",
+      "labelPlaceholder": "Scenario name (optional)",
+      "empty": "You haven't saved any analysis for this company yet.",
+      "loadButton": "Load",
+      "deleteButton": "Delete",
+      "fairValueShort": "Fair:"
+    },
     "errorWacc": "WACC must be greater than perpetual growth for the model to be valid. Adjust the sliders.",
     "errorShares": "Enter the number of shares outstanding to compute value per share.",
     "errorFcf": "Enter a valid initial Free Cash Flow to start."
