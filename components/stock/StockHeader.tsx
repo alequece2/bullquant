@@ -170,7 +170,7 @@ export function StockHeader({ company }: { company: CompanyProp }) {
               <span className="text-sm text-muted-foreground mb-1.5 font-medium">USD</span>
             </div>
             
-            <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-bull' : 'text-bear'}`}>
               {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               <span>{isPositive ? '+' : ''}{priceData.change.toFixed(2)}</span>
               <span>({isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%)</span>

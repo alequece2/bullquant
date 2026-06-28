@@ -152,7 +152,7 @@ export default function Home() {
             <div className="w-px h-8 bg-border"></div>
             <div className="flex flex-col">
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t('upToday')}</span>
-              <span className="text-xl font-bold text-emerald-500 flex items-center gap-1">
+              <span className="text-xl font-bold text-bull flex items-center gap-1">
                 <TrendingUp className="w-4 h-4" /> {upToday}
               </span>
             </div>
@@ -229,7 +229,7 @@ export default function Home() {
                     </div>
                     
                     {price && (
-                      <div className={`flex flex-col items-end ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <div className={`flex flex-col items-end ${isPositive ? 'text-bull' : 'text-bear'}`}>
                         <div className="flex items-center gap-1 font-bold">
                           {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                           <span>{isPositive ? '+' : ''}{price.changePercent.toFixed(2)}%</span>

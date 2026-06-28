@@ -234,7 +234,7 @@ export function DcfCalculator() {
             <span className="text-xs text-muted-foreground truncate">{loadedName}</span>
           </div>
         )}
-        {loadError && <p className="text-sm text-red-500">{loadError}</p>}
+        {loadError && <p className="text-sm text-destructive">{loadError}</p>}
 
         {/* Inputs numéricos */}
         <div className="grid grid-cols-2 gap-4">

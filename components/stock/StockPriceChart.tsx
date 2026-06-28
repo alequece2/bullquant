@@ -97,10 +97,10 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
         <div>
           <h2 className="text-lg font-bold text-foreground">{t('title')}</h2>
           <div className="flex items-center gap-2 mt-1">
-            <span className={`text-2xl font-extrabold tracking-tight ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <span className={`text-2xl font-extrabold tracking-tight ${isPositive ? 'text-bull' : 'text-bear'}`}>
               {isPositive ? '+' : '-'}${Math.abs(changeValue).toFixed(2)}
             </span>
-            <span className={`flex items-center text-sm font-bold px-2 py-0.5 rounded-full ${isPositive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+            <span className={`flex items-center text-sm font-bold px-2 py-0.5 rounded-full ${isPositive ? 'bg-bull/10 text-bull' : 'bg-bear/10 text-bear'}`}>
               {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
               {Math.abs(changePercent).toFixed(2)}%
             </span>

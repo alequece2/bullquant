@@ -34,7 +34,9 @@ export function StockCard({
 
   return (
     <Link href={`/stock/${ticker}`} className="block group">
-      <div className="bg-card/40 backdrop-blur-sm border border-border/60 hover:bg-card/80 hover:border-primary/40 hover:shadow-[0_4px_16px_rgb(0,0,0,0.12)] duration-200 transition-all p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
+      <div className="bg-card/40 backdrop-blur-sm border border-border/60 hover:bg-card/80 hover:border-primary/40 hover:shadow-[0_4px_20px_rgb(0,0,0,0.25)] duration-200 transition-all p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
+        {/* Gold top hairline on hover */}
+        <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="bg-primary/5 p-1 rounded-md border border-primary/10 flex items-center justify-center shrink-0 w-8 h-8 overflow-hidden">
@@ -50,12 +52,12 @@ export function StockCard({
                   }}
                 />
               ) : null}
-              <span className={`font-bold text-sm ${logoUrl ? "hidden" : ""}`}>
+              <span className={`font-heading font-bold text-sm text-primary ${logoUrl ? "hidden" : ""}`}>
                 {ticker[0]}
               </span>
             </div>
             <div className="flex flex-col overflow-hidden min-w-0">
-              <span className="font-bold text-sm truncate group-hover:text-primary transition-colors">
+              <span className="font-heading font-bold text-sm truncate group-hover:text-primary transition-colors">
                 {ticker}
               </span>
               <span className="text-[11px] text-muted-foreground truncate">
@@ -68,7 +70,7 @@ export function StockCard({
             {isLoading ? (
               <div className="h-5 w-14 bg-muted animate-pulse rounded"></div>
             ) : (
-              <span className="font-bold text-sm tabular-nums">
+              <span className="nums font-semibold text-sm">
                 {currentPrice ? `$${currentPrice.toFixed(2)}` : "N/A"}
               </span>
             )}
@@ -78,8 +80,8 @@ export function StockCard({
             ) : (
               changePercent !== null && (
                 <span
-                  className={`text-[11px] font-semibold tabular-nums mt-0.5 ${
-                    isPositive ? "text-emerald-500" : "text-destructive"
+                  className={`nums text-[11px] font-semibold mt-0.5 ${
+                    isPositive ? "text-bull" : "text-bear"
                   }`}
                 >
                   {isPositive ? "+" : ""}
@@ -92,7 +94,7 @@ export function StockCard({
 
         <div className="mt-2.5 pt-2.5 border-t border-border/40 flex items-center justify-between">
           <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{t("marketCap")}</span>
-          <span className="text-xs font-semibold text-foreground/90 tabular-nums">
+          <span className="nums text-xs font-semibold text-foreground/90">
             {marketCap ? formatLargeNumber(marketCap) : "N/A"}
           </span>
         </div>

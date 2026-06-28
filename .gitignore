@@ -48,3 +48,6 @@ __pycache__/
 
 # scratch / debug (ficheiros de exploração — nunca versionar)
 scratch/
+
+# claude code — skills são tooling instalável (8M+), não código de produto
+/.claude/skills/

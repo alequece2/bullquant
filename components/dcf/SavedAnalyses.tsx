@@ -136,7 +136,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
           <span className="ml-1.5">{t("saved.saveButton")}</span>
         </Button>
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
 
       {/* Lista */}
       {isLoading ? (
@@ -161,7 +161,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   <p className="text-xs text-muted-foreground tabular-nums">
                     {t("saved.fairValueShort")} {formatPrice(a.fairValue, currency)}
                     {a.marginOfSafety != null && (
-                      <span className={cn("ml-2 font-medium", under ? "text-emerald-500" : "text-red-500")}>
+                      <span className={cn("ml-2 font-medium", under ? "text-bull" : "text-bear")}>
                         {under ? "+" : ""}
                         {formatPercent(a.marginOfSafety)}
                       </span>
@@ -181,7 +181,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-red-500"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
                     title={t("saved.deleteButton")}
                     onClick={() => handleDelete(a.id)}
                   >

@@ -257,9 +257,9 @@ function EventChip({ e }: { e: EarningsItem }) {
         <span className="truncate text-foreground">{e.ticker}</span>
         {reported &&
           (beat ? (
-            <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
+            <TrendingUp className="h-3 w-3 shrink-0 text-bull" />
           ) : (
-            <TrendingDown className="h-3 w-3 shrink-0 text-red-600 dark:text-red-400" />
+            <TrendingDown className="h-3 w-3 shrink-0 text-bear" />
           ))}
       </DialogTrigger>
 
@@ -291,7 +291,7 @@ function EventChip({ e }: { e: EarningsItem }) {
             </div>
             <div className="flex justify-between items-center text-sm border-t border-border/50 pt-1">
               <span className="text-muted-foreground">Reportado</span>
-              <span className={`font-semibold ${reported ? (beat ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : ""}`}>
+              <span className={`font-semibold ${reported ? (beat ? "text-bull" : "text-bear") : ""}`}>
                 {formatCurrency(e.epsActual)}
               </span>
             </div>
@@ -305,7 +305,7 @@ function EventChip({ e }: { e: EarningsItem }) {
             </div>
             <div className="flex justify-between items-center text-sm border-t border-border/50 pt-1">
               <span className="text-muted-foreground">Reportado</span>
-              <span className={`font-semibold ${e.revenueActual !== null && e.revenueEstimate !== null ? (e.revenueActual >= e.revenueEstimate ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : ""}`}>
+              <span className={`font-semibold ${e.revenueActual !== null && e.revenueEstimate !== null ? (e.revenueActual >= e.revenueEstimate ? "text-bull" : "text-bear") : ""}`}>
                 {formatCompact(e.revenueActual)}
               </span>
             </div>

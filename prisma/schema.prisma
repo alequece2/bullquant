@@ -61,6 +61,7 @@ model Company {
   portfolioItems PortfolioItem[]
   earnings       EarningsEvent[]
   dcfAnalyses    DcfAnalysis[]
+  insiderTxns    InsiderTransaction[]
 
   @@index([ticker])
   @@index([exchange])
@@ -80,9 +81,9 @@ model Fundamental {
   filedAt       DateTime?
 
   // Income Statement
-  revenue           Decimal? @db.Decimal(20, 4)
-  costOfRevenue     Decimal? @db.Decimal(20, 4)
-  grossProfit       Decimal? @db.Decimal(20, 4)
+  revenue                Decimal? @db.Decimal(20, 4)
+  costOfRevenue          Decimal? @db.Decimal(20, 4)
+  grossProfit            Decimal? @db.Decimal(20, 4)
   operatingExpenses      Decimal? @db.Decimal(20, 4)
   researchAndDevelopment Decimal? @db.Decimal(20, 4)
   sellingGeneralAndAdmin Decimal? @db.Decimal(20, 4)
@@ -90,10 +91,10 @@ model Fundamental {
   operatingIncome        Decimal? @db.Decimal(20, 4)
   revenueSegments        Json?
   interestExpense        Decimal? @db.Decimal(20, 4)
-  taxExpense        Decimal? @db.Decimal(20, 4)
-  netIncome         Decimal? @db.Decimal(20, 4)
-  epsDiluted        Decimal? @db.Decimal(10, 4)
-  sharesOutstanding Decimal? @db.Decimal(20, 4)
+  taxExpense             Decimal? @db.Decimal(20, 4)
+  netIncome              Decimal? @db.Decimal(20, 4)
+  epsDiluted             Decimal? @db.Decimal(10, 4)
+  sharesOutstanding      Decimal? @db.Decimal(20, 4)
 
   // Cash Flow
   operatingCashFlow Decimal? @db.Decimal(20, 4)
@@ -280,4 +281,45 @@ model AIUsageLog {
 
   @@index([userId, usedAt])
   @@map("ai_usage_logs")
+}
+
+// ── INSIDER TRADING (SEC Form 4, via Finnhub) ─
+model InsiderTransaction {
+  id        String @id @default(cuid())
+  companyId String
+
+  insiderName String
+  title       String? // cargo (CEO, CFO, Director…) — quando disponível
+
+  type            InsiderTxnType
+  transactionCode String? // código SEC bruto (P, S, A, M, G, F…)
+
+  shares           Decimal  @db.Decimal(20, 4) // nº de ações da transação (sempre positivo)
+  sharesChange     Decimal? @db.Decimal(20, 4) // variação com sinal (+ compra / − venda)
+  price            Decimal? @db.Decimal(12, 4) // preço por ação
+  value            Decimal? @db.Decimal(20, 4) // shares × price
+  sharesOwnedAfter Decimal? @db.Decimal(20, 4) // posição total após a transação
+
+  transactionDate DateTime  @db.Date
+  filedAt         DateTime? @db.Date
+
+  source String @default("finnhub")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Chave natural para upsert idempotente (Finnhub não fornece id estável)
+  @@unique([companyId, insiderName, transactionDate, transactionCode, sharesChange])
+  @@index([companyId, transactionDate])
+  @@map("insider_transactions")
+}
+
+enum InsiderTxnType {
+  BUY
+  SELL
+  OTHER
+
+  @@map("insider_txn_type")
 }

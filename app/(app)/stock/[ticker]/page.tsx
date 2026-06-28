@@ -5,6 +5,7 @@ import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
 import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
+import { InsiderActivity } from '@/components/stock/InsiderActivity'
 
 export default async function StockPage({
   params,
@@ -76,6 +77,9 @@ export default async function StockPage({
 
       {/* 4. Financials & Decision Engine */}
       <FinancialsEngine ticker={company.ticker} sector={company.sector} />
+
+      {/* 5. Insider Activity (SEC Form 4) */}
+      <InsiderActivity ticker={company.ticker} />
     </div>
   )
 }
