@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { Briefcase, Calculator, CalendarDays, Sparkles, ArrowUpRight, LucideIcon } from "lucide-react";
 import { StockCard } from "@/components/stock/StockCard";
 import { ScreenerCompany, ScreenerCategory } from "@/lib/finance/screener";
 import { cn } from "@/lib/utils";
@@ -68,18 +70,36 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
 
   return (
     <div className="flex-1 flex flex-col h-full bg-muted/20">
-      {/* Top Hero Section */}
-      <div className="pt-12 pb-10 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-primary/5 via-card to-background border-b border-border/40">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-          {t("title")}
-        </h1>
-        <p className="mt-4 text-muted-foreground text-center max-w-xl">
+      {/* Header (compacto, alinhado à esquerda) */}
+      <div className="w-full max-w-[1600px] mx-auto px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground max-w-2xl">
           {t("subtitle")}
         </p>
       </div>
 
+      {/* Quick Actions / Shortcuts */}
+      <div className="w-full max-w-[1600px] mx-auto px-6 pb-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">
+          {t("quickActionsTitle")}
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <QuickAction href="/portfolio" icon={Briefcase} title={t("actions.portfolio")} desc={t("actions.portfolioDesc")} />
+          <QuickAction href="/dcf" icon={Calculator} title={t("actions.dcf")} desc={t("actions.dcfDesc")} />
+          <QuickAction href="/calendar" icon={CalendarDays} title={t("actions.calendar")} desc={t("actions.calendarDesc")} />
+          <QuickAction href="/ai-insights" icon={Sparkles} title={t("actions.ai")} desc={t("actions.aiDesc")} />
+        </div>
+      </div>
+
+      {/* Explore companies heading */}
+      <div className="w-full max-w-[1600px] mx-auto px-6 pb-1">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {t("exploreTitle")}
+        </h2>
+      </div>
+
       {/* Tabs Section */}
-      <div className="border-b border-border bg-background sticky top-0 z-10">
+      <div className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-10">
         <div className="flex items-center overflow-x-auto no-scrollbar px-6 max-w-[1600px] mx-auto">
           <div className="flex space-x-1 py-1 min-w-max">
             {tabs.map((tab) => (
@@ -101,9 +121,9 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
       </div>
 
       {/* Grid Section */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto px-6 py-5">
         <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
             {companies.map((company) => {
               const priceData = prices[company.ticker];
 
@@ -130,5 +150,35 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
         </div>
       </div>
     </div>
+  );
+}
+
+function QuickAction({
+  href,
+  icon: Icon,
+  title,
+  desc,
+}: {
+  href: string;
+  icon: LucideIcon;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative flex items-start gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-all hover:border-primary/40 hover:bg-card/80"
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold leading-tight group-hover:text-primary transition-colors">
+          {title}
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{desc}</p>
+      </div>
+      <ArrowUpRight className="absolute right-3 top-3 h-4 w-4 text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100" />
+    </Link>
   );
 }

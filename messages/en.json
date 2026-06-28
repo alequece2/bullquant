@@ -4,6 +4,18 @@
     "subtitle": "Explore market trends, discover high-growth opportunities, and track the most discussed stocks across Wall Street.",
     "empty": "No companies found for this category.",
     "marketCap": "Market Cap",
+    "quickActionsTitle": "Quick actions",
+    "exploreTitle": "Explore companies",
+    "actions": {
+      "portfolio": "My Portfolio",
+      "portfolioDesc": "Companies you follow and live prices",
+      "dcf": "New DCF analysis",
+      "dcfDesc": "Estimate a stock's intrinsic value",
+      "calendar": "Earnings calendar",
+      "calendarDesc": "Upcoming earnings and who beat estimates",
+      "ai": "AI Insights",
+      "aiDesc": "AI-generated qualitative analysis"
+    },
     "tabs": {
       "sp500": "S&P 500",
       "trending": "Most Trending",
@@ -18,7 +30,14 @@
     "portfolio": "Portfolio",
     "calendar": "Calendar",
     "dcf": "DCF Calculator",
-    "aiInsights": "AI Insights"
+    "aiInsights": "AI Insights",
+    "desc": {
+      "dashboard": "Overview, shortcuts and company explorer",
+      "portfolio": "The companies you follow and their live prices",
+      "calendar": "Earnings calendar with estimates",
+      "dcf": "Estimate a stock's intrinsic value",
+      "aiInsights": "AI-generated qualitative company analysis"
+    }
   },
   "login": {
     "title": "Sign in to BullQuant",

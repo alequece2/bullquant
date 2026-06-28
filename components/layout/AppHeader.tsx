@@ -20,12 +20,12 @@ export async function AppHeader() {
         </Button>
 
         {/* Global Search Bar */}
-        <div className="flex-1 w-full max-w-xl mx-auto md:mx-0">
+        <div className="w-full max-w-xl">
           <SearchBar />
         </div>
-        
-        {/* User Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+
+        {/* User Actions — empurrados para a margem direita */}
+        <div className="flex items-center gap-2 shrink-0 ml-auto">
           {user && (
             <div className="flex items-center gap-2">
               <Link 
