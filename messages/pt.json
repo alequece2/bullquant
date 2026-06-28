@@ -114,6 +114,11 @@
     "lastUpdate": "Última atualização:"
   },
   "stock": {
+    "insiderTitle": "Transações de Insiders",
+    "insidersErrorTitle": "Dados de Insiders Indisponíveis",
+    "insidersErrorDesc": "Não foi possível carregar as transações recentes de insiders.",
+    "recentInsiderBuys": "Compras Recentes de Insiders",
+    "noInsiderBuys": "Não foram detetadas compras recentes por insiders no mercado aberto.",
     "underConstruction": "Em construção",
     "buildingMessage": "A página da empresa vai nascer aqui.",
     "backHome": "Voltar ao Início",

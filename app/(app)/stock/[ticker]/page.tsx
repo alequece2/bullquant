@@ -5,6 +5,7 @@ import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
 import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
+import { InsiderTracker } from '@/components/stock/InsiderTracker'
 
 export default async function StockPage({
   params,
@@ -71,8 +72,15 @@ export default async function StockPage({
         <StockSnapshot ticker={company.ticker} fundamentals={fundamentalsToPass} />
       </div>
 
-      {/* 3. Price History Chart */}
-      <StockPriceChart ticker={company.ticker} />
+      {/* 3. Price History Chart & Insiders */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2">
+          <StockPriceChart ticker={company.ticker} />
+        </div>
+        <div className="xl:col-span-1">
+          <InsiderTracker ticker={company.ticker} />
+        </div>
+      </div>
 
       {/* 4. Financials & Decision Engine */}
       <FinancialsEngine ticker={company.ticker} sector={company.sector} />

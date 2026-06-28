@@ -87,6 +87,11 @@
     "premiumSoonDesc": "Price alerts, advanced screeners, and PDF reports are under development."
   },
   "stock": {
+    "insiderTitle": "Insider Transactions",
+    "insidersErrorTitle": "Insider Data Unavailable",
+    "insidersErrorDesc": "Could not load recent insider transactions.",
+    "recentInsiderBuys": "Recent Insider Purchases",
+    "noInsiderBuys": "No recent open-market buys by insiders detected.",
     "underConstruction": "Under construction",
     "buildingMessage": "The stock page will be built here.",
     "backHome": "Back Home",
