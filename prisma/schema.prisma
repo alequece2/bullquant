@@ -62,6 +62,7 @@ model Company {
   earnings       EarningsEvent[]
   dcfAnalyses    DcfAnalysis[]
   insiderTxns    InsiderTransaction[]
+  companyBrief   CompanyBrief?
 
   @@index([ticker])
   @@index([exchange])
@@ -268,6 +269,23 @@ model AIInsightCache {
 
   @@index([companyId, expiresAt])
   @@map("ai_insight_cache")
+}
+
+// ── COMPANY BRIEF (AI NEWS SUMMARY) ───────────
+model CompanyBrief {
+  id        String @id @default(cuid())
+  companyId String @unique
+
+  briefData Json
+
+  modelVersion String
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("company_brief")
 }
 
 // ── CONTROLO DE USO DE AI ─────────────────────

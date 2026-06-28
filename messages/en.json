@@ -151,6 +151,14 @@
     "backHome": "Back Home",
     "updatedAt": "Updated at",
     "priceUnavailable": "Price unavailable",
+    "savedValuations": {
+      "title": "My Saved Valuations",
+      "openCalculator": "Open in Calculator",
+      "noAnalyses": "You haven't saved any DCF valuations for this company.",
+      "savedAt": "Saved on",
+      "fairValue": "Fair Value",
+      "mos": "Margin of Safety"
+    },
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Price History",
@@ -194,6 +202,7 @@
     "waccHint": "Required return. Higher means a more conservative value.",
     "terminalGrowth": "Perpetual Growth",
     "terminalGrowthHint": "Long-term growth after year 10 (typically ≤ inflation).",
+    "reverseDcf": "Calculate Implied Growth (Reverse DCF)",
     "fairValue": "Fair Value",
     "currentPrice": "Current Price",
     "marginOfSafety": "Margin of Safety",

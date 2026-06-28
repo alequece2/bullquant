@@ -1,12 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { Search, Loader2 } from "lucide-react"
+import { Search, Loader2, Wand2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/useDebounce"
-import { runDcf, type DcfInputs } from "@/lib/finance/dcf"
+import { runDcf, solveReverseDcf, type DcfInputs } from "@/lib/finance/dcf"
 import { DcfResults } from "./DcfResults"
 import { Slider } from "./Slider"
 import { SavedAnalyses, type SavedAnalysis } from "./SavedAnalyses"
@@ -179,6 +180,23 @@ export function DcfCalculator() {
     if (a.priceAtSave != null) setCurrentPrice(round2(a.priceAtSave))
   }
 
+  // Resolver Crescimento Implícito (Reverse DCF)
+  const handleReverseDcf = () => {
+    if (currentPrice <= 0 || fcf0M <= 0 || sharesM <= 0) return
+    const implied = solveReverseDcf({
+      fcf0: fcf0M * MILLION,
+      wacc: wacc / 100,
+      terminalGrowth: terminalGrowth / 100,
+      shares: sharesM * MILLION,
+      netDebt: netDebtM * MILLION,
+      currentPrice,
+    })
+    if (implied) {
+      setGrowth1(round2(implied.impliedGrowth1 * 100))
+      setGrowth2(round2(implied.impliedGrowth2 * 100))
+    }
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* ── Painel esquerdo: inputs ── */}
@@ -270,6 +288,12 @@ export function DcfCalculator() {
 
         {/* Sliders */}
         <div className="space-y-5 pt-2">
+          <div className="flex items-center justify-end">
+            <Button variant="outline" size="sm" onClick={handleReverseDcf} className="h-8 text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all">
+              <Wand2 className="w-3 h-3 mr-2" />
+              {t("reverseDcf") || "Calculate Implied Growth (Reverse DCF)"}
+            </Button>
+          </div>
           <Slider
             label={t("growth1")}
             value={growth1}

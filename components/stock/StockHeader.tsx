@@ -107,13 +107,20 @@ export function StockHeader({ company }: { company: CompanyProp }) {
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
       {/* Left side: Company Info */}
       <div className="flex items-center gap-4">
-        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16">
+        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16 relative overflow-hidden">
           {company.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={`${company.logoUrl}?v=1`} alt={company.name} referrerPolicy="no-referrer" className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
-          ) : (
-            <span className="font-extrabold text-2xl text-primary">{company.ticker[0]}</span>
-          )}
+            <img 
+              src={company.logoUrl} 
+              alt={company.name} 
+              className="w-12 h-12 object-contain rounded-lg bg-white p-1" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              }}
+            />
+          ) : null}
+          <span className={`font-extrabold text-2xl text-primary absolute ${company.logoUrl ? "hidden" : ""}`}>{company.ticker[0]}</span>
         </div>
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">{company.name}</h1>

@@ -244,13 +244,20 @@ function EventChip({ e }: { e: EarningsItem }) {
         className="w-full text-left group flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted"
       >
         {e.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={e.logoUrl}
-            alt=""
-            referrerPolicy="no-referrer"
-            className="h-3.5 w-3.5 rounded-sm object-contain bg-white shrink-0"
-          />
+          <div className="relative h-3.5 w-3.5 shrink-0 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={e.logoUrl}
+              alt=""
+              referrerPolicy="no-referrer"
+              className="h-full w-full rounded-sm object-contain bg-white"
+              onError={(ev) => {
+                (ev.target as HTMLImageElement).style.display = "none";
+                (ev.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              }}
+            />
+            <span className={`text-[8px] font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
+          </div>
         ) : HourIcon ? (
           <HourIcon className="h-3 w-3 shrink-0 opacity-60" />
         ) : null}
@@ -267,13 +274,20 @@ function EventChip({ e }: { e: EarningsItem }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {e.logoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={e.logoUrl}
-                alt=""
-                referrerPolicy="no-referrer"
-                className="h-5 w-5 rounded-sm object-contain bg-white shrink-0"
-              />
+              <div className="relative h-5 w-5 shrink-0 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={e.logoUrl}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full rounded-sm object-contain bg-white"
+                  onError={(ev) => {
+                    (ev.target as HTMLImageElement).style.display = "none";
+                    (ev.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                  }}
+                />
+                <span className={`text-[10px] font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
+              </div>
             )}
             {e.name} ({e.ticker})
           </DialogTitle>

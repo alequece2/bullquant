@@ -183,6 +183,14 @@
       "addToPortfolio": "Adicionar ao Portfólio",
       "updating": "A atualizar..."
     },
+    "savedValuations": {
+      "title": "As Minhas Avaliações (DCF)",
+      "openCalculator": "Abrir Calculadora",
+      "noAnalyses": "Ainda não guardaste nenhuma avaliação DCF para esta empresa.",
+      "savedAt": "Guardado a",
+      "fairValue": "Preço Justo",
+      "mos": "Margem de Segurança"
+    },
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Histórico de Preços",
@@ -226,6 +234,7 @@
     "waccHint": "Retorno exigido. Quanto maior, mais conservador o valor.",
     "terminalGrowth": "Crescimento Perpétuo",
     "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
+    "reverseDcf": "Calcular Crescimento Implícito (Reverse DCF)",
     "fairValue": "Valor Justo",
     "currentPrice": "Preço Atual",
     "marginOfSafety": "Margem de Segurança",
