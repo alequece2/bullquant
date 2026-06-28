@@ -1,20 +1,49 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { BRAND } from "@/lib/brand";
 
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "BullQuant - Value Investing",
-  description: "Plataforma web de análise fundamental de ações.",
+  title: {
+    default: `${BRAND.name} — Value Investing, com visão`,
+    template: `%s · ${BRAND.name}`,
+  },
+  description:
+    "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
+  icons: {
+    icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/brand/icon.svg" }],
+  },
+  openGraph: {
+    title: `${BRAND.name} — Value Investing, com visão`,
+    description:
+      "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
+    siteName: BRAND.name,
+    type: "website",
+  },
 };
-
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 
 export default async function RootLayout({
   children,
@@ -24,12 +53,13 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="pt" className={`${inter.variable} h-full antialiased dark`}>
+    <html
+      lang="pt"
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+    >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
+          <main className="flex-1 flex flex-col">{children}</main>
         </NextIntlClientProvider>
       </body>
     </html>

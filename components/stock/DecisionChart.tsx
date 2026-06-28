@@ -296,7 +296,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
           </div>
           {cagr !== undefined && cagr !== null && (
             <p className="text-xs font-semibold text-muted-foreground mt-0.5">
-              CAGR: <span className={cagr >= 0 ? "text-emerald-500" : "text-rose-500"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
+              CAGR: <span className={cagr >= 0 ? "text-bull" : "text-bear"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
             </p>
           )}
         </div>

@@ -36,7 +36,7 @@ export default async function SettingsPage() {
                 {user.email}
               </div>
             </div>
-            <div className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-2 rounded-full font-bold flex items-center shadow-sm">
+            <div className="bg-bull/10 text-bull border border-bull/20 px-4 py-2 rounded-full font-bold flex items-center shadow-sm">
               <Star className="h-4 w-4 mr-2 fill-current" />
               {t('planFree')}
             </div>

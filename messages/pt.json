@@ -1,9 +1,61 @@
 {
+  "marketing": {
+    "eyebrow": "Análise fundamental · Value investing",
+    "titleLead": "Vê o valor que",
+    "titleAccent": "os outros não veem.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights — em português e de graça. Análise séria para quem investe a longo prazo.",
+    "primaryCta": "Criar conta grátis",
+    "secondaryCta": "Ver exemplo: AAPL",
+    "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
+    "features": {
+      "fundamentals": {
+        "title": "10 anos de fundamentais",
+        "desc": "Receitas, margens, ROIC e cash flow num relance — com CAGR calculado automaticamente."
+      },
+      "dcf": {
+        "title": "DCF integrada",
+        "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
+      },
+      "ai": {
+        "title": "AI Insights",
+        "desc": "Moat, catalisadores e riscos resumidos por IA — sempre em português, nunca conselho de investimento."
+      }
+    }
+  },
+  "insider": {
+    "title": "Atividade de Insiders",
+    "subtitle": "Compras e vendas de ações por executivos e diretores (SEC Form 4).",
+    "buysWindow": "{n} compras · {days}d",
+    "sellsWindow": "{n} vendas · {days}d",
+    "emptyTitle": "Sem transações de insiders",
+    "emptyDesc": "Ainda não há registos de Form 4 para esta empresa. Os dados são atualizados semanalmente.",
+    "type": { "buy": "Compra", "sell": "Venda", "other": "Outro" },
+    "col": {
+      "insider": "Insider",
+      "type": "Tipo",
+      "shares": "Ações",
+      "price": "Preço",
+      "value": "Valor",
+      "date": "Data"
+    }
+  },
   "dashboard": {
     "title": "Insights",
     "subtitle": "Explora tendências de mercado, descobre oportunidades de crescimento e acompanha as ações mais comentadas de Wall Street.",
     "empty": "Nenhuma empresa encontrada para esta categoria.",
     "marketCap": "Capitalização",
+    "quickActionsTitle": "Ações rápidas",
+    "exploreTitle": "Explorar empresas",
+    "actions": {
+      "portfolio": "O Meu Portfólio",
+      "portfolioDesc": "Empresas que segues e preços ao vivo",
+      "dcf": "Nova análise DCF",
+      "dcfDesc": "Calcula o valor intrínseco de uma ação",
+      "calendar": "Calendário de resultados",
+      "calendarDesc": "Próximos earnings e quem bateu estimativas",
+      "ai": "AI Insights",
+      "aiDesc": "Análise qualitativa gerada por IA"
+    },
     "tabs": {
       "sp500": "S&P 500",
       "trending": "Em Destaque",
@@ -18,10 +70,17 @@
     "portfolio": "Portfólio",
     "calendar": "Calendário",
     "dcf": "Calculadora DCF",
-    "aiInsights": "AI Insights"
+    "aiInsights": "AI Insights",
+    "desc": {
+      "dashboard": "Visão geral, atalhos e exploração de empresas",
+      "portfolio": "As empresas que segues e os seus preços ao vivo",
+      "calendar": "Calendário de resultados (earnings) com estimativas",
+      "dcf": "Calcula o valor intrínseco de uma ação",
+      "aiInsights": "Análise qualitativa de uma empresa gerada por IA"
+    }
   },
   "login": {
-    "title": "Entrar no BullQuant",
+    "title": "Entrar no BullVision",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -34,7 +93,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullQuant.",
+    "subtitle": "Junta-te a milhares de investidores no BullVision.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -82,7 +141,7 @@
     "subtitle": "Gere os teus dados pessoais e definições.",
     "planFree": "Plano FREE",
     "subscriptionTitle": "Detalhes da Subscrição",
-    "subscriptionDesc": "Atualmente estás a usar a versão gratuita do BullQuant. O plano gratuito inclui acesso ao motor de pesquisa de empresas e snapshots básicos de fundamentais.",
+    "subscriptionDesc": "Atualmente estás a usar a versão gratuita do BullVision. O plano gratuito inclui acesso ao motor de pesquisa de empresas e snapshots básicos de fundamentais.",
     "premiumSoonTitle": "🚀 Funcionalidades Premium em breve!",
     "premiumSoonDesc": "Alertas de preço, screener avançado e relatórios em PDF estão a ser desenvolvidos."
   },
@@ -103,7 +162,7 @@
       "title": "Sugestões para adicionares"
     },
     "landing": {
-      "title": "BullQuant Alpha",
+      "title": "BullVision Alpha",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"
@@ -123,6 +182,27 @@
       "followed": "Seguido",
       "addToPortfolio": "Adicionar ao Portfólio",
       "updating": "A atualizar..."
+    },
+    "savedValuations": {
+      "title": "As Minhas Avaliações (DCF)",
+      "openCalculator": "Abrir Calculadora",
+      "noAnalyses": "Ainda não guardaste nenhuma avaliação DCF para esta empresa.",
+      "savedAt": "Guardado a",
+      "fairValue": "Preço Justo",
+      "mos": "Margem de Segurança",
+      "growth": "Crescimento (1-5a)",
+      "termGrowth": "Cresc. Terminal"
+    },
+    "brief": {
+      "title": "Brief",
+      "loading": "A nossa IA está a analisar os acontecimentos recentes...",
+      "subtitle": "Resumo estratégico dos desenvolvimentos recentes (gerado por IA)",
+      "date": "Data",
+      "sentiment": {
+        "bullish": "Otimista",
+        "bearish": "Pessimista",
+        "neutral": "Neutro"
+      }
     },
     "snapshotTitle": "Snapshot",
     "chart": {
@@ -167,6 +247,7 @@
     "waccHint": "Retorno exigido. Quanto maior, mais conservador o valor.",
     "terminalGrowth": "Crescimento Perpétuo",
     "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
+    "reverseDcf": "Calcular Crescimento Implícito (Reverse DCF)",
     "fairValue": "Valor Justo",
     "currentPrice": "Preço Atual",
     "marginOfSafety": "Margem de Segurança",
@@ -177,6 +258,16 @@
     "terminalValuePv": "Valor Terminal (VP)",
     "fcfPv": "FCF Descontado (VP)",
     "disclaimer": "Os valores são uma estimativa baseada nos teus pressupostos. Não constituem recomendação de compra ou venda.",
+    "saved": {
+      "title": "As minhas análises",
+      "saveButton": "Guardar",
+      "saveError": "Não foi possível guardar. Tenta novamente.",
+      "labelPlaceholder": "Nome do cenário (opcional)",
+      "empty": "Ainda não guardaste nenhuma análise para esta empresa.",
+      "loadButton": "Carregar",
+      "deleteButton": "Apagar",
+      "fairValueShort": "Justo:"
+    },
     "errorWacc": "O WACC tem de ser superior ao crescimento perpétuo para o modelo ser válido. Ajusta os sliders.",
     "errorShares": "Indica o número de ações em circulação para calcular o valor por ação.",
     "errorFcf": "Indica um Free Cash Flow inicial válido para começar."

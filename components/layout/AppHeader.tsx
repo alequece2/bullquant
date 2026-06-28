@@ -1,5 +1,6 @@
 import { SearchBar } from '@/components/search/SearchBar';
-import { UserCircle, LogOut, Menu } from 'lucide-react';
+import { UserCircle, LogOut } from 'lucide-react';
+import { Logo } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
@@ -14,18 +15,18 @@ export async function AppHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4 md:px-6 gap-4">
-        {/* Mobile Menu Button - Optional, just for layout placeholder */}
-        <Button variant="ghost" size="icon" className="md:hidden shrink-0">
-          <Menu className="h-5 w-5" />
-        </Button>
+        {/* Mobile brand mark (sidebar is hidden on mobile) */}
+        <div className="md:hidden shrink-0">
+          <Logo href="/dashboard" size="sm" iconOnly />
+        </div>
 
         {/* Global Search Bar */}
-        <div className="flex-1 w-full max-w-xl mx-auto md:mx-0">
+        <div className="w-full max-w-xl">
           <SearchBar />
         </div>
-        
-        {/* User Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+
+        {/* User Actions — empurrados para a margem direita */}
+        <div className="flex items-center gap-2 shrink-0 ml-auto">
           {user && (
             <div className="flex items-center gap-2">
               <Link 

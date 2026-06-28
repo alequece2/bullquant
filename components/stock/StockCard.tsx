@@ -34,10 +34,12 @@ export function StockCard({
 
   return (
     <Link href={`/stock/${ticker}`} className="block group">
-      <div className="bg-card/40 backdrop-blur-sm border border-border/60 hover:bg-card/80 hover:border-primary/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary/5 hover:-translate-y-1 duration-300 transition-all p-5 rounded-2xl flex flex-col h-full relative overflow-hidden">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="bg-primary/5 p-1 rounded-lg border border-primary/10 flex items-center justify-center shrink-0 w-10 h-10 overflow-hidden">
+      <div className="bg-card/40 backdrop-blur-sm border border-border/60 hover:bg-card/80 hover:border-primary/40 hover:shadow-[0_4px_20px_rgb(0,0,0,0.25)] duration-200 transition-all p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
+        {/* Gold top hairline on hover */}
+        <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="bg-primary/5 p-1 rounded-md border border-primary/10 flex items-center justify-center shrink-0 w-8 h-8 overflow-hidden">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -50,38 +52,36 @@ export function StockCard({
                   }}
                 />
               ) : null}
-              <span className={`font-bold text-sm ${logoUrl ? "hidden" : ""}`}>
+              <span className={`font-heading font-bold text-sm text-primary ${logoUrl ? "hidden" : ""}`}>
                 {ticker[0]}
               </span>
             </div>
-            <div className="flex flex-col overflow-hidden">
-              <span className="font-extrabold text-lg truncate group-hover:text-primary transition-colors">
+            <div className="flex flex-col overflow-hidden min-w-0">
+              <span className="font-heading font-bold text-sm truncate group-hover:text-primary transition-colors">
                 {ticker}
               </span>
-              <span className="text-xs text-muted-foreground truncate w-[100px] sm:w-[120px]">
+              <span className="text-[11px] text-muted-foreground truncate">
                 {name}
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col items-end shrink-0">
+          <div className="flex flex-col items-end shrink-0 pl-2">
             {isLoading ? (
-              <div className="h-6 w-16 bg-muted animate-pulse rounded"></div>
+              <div className="h-5 w-14 bg-muted animate-pulse rounded"></div>
             ) : (
-              <span className="font-bold text-lg">
+              <span className="nums font-semibold text-sm">
                 {currentPrice ? `$${currentPrice.toFixed(2)}` : "N/A"}
               </span>
             )}
-            
+
             {isLoading ? (
-              <div className="h-4 w-12 bg-muted animate-pulse rounded mt-1"></div>
+              <div className="h-3.5 w-10 bg-muted animate-pulse rounded mt-1"></div>
             ) : (
               changePercent !== null && (
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
-                    isPositive
-                      ? "bg-emerald-500/10 text-emerald-500"
-                      : "bg-destructive/10 text-destructive"
+                  className={`nums text-[11px] font-semibold mt-0.5 ${
+                    isPositive ? "text-bull" : "text-bear"
                   }`}
                 >
                   {isPositive ? "+" : ""}
@@ -92,9 +92,9 @@ export function StockCard({
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t("marketCap")}</span>
-          <span className="text-sm font-semibold text-foreground/90">
+        <div className="mt-2.5 pt-2.5 border-t border-border/40 flex items-center justify-between">
+          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{t("marketCap")}</span>
+          <span className="nums text-xs font-semibold text-foreground/90">
             {marketCap ? formatLargeNumber(marketCap) : "N/A"}
           </span>
         </div>

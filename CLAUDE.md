@@ -581,6 +581,19 @@ abre um `<Dialog>` com **estimates** (EPS/revenue estimados) e, nos já reportad
 indicação visual de **beat/miss** (bateu ou não as expectativas). Dados via
 `/api/earnings`. Ingestão: `scripts/ingest_earnings.py` + `.github/workflows/ingest-earnings.yml`.
 
+**Guardar análises DCF** — na calculadora, com uma empresa carregada, o utilizador
+pode **guardar cenários DCF** (inputs + snapshot do fair value/margem) e revisitá-los
+mais tarde (carregar de volta aos sliders ou apagar). Modelo `DcfAnalysis`
+(tabela `dcf_analyses`), por `userId` + `companyId`. API: `GET/POST /api/dcf/analyses`
+e `DELETE /api/dcf/analyses/[id]`. UI em `components/dcf/SavedAnalyses.tsx`.
+
+> ⚠️ **Migrations vs db push:** a BD tem *drift* — `earnings_events` e `dcf_analyses`
+> foram criadas com `prisma db push` (aditivo, não-destrutivo), **não** com migration.
+> Por isso `prisma migrate dev` agora detetaria drift e quereria **resetar a BD
+> (apaga tudo)**. Até alguém consolidar o histórico de migrations, usar `prisma db push`
+> para mudanças aditivas. Carregar `.env.local` antes (`set -a; . ./.env.local; set +a`)
+> porque o Prisma CLI lê `.env`, não `.env.local`.
+
 ---
 
 ## 11. Roadmap (resumo — 12 semanas, início 23 Jun 2026)
