@@ -58,6 +58,7 @@ model Company {
   prices         Price[]
   aiInsightCache AIInsightCache?
   portfolioItems PortfolioItem[]
+  earnings       EarningsEvent[]
 
   @@index([ticker])
   @@index([exchange])
@@ -175,6 +176,41 @@ model PortfolioItem {
   @@unique([portfolioId, companyId])
   @@index([portfolioId])
   @@map("portfolio_items")
+}
+
+// ── CALENDÁRIO DE RESULTADOS (EARNINGS) ───────
+model EarningsEvent {
+  id        String @id @default(cuid())
+  companyId String
+
+  date          DateTime     @db.Date // data prevista/efetiva do report
+  hour          EarningsHour @default(UNKNOWN)
+  fiscalYear    Int
+  fiscalQuarter Int // 1-4
+
+  epsEstimate     Decimal? @db.Decimal(10, 4)
+  epsActual       Decimal? @db.Decimal(10, 4)
+  revenueEstimate Decimal? @db.Decimal(20, 4)
+  revenueActual   Decimal? @db.Decimal(20, 4)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, fiscalYear, fiscalQuarter])
+  @@index([date])
+  @@index([companyId, date])
+  @@map("earnings_events")
+}
+
+enum EarningsHour {
+  BMO // before market open
+  AMC // after market close
+  DMH // during market hours
+  UNKNOWN
+
+  @@map("earnings_hour")
 }
 
 // ── AI INSIGHTS (CACHE) ───────────────────────

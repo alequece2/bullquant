@@ -1,4 +1,25 @@
 {
+  "dashboard": {
+    "title": "Insights",
+    "subtitle": "Explore market trends, discover high-growth opportunities, and track the most discussed stocks across Wall Street.",
+    "empty": "No companies found for this category.",
+    "marketCap": "Market Cap",
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Most Trending",
+      "growth": "Growth",
+      "dividend": "Dividend Growth",
+      "buyback": "Buyback Machines",
+      "ai": "Artificial Intelligence"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "calendar": "Calendar",
+    "dcf": "DCF Calculator",
+    "aiInsights": "AI Insights"
+  },
   "login": {
     "title": "Sign in to BullQuant",
     "subtitle": "Access your portfolio and analytics.",
@@ -47,7 +68,8 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
-    "dcf": "DCF"
+    "dcf": "DCF",
+    "calendar": "Calendar"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -156,5 +178,20 @@
       "operating": "OPERAT.",
       "profit": "PROFIT"
     }
+  },
+  "calendar": {
+    "title": "Earnings Calendar",
+    "subtitle": "Track the earnings report dates of the companies we cover.",
+    "disclaimer": "Future dates are estimates from the data sources and may change. Always confirm on the company's investor relations page.",
+    "today": "Today",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "scopeAll": "All",
+    "scopeWatchlist": "Watchlist",
+    "more": "more",
+    "empty": "No earnings scheduled in this period.",
+    "summary": "{count} earnings in this period",
+    "legendBmo": "Before open",
+    "legendAmc": "After close"
   }
 }

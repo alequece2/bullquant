@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SearchBar } from '@/components/search/SearchBar';
-import { LineChart, LogOut, UserCircle, Calculator } from 'lucide-react';
+import { LineChart, LogOut, UserCircle, Calculator, CalendarDays } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
@@ -28,6 +28,14 @@ export async function Header() {
           </div>
 
           <nav className="flex items-center space-x-2">
+            <Link
+              href="/calendar"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
+              title={t('calendar')}
+            >
+              <CalendarDays className="h-5 w-5" />
+              <span className="hidden md:inline-block">{t('calendar')}</span>
+            </Link>
             <Link
               href="/dcf"
               className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"

@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { TrendingUp, TrendingDown, Clock, Search, Briefcase, Loader2, ArrowRight } from "lucide-react"
-import { buttonVariants } from "@/components/ui/button"
 
 type Company = {
   id: string;
@@ -26,8 +26,9 @@ type PriceData = {
 }
 
 export default function Home() {
-  const t = useTranslations("portfolio") 
+  const t = useTranslations("portfolio")
   const locale = useLocale()
+  const router = useRouter()
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
   const [isLoading, setIsLoading] = useState(true)
@@ -95,6 +96,11 @@ export default function Home() {
     init()
   }, [])
 
+  // Sem sessão → enviar para login (sem side-effect dentro do render).
+  useEffect(() => {
+    if (authError) router.replace("/login")
+  }, [authError, router])
+
   useEffect(() => {
     if (items.length > 0) {
       const tickers = items.map(item => item.company.ticker)
@@ -118,24 +124,8 @@ export default function Home() {
   }
 
   if (authError) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 py-20 px-4 text-center mt-12">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl mb-6">
-          {t('landing.title')}
-        </h1>
-        <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8 mb-8">
-          {t('landing.description')}
-        </p>
-        <div className="flex gap-4">
-          <Link href="/stock/AAPL" className={buttonVariants({ size: "lg", variant: "outline" })}>
-            {t('landing.testExample')} <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-          <Link href="/register" className={buttonVariants({ size: "lg" })}>
-            {t('landing.createAccount')}
-          </Link>
-        </div>
-      </div>
-    )
+    // O redirect é tratado no useEffect acima.
+    return null;
   }
 
   const upToday = Object.values(prices).filter(p => p.change >= 0).length

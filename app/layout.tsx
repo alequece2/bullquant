@@ -27,7 +27,6 @@ export default async function RootLayout({
     <html lang="pt" className={`${inter.variable} h-full antialiased dark`}>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
-          <Header />
           <main className="flex-1 flex flex-col">
             {children}
           </main>
