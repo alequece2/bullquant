@@ -84,7 +84,7 @@ def upsert_insider(cur, company_id: str, rows: list[dict]) -> int:
         name = (tx.get("name") or "").strip()
         change = tx.get("change")
         tdate = tx.get("transactionDate")
-        code = tx.get("transactionCode")
+        code = tx.get("transactionCode") or ""
         if not name or change is None or not tdate:
             continue  # sem dados mínimos → ignora
 
