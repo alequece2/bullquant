@@ -189,7 +189,20 @@
       "noAnalyses": "Ainda não guardaste nenhuma avaliação DCF para esta empresa.",
       "savedAt": "Guardado a",
       "fairValue": "Preço Justo",
-      "mos": "Margem de Segurança"
+      "mos": "Margem de Segurança",
+      "growth": "Crescimento (1-5a)",
+      "termGrowth": "Cresc. Terminal"
+    },
+    "brief": {
+      "title": "Brief",
+      "loading": "A nossa IA está a analisar os acontecimentos recentes...",
+      "subtitle": "Resumo estratégico dos desenvolvimentos recentes (gerado por IA)",
+      "date": "Data",
+      "sentiment": {
+        "bullish": "Otimista",
+        "bearish": "Pessimista",
+        "neutral": "Neutro"
+      }
     },
     "snapshotTitle": "Snapshot",
     "chart": {

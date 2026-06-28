@@ -1,7 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Sparkles, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { BRAND } from "@/lib/brand"
 
 type BriefEvent = {
   sentiment: "BULLISH" | "BEARISH" | "NEUTRAL"
@@ -14,46 +17,57 @@ type BriefData = {
   events: BriefEvent[]
 }
 
+const SENTIMENT = {
+  BULLISH: { Icon: TrendingUp, color: "text-bull", bg: "bg-bull/10", key: "bullish" },
+  BEARISH: { Icon: TrendingDown, color: "text-bear", bg: "bg-bear/10", key: "bearish" },
+  NEUTRAL: { Icon: Minus, color: "text-muted-foreground", bg: "bg-muted", key: "neutral" },
+} as const
+
 export function StockBrief({ ticker }: { ticker: string }) {
+  const t = useTranslations("stock.brief")
   const [data, setData] = React.useState<BriefData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(false)
 
   React.useEffect(() => {
+    let active = true
     async function fetchBrief() {
       try {
         const res = await fetch(`/api/ai/brief?ticker=${ticker}`)
         if (!res.ok) throw new Error("Failed to fetch")
         const json = await res.json()
-        setData(json.brief)
+        if (active) setData(json.brief)
       } catch (err) {
         console.error(err)
-        setError(true)
+        if (active) setError(true)
       } finally {
-        setLoading(false)
+        if (active) setLoading(false)
       }
     }
     fetchBrief()
+    return () => {
+      active = false
+    }
   }, [ticker])
 
   if (error) return null
 
   if (loading) {
     return (
-      <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm space-y-6">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            BullQuant Brief <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="mb-6">
+          <h2 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground">
+            {BRAND.name} {t("title")}
+            <Sparkles className="h-5 w-5 animate-pulse text-primary" />
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">A nossa IA está a analisar os acontecimentos recentes...</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-2">
-              <div className="h-5 w-3/4 bg-muted animate-pulse rounded" />
-              <div className="h-4 w-1/4 bg-muted animate-pulse rounded" />
-              <div className="h-4 w-full bg-muted animate-pulse rounded" />
-              <div className="h-4 w-full bg-muted animate-pulse rounded" />
+              <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
+              <div className="h-4 w-1/4 animate-pulse rounded bg-muted" />
+              <div className="h-4 w-full animate-pulse rounded bg-muted" />
             </div>
           ))}
         </div>
@@ -64,43 +78,38 @@ export function StockBrief({ ticker }: { ticker: string }) {
   if (!data || data.events.length === 0) return null
 
   return (
-    <div className="bg-[#1A1A24] border border-[#2D2D3D] rounded-xl p-6 shadow-lg text-slate-300">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-          BullQuant Brief <Sparkles className="w-5 h-5 text-amber-400" />
+        <h2 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground">
+          {BRAND.name} {t("title")}
+          <Sparkles className="h-5 w-5 text-primary" />
         </h2>
-        <p className="text-sm text-slate-400 mt-1">Um resumo estratégico dos desenvolvimentos recentes (Powered by AI)</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      <ul className="space-y-6 list-disc pl-5 marker:text-slate-600">
+      <ul className="space-y-6">
         {data.events.map((event, idx) => {
-          let SentimentIcon = Minus
-          let sentimentColor = "text-slate-400"
-          let sentimentText = "Neutral"
-
-          if (event.sentiment === "BULLISH") {
-            SentimentIcon = TrendingUp
-            sentimentColor = "text-bull"
-            sentimentText = "Bullish"
-          } else if (event.sentiment === "BEARISH") {
-            SentimentIcon = TrendingDown
-            sentimentColor = "text-bear"
-            sentimentText = "Bearish"
-          }
-
+          const s = SENTIMENT[event.sentiment] ?? SENTIMENT.NEUTRAL
+          const { Icon } = s
           return (
-            <li key={idx} className="pl-2">
-              <div className="flex items-center gap-2 font-bold text-white mb-2 text-lg">
-                <span className={`flex items-center gap-1 ${sentimentColor} text-sm bg-background/50 px-2 py-0.5 rounded-md`}>
-                  <SentimentIcon className="w-4 h-4" />
-                  ({sentimentText})
+            <li key={idx} className="border-l-2 border-border pl-4">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold",
+                    s.bg,
+                    s.color,
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {t(`sentiment.${s.key}`)}
                 </span>
-                <span>{event.title}</span>
+                <span className="font-semibold text-foreground">{event.title}</span>
               </div>
-              <p className="text-sm text-slate-400 mb-2 font-medium">Date: {event.date}</p>
-              <p className="text-slate-300 leading-relaxed text-sm">
-                {event.content}
+              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                {t("date")}: {event.date}
               </p>
+              <p className="text-sm leading-relaxed text-foreground/80">{event.content}</p>
             </li>
           )
         })}

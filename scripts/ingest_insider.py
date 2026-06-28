@@ -84,11 +84,14 @@ def upsert_insider(cur, company_id: str, rows: list[dict]) -> int:
         name = (tx.get("name") or "").strip()
         change = tx.get("change")
         tdate = tx.get("transactionDate")
-        code = tx.get("transactionCode") or ""
+        # code entra na chave natural do upsert; "" (nunca NULL) para que o
+        # ON CONFLICT case mesmo quando o Finnhub não fornece código — caso
+        # contrário o Postgres trata NULL como distinto e duplica a cada cron.
+        code = (tx.get("transactionCode") or "").strip().upper()
         if not name or change is None or not tdate:
             continue  # sem dados mínimos → ignora
 
-        txn_type = TYPE_MAP.get((code or "").upper(), "OTHER")
+        txn_type = TYPE_MAP.get(code, "OTHER")
         shares = abs(float(change))
         price = tx.get("transactionPrice")
         value = shares * float(price) if price else None

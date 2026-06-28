@@ -92,7 +92,7 @@ export default async function StockPage({
         logoUrl: company.logoUrl
       }} />
 
-      {/* 1.5. BullQuant Brief (AI) */}
+      {/* 1.5. BullVision Brief (AI) */}
       <StockBrief ticker={company.ticker} />
 
       {/* 2. Fundamentals Snapshot */}

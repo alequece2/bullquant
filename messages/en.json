@@ -157,7 +157,20 @@
       "noAnalyses": "You haven't saved any DCF valuations for this company.",
       "savedAt": "Saved on",
       "fairValue": "Fair Value",
-      "mos": "Margin of Safety"
+      "mos": "Margin of Safety",
+      "growth": "Growth (1-5y)",
+      "termGrowth": "Term. Growth"
+    },
+    "brief": {
+      "title": "Brief",
+      "loading": "Our AI is analysing recent developments...",
+      "subtitle": "A strategic summary of recent developments (AI-generated)",
+      "date": "Date",
+      "sentiment": {
+        "bullish": "Bullish",
+        "bearish": "Bearish",
+        "neutral": "Neutral"
+      }
     },
     "snapshotTitle": "Snapshot",
     "chart": {

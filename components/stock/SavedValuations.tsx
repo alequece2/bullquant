@@ -93,7 +93,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
-                    Growth (1-5y)
+                    {t("growth")}
                   </p>
                   <p className="font-mono text-sm font-medium">
                     {(a.growthStage1 * 100).toFixed(1)}%
@@ -101,7 +101,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
-                    Term. Growth
+                    {t("termGrowth")}
                   </p>
                   <p className="font-mono text-sm font-medium">
                     {(a.terminalGrowth * 100).toFixed(1)}%

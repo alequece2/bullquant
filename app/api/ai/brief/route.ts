@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 import { generateObject } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
 
 export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
+
+// Limite diário de gerações de IA no plano FREE (CLAUDE.md §10, feature 6).
+// Só gerações reais contam; servir da cache não consome quota.
+const DAILY_FREE_LIMIT = 5
 
 export async function GET(request: Request) {
   try {
@@ -23,13 +29,43 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
-    // 1. Check Cache
-    const cached = await prisma.companyBrief.findUnique({ 
-      where: { companyId: company.id } 
+    // Auth — este endpoint chama Gemini/Finnhub; exige utilizador autenticado
+    // para não expor o custo a pedidos anónimos.
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // 1. Check Cache (servir da cache não consome quota de IA)
+    const cached = await prisma.companyBrief.findUnique({
+      where: { companyId: company.id }
     })
-    
+
     if (cached && cached.expiresAt > new Date()) {
       return NextResponse.json({ brief: cached.briefData })
+    }
+
+    // 1b. Rate limit — só conta gerações reais. FREE: limite diário; PRO: sem limite.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { plan: true },
+    })
+    if (dbUser?.plan !== 'PRO') {
+      const startOfDay = new Date()
+      startOfDay.setHours(0, 0, 0, 0)
+      const usedToday = await prisma.aIUsageLog.count({
+        where: { userId: user.id, usedAt: { gte: startOfDay } },
+      })
+      if (usedToday >= DAILY_FREE_LIMIT) {
+        return NextResponse.json(
+          {
+            error: 'rate_limit',
+            message: 'Limite diário de análises de IA atingido. Tenta novamente amanhã.',
+          },
+          { status: 429 },
+        )
+      }
     }
 
     // 2. Fetch Finnhub News (last 15 days)
@@ -89,17 +125,22 @@ export async function GET(request: Request) {
     await prisma.companyBrief.upsert({
       where: { companyId: company.id },
       update: {
-        briefData: object as any,
+        briefData: object as Prisma.InputJsonValue,
         expiresAt,
         modelVersion: modelName,
         generatedAt: new Date()
       },
       create: {
         companyId: company.id,
-        briefData: object as any,
+        briefData: object as Prisma.InputJsonValue,
         expiresAt,
         modelVersion: modelName
       }
+    })
+
+    // 5. Registar uso (só após geração real bem-sucedida)
+    await prisma.aIUsageLog.create({
+      data: { userId: user.id, ticker: company.ticker },
     })
 
     return NextResponse.json({ brief: object })
