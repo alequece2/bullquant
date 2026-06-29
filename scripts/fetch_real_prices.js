@@ -1,5 +1,28 @@
+// IMPORTANT: Load env vars BEFORE requiring @prisma/client, because Prisma's
+// internal loader reads the bare .env file (which has an empty FINNHUB_API_KEY)
+// and would overwrite our value if we called dotenv after.
+const path = require('path');
+// Override env — dotenv only sets a key if it isn't already in process.env,
+// so we force-set the ones we need from .env.local FIRST.
+const fs = require('fs');
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx < 0) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim();
+    // Force-set so Prisma's .env loader can't blank these out
+    process.env[key] = val;
+  }
+}
+loadEnvFile(path.join(__dirname, '../.env.local'));
+loadEnvFile(path.join(__dirname, '../.env.dev'));
+
 const { PrismaClient } = require('@prisma/client');
-require('dotenv').config({ path: '.env.dev' });
 const prisma = new PrismaClient();
 
 async function run() {
@@ -10,6 +33,12 @@ async function run() {
   const date = new Date();
   date.setHours(0,0,0,0);
   const apiKey = process.env.FINNHUB_API_KEY;
+  
+  if (!apiKey) {
+    console.error('ERROR: FINNHUB_API_KEY is not set. Aborting.');
+    process.exit(1);
+  }
+  console.log(`Using API key: ${apiKey.slice(0, 6)}...${apiKey.slice(-4)}`);
   
   // Finnhub allows 60 req / min -> 1 req per sec.
   for (let i = 0; i < companies.length; i++) {

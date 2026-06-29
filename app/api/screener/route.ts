@@ -30,13 +30,9 @@ export async function POST(request: Request) {
       whereClause.revenue = { gte: minRevenue }
     }
 
-    if (minDividendYield !== undefined) {
-      whereClause.dividendPerShare = { gte: minDividendYield }
-      // Note: In MVP, dividendPerShare is absolute, so filtering by absolute dividend is a proxy.
-      // Alternatively, we filter companies that just HAVE a dividend if > 0.
-      if (minDividendYield > 0) {
-        whereClause.dividendPerShare = { gt: 0 }
-      }
+    if (minDividendYield !== undefined && minDividendYield > 0) {
+      // Filter companies that have any dividend (absolute proxy since we store dividendPerShare, not yield)
+      whereClause.dividendPerShare = { gt: 0 }
     }
 
     const results = await prisma.fundamental.findMany({

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { UserCircle, Mail, Star, LogOut, Settings as SettingsIcon, Globe, Palette, Loader2 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -23,10 +24,13 @@ interface SettingsClientProps {
 
 export function SettingsClient({ user, locale }: SettingsClientProps) {
   const t = useTranslations('settings')
+  const router = useRouter()
   
   const [name, setName] = useState(user.name || '')
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+  // Track the initial name normalised to empty string so comparison is consistent
+  const initialName = user.name || ''
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,6 +53,8 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   const handleLanguageChange = async (newLocale: string | null) => {
     if (newLocale) {
       await setLocale(newLocale)
+      // Force a full navigation so Server Components re-render with the new locale cookie
+      router.refresh()
     }
   }
 
@@ -108,7 +114,7 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
                   </p>
                 )}
 
-                <Button type="submit" disabled={isSaving || name === user.name}>
+                <Button type="submit" disabled={isSaving || name.trim() === initialName.trim() || name.trim() === ''}>
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   {t('profile.save')}
                 </Button>
