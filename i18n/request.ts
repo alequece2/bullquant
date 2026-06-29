@@ -1,9 +1,44 @@
 import { getRequestConfig } from 'next-intl/server'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
+
+const SUPPORTED_LOCALES = ['en', 'pt', 'es', 'fr', 'de']
+const DEFAULT_LOCALE = 'en'
 
 export default getRequestConfig(async () => {
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt'
+  let locale = cookieStore.get('NEXT_LOCALE')?.value
+
+  // Se não houver cookie explícita, tentamos auto-detetar pelo IP ou idioma do browser
+  if (!locale) {
+    const headersList = await headers()
+    
+    // 1. Tentar pelo cabeçalho de país da Vercel (Geolocalização por IP)
+    const country = headersList.get('x-vercel-ip-country')
+    if (country) {
+      const c = country.toUpperCase()
+      if (['PT', 'BR', 'AO', 'MZ', 'CV', 'GW', 'ST'].includes(c)) locale = 'pt'
+      else if (['ES', 'MX', 'AR', 'CO', 'CL', 'PE', 'VE', 'EC', 'GT', 'CU', 'BO', 'DO', 'HN', 'PY', 'SV', 'NI', 'CR', 'PA', 'UY'].includes(c)) locale = 'es'
+      else if (['FR', 'BE', 'CH', 'CA', 'SN', 'CI', 'CM', 'ML', 'NE', 'BF', 'MG', 'GN', 'RW', 'BI', 'BJ', 'HT', 'TG'].includes(c)) locale = 'fr'
+      else if (['DE', 'AT', 'LI', 'LU'].includes(c)) locale = 'de'
+    }
+    
+    // 2. Fallback para o idioma configurado no browser (Accept-Language)
+    if (!locale) {
+      const acceptLanguage = headersList.get('accept-language')
+      if (acceptLanguage) {
+        const preferredLocales = acceptLanguage
+          .split(',')
+          .map(lang => lang.split(';')[0].trim().split('-')[0].toLowerCase())
+        
+        locale = preferredLocales.find(lang => SUPPORTED_LOCALES.includes(lang))
+      }
+    }
+  }
+  
+  // Validação final e fallback absoluto
+  if (!locale || !SUPPORTED_LOCALES.includes(locale)) {
+    locale = DEFAULT_LOCALE
+  }
   
   return {
     locale,

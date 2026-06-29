@@ -51,10 +51,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const messages = await getMessages();
+  // Obtém o idioma que foi resolvido (por IP, browser ou cookie) no ficheiro request.ts
+  const { getLocale } = await import('next-intl/server');
+  const locale = await getLocale();
 
   return (
     <html
-      lang="pt"
+      lang={locale}
       className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
