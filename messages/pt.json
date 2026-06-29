@@ -369,6 +369,9 @@
     "subtitle": "Encontra empresas de alta qualidade com base nos teus próprios critérios.",
     "filters": {
       "title": "Critérios",
+      "guruStrategies": "Estratégias de Guru",
+      "moatCompounders": "Moat Compounders (Buffett)",
+      "moatTooltip": "Empresas com enorme poder de fixação de preços (Margem > 40%) e alta eficiência (ROIC > 15%).",
       "sector": "Setor",
       "sectorPlaceholder": "Todos os Setores",
       "allSectors": "Todos os Setores",

@@ -369,6 +369,9 @@
     "subtitle": "Find high-quality companies based on your own criteria.",
     "filters": {
       "title": "Criteria",
+      "guruStrategies": "Guru Strategies",
+      "moatCompounders": "Moat Compounders (Buffett)",
+      "moatTooltip": "Companies with massive pricing power (Margin > 40%) and high capital efficiency (ROIC > 15%).",
       "sector": "Sector",
       "sectorPlaceholder": "All Sectors",
       "allSectors": "All Sectors",
