@@ -255,7 +255,11 @@
       "cashFlow": "Cash Flow",
       "marginAndGrowth": "Margins & Growth",
       "balance": "Balance Sheet",
-      "dividend": "Dividends"
+      "dividend": "Dividends",
+      "na": "N/A",
+      "naGeneric": "No data available for this company.",
+      "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
+      "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     }
   },
   "dcf": {

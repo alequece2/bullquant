@@ -351,7 +351,15 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     revenue = dur.get("revenue")
     gross_profit = dur.get("grossProfit")
-    
+
+    # Fallback: muitas empresas reportam Revenue e CostOfRevenue mas NÃO a tag
+    # explícita GrossProfit. Calcular grossProfit = revenue − costOfRevenue
+    # recupera a gross margin sem depender dessa única tag XBRL.
+    # (Bancos/seguradoras não têm COGS → continua None, que é o correto.)
+    cost_of_rev = dur.get("costOfRevenue")
+    if gross_profit is None and revenue is not None and cost_of_rev is not None:
+        gross_profit = revenue - cost_of_rev
+
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
         gross_profit = revenue  # Força a integridade se a extração colidir tags residuais

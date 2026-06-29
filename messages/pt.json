@@ -255,7 +255,11 @@
       "cashFlow": "Cash Flow",
       "marginAndGrowth": "Margens & Crescimento",
       "balance": "Balanço",
-      "dividend": "Dividendos"
+      "dividend": "Dividendos",
+      "na": "N/D",
+      "naGeneric": "Sem dados disponíveis para esta empresa.",
+      "naMargin": "Margem não reportada — típico de bancos e seguradoras, que não têm custo de produção (COGS).",
+      "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
     }
   },
   "dcf": {
