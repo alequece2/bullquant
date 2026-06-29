@@ -100,12 +100,21 @@ export function SearchBar() {
                   onClick={() => handleSelect(company)}
                   className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between group/item"
                 >
-                  <div>
-                    <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
-                      {company.ticker}
-                    </div>
-                    <div className="text-sm text-muted-foreground line-clamp-1">
-                      {company.name}
+                  <div className="flex items-center gap-3">
+                    {company.logoUrl ? (
+                      <img src={company.logoUrl} alt={company.ticker} className="w-8 h-8 rounded-full bg-white p-0.5 object-contain" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted text-[10px] font-bold text-muted-foreground border border-border/50">
+                        {company.ticker.substring(0, 2)}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
+                        {company.ticker}
+                      </div>
+                      <div className="text-sm text-muted-foreground line-clamp-1">
+                        {company.name}
+                      </div>
                     </div>
                   </div>
                   <div className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
