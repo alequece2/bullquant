@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export type RecentSearch = {
   ticker: string;
@@ -14,30 +14,57 @@ export function useRecentSearches() {
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
+  const loadSearches = useCallback(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         setRecentSearches(JSON.parse(stored));
+      } else {
+        setRecentSearches([]);
       }
     } catch (e) {
       console.error('Failed to load recent searches', e);
     }
   }, []);
 
+  useEffect(() => {
+    setIsClient(true);
+    loadSearches();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        loadSearches();
+      }
+    };
+
+    const handleCustomEvent = () => {
+      loadSearches();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('recentSearchesUpdated', handleCustomEvent);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('recentSearchesUpdated', handleCustomEvent);
+    };
+  }, [loadSearches]);
+
+  const updateStorageAndNotify = (newSearches: RecentSearch[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newSearches));
+      window.dispatchEvent(new Event('recentSearchesUpdated'));
+    } catch (e) {
+      console.error('Failed to save recent search', e);
+    }
+  };
+
   const addSearch = (search: RecentSearch) => {
     setRecentSearches((prev) => {
       // Remove if already exists to move it to the top
       const filtered = prev.filter((s) => s.ticker !== search.ticker);
       const newSearches = [search, ...filtered].slice(0, MAX_RECENT_SEARCHES);
-      
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newSearches));
-      } catch (e) {
-        console.error('Failed to save recent search', e);
-      }
-      
+      updateStorageAndNotify(newSearches);
       return newSearches;
     });
   };
@@ -45,11 +72,7 @@ export function useRecentSearches() {
   const removeSearch = (ticker: string) => {
     setRecentSearches((prev) => {
       const newSearches = prev.filter((s) => s.ticker !== ticker);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newSearches));
-      } catch (e) {
-        console.error('Failed to save recent search', e);
-      }
+      updateStorageAndNotify(newSearches);
       return newSearches;
     });
   };
@@ -58,6 +81,7 @@ export function useRecentSearches() {
     setRecentSearches([]);
     try {
       localStorage.removeItem(STORAGE_KEY);
+      window.dispatchEvent(new Event('recentSearchesUpdated'));
     } catch (e) {
       console.error('Failed to clear recent searches', e);
     }
