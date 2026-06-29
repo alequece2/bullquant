@@ -87,6 +87,7 @@
     "calendar": "Calendar",
     "dcf": "DCF Calculator",
     "transcripts": "Transcripts",
+    "recentSearches": "Recent Searches",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
       "portfolio": "The companies you follow and their live prices",
