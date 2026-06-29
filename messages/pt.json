@@ -86,13 +86,13 @@
     "portfolio": "Portfólio",
     "calendar": "Calendário",
     "dcf": "Calculadora DCF",
-    "aiInsights": "AI Insights",
+    "transcripts": "Transcrições",
     "desc": {
       "dashboard": "Visão geral, atalhos e exploração de empresas",
       "portfolio": "As empresas que segues e os seus preços ao vivo",
       "calendar": "Calendário de resultados (earnings) com estimativas",
       "dcf": "Calcula o valor intrínseco de uma ação",
-      "aiInsights": "Análise qualitativa de uma empresa gerada por IA"
+      "transcripts": "Transcrições das calls de resultados trimestrais"
     }
   },
   "login": {

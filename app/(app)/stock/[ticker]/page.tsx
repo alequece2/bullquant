@@ -8,7 +8,7 @@ import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
-import { TranscriptsPlaceholder } from '@/components/stock/TranscriptsPlaceholder'
+
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 
@@ -94,8 +94,7 @@ export default async function StockPage({
         logoUrl: company.logoUrl
       }} />
 
-      {/* 1.5. Earnings Calls Transcripts (Em Desenvolvimento) */}
-      <TranscriptsPlaceholder />
+
 
       {/* 2. Fundamentals Snapshot */}
       <div>

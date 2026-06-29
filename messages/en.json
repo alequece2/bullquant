@@ -86,13 +86,13 @@
     "portfolio": "Portfolio",
     "calendar": "Calendar",
     "dcf": "DCF Calculator",
-    "aiInsights": "AI Insights",
+    "transcripts": "Transcripts",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
       "portfolio": "The companies you follow and their live prices",
       "calendar": "Earnings calendar with estimates",
-      "dcf": "Estimate a stock's intrinsic value",
-      "aiInsights": "AI-generated qualitative company analysis"
+      "dcf": "Calculate the intrinsic value of a stock",
+      "transcripts": "Read through quarterly earnings call transcripts"
     }
   },
   "login": {
