@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Briefcase, CalendarDays, Calculator, Sparkles, LayoutDashboard } from 'lucide-react';
+import { Briefcase, CalendarDays, Calculator, Sparkles, LayoutDashboard, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { BRAND } from '@/lib/brand';
@@ -10,6 +11,7 @@ import { Logo } from '@/components/brand/Logo';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 export function AppSidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const t = useTranslations('sidebar');
 
@@ -18,13 +20,23 @@ export function AppSidebar() {
     { href: '/portfolio', icon: Briefcase, label: t('portfolio'), desc: t('desc.portfolio') },
     { href: '/calendar', icon: CalendarDays, label: t('calendar'), desc: t('desc.calendar') },
     { href: '/dcf', icon: Calculator, label: t('dcf'), desc: t('desc.dcf') },
-    { href: '/ai-insights', icon: Sparkles, label: t('aiInsights'), desc: t('desc.aiInsights') },
   ];
 
   return (
-    <aside className="w-64 border-r border-sidebar-border bg-sidebar flex flex-col h-full hidden md:flex shrink-0">
-      <div className="h-16 flex items-center px-5 border-b border-sidebar-border/60 shrink-0">
-        <Logo href="/dashboard" size="md" />
+    <aside 
+      className={cn(
+        "border-r border-sidebar-border bg-sidebar flex-col h-full hidden md:flex shrink-0 transition-all duration-300",
+        isCollapsed ? "w-[72px]" : "w-64"
+      )}
+    >
+      <div className={cn("h-16 flex items-center border-b border-sidebar-border/60 shrink-0", isCollapsed ? "justify-center px-0" : "px-5")}>
+        {!isCollapsed ? (
+          <Logo href="/dashboard" size="md" />
+        ) : (
+          <Link href="/dashboard" className="flex items-center justify-center">
+            <span className="h-8 w-8 rounded-md bg-primary/20 flex items-center justify-center text-primary font-bold">B</span>
+          </Link>
+        )}
       </div>
 
       <TooltipProvider delay={200}>
@@ -39,7 +51,8 @@ export function AppSidebar() {
                     <Link
                       href={link.href}
                       className={cn(
-                        "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        "group relative flex items-center rounded-lg text-sm font-medium transition-colors",
+                        isCollapsed ? "justify-center py-3 px-0" : "gap-3 px-3 py-2.5",
                         isActive
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -52,8 +65,8 @@ export function AppSidebar() {
                           isActive ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      <Icon className={cn("h-5 w-5 shrink-0 transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} strokeWidth={2} />
-                      <span>{link.label}</span>
+                      <Icon className={cn("shrink-0 transition-colors", isCollapsed ? "h-6 w-6" : "h-5 w-5", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} strokeWidth={2} />
+                      {!isCollapsed && <span>{link.label}</span>}
                     </Link>
                   }
                 />
@@ -66,12 +79,24 @@ export function AppSidebar() {
         </nav>
       </TooltipProvider>
 
-      {/* Footer — parent brand */}
-      <div className="px-5 py-4 border-t border-sidebar-border/60 shrink-0">
-        <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
-          <span className="h-1 w-1 rounded-full bg-primary/70" />
-          by {BRAND.parent}
-        </div>
+      {/* Footer */}
+      <div className={cn("py-4 border-t border-sidebar-border/60 shrink-0 flex items-center", isCollapsed ? "flex-col gap-4 px-2" : "justify-between px-5")}>
+        {!isCollapsed && (
+          <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
+            <span className="h-1 w-1 rounded-full bg-primary/70" />
+            by {BRAND.parent}
+          </div>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={cn(
+            "p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors",
+            isCollapsed && "mx-auto"
+          )}
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+        </button>
       </div>
     </aside>
   );

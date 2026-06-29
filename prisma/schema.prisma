@@ -46,6 +46,7 @@ model Company {
   logoUrl     String?
   description String? @db.Text
   website     String?
+  ceo         String?
   employees   Int?
   isActive    Boolean @default(true)
 

@@ -28,6 +28,7 @@ export function StockBrief({ ticker }: { ticker: string }) {
   const [data, setData] = React.useState<BriefData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(false)
+  const [isExpanded, setIsExpanded] = React.useState(false)
 
   React.useEffect(() => {
     let active = true
@@ -88,7 +89,7 @@ export function StockBrief({ ticker }: { ticker: string }) {
       </div>
 
       <ul className="space-y-6">
-        {data.events.map((event, idx) => {
+        {(isExpanded ? data.events : data.events.slice(0, 1)).map((event, idx) => {
           const s = SENTIMENT[event.sentiment] ?? SENTIMENT.NEUTRAL
           const { Icon } = s
           return (
@@ -114,6 +115,17 @@ export function StockBrief({ ticker }: { ticker: string }) {
           )
         })}
       </ul>
+      
+      {data.events.length > 1 && (
+        <div className="mt-6 border-t border-border/50 pt-4 text-center">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {isExpanded ? t("collapse") : t("expand", { n: data.events.length - 1 })}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

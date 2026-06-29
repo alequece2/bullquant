@@ -23,20 +23,36 @@
     }
   },
   "insider": {
-    "title": "Atividade de Insiders",
-    "subtitle": "Compras e vendas de ações por executivos e diretores (SEC Form 4).",
-    "buysWindow": "{n} compras · {days}d",
-    "sellsWindow": "{n} vendas · {days}d",
-    "emptyTitle": "Sem transações de insiders",
-    "emptyDesc": "Ainda não há registos de Form 4 para esta empresa. Os dados são atualizados semanalmente.",
-    "type": { "buy": "Compra", "sell": "Venda", "other": "Outro" },
+    "title": "Transações de Insiders",
+    "subtitle": "Declarações (Form 4) de diretores, executivos e detentores de >10%.",
+    "emptyTitle": "Sem Atividade",
+    "emptyDesc": "Não foram detetadas transações recentes de insiders para esta empresa.",
+    "showMore": "Mostrar mais {n} transações",
+    "showLess": "Ver menos",
+    "buysWindow": "{n} Compras ({days}d)",
+    "sellsWindow": "{n} Vendas ({days}d)",
     "col": {
-      "insider": "Insider",
+      "insider": "Nome",
       "type": "Tipo",
       "shares": "Ações",
       "price": "Preço",
       "value": "Valor",
       "date": "Data"
+    },
+    "type": {
+      "buy": "COMPRA",
+      "sell": "VENDA",
+      "other": "OUTRO"
+    },
+    "codes": {
+      "P": "P - Compra no Mercado",
+      "S": "S - Venda no Mercado",
+      "A": "A - Atribuição / Bónus",
+      "M": "M - Exercício de Opções",
+      "F": "F - Retenção de Impostos (In Kind)",
+      "G": "G - Oferta / Doação",
+      "J": "J - Outro",
+      "unknown": "Código SEC: {code}"
     }
   },
   "dashboard": {
@@ -202,7 +218,18 @@
         "bullish": "Otimista",
         "bearish": "Pessimista",
         "neutral": "Neutro"
-      }
+      },
+      "expand": "Ler mais {n} desenvolvimentos",
+      "collapse": "Recolher"
+    },
+    "profile": {
+      "title": "Perfil da Empresa",
+      "website": "Website",
+      "sector": "Setor",
+      "industry": "Indústria",
+      "employees": "Trabalhadores Efetivos",
+      "country": "País",
+      "exchange": "Bolsa"
     },
     "snapshotTitle": "Snapshot",
     "chart": {
@@ -316,5 +343,21 @@
     "summary": "{count} resultados neste período",
     "legendBmo": "Antes da abertura",
     "legendAmc": "Após o fecho"
+  },
+  "news": {
+    "title": "Notícias da Empresa",
+    "subtitle": "Artigos recentes dos últimos 30 dias.",
+    "source": "via Finnhub",
+    "emptyTitle": "Sem Notícias Recentes",
+    "emptyDesc": "Não foram encontradas notícias recentes para esta empresa.",
+    "showMore": "Mostrar mais {n} artigos",
+    "showLess": "Ver menos"
+  },
+  "transcripts": {
+    "title": "Earnings Calls Transcripts",
+    "subtitle": "Leia e pesquise nas conferências de apresentação de resultados.",
+    "inDevelopment": "Em Desenvolvimento",
+    "placeholderTitle": "Transcrições em Breve",
+    "placeholderDesc": "Estamos a finalizar a integração com os fornecedores de dados. Esta funcionalidade ficará disponível brevemente."
   }
 }

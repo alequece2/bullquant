@@ -8,7 +8,9 @@ import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
-import { StockBrief } from '@/components/stock/StockBrief'
+import { TranscriptsPlaceholder } from '@/components/stock/TranscriptsPlaceholder'
+import { CompanyProfile } from '@/components/stock/CompanyProfile'
+import { StockNews } from '@/components/stock/StockNews'
 
 export default async function StockPage({
   params,
@@ -92,8 +94,8 @@ export default async function StockPage({
         logoUrl: company.logoUrl
       }} />
 
-      {/* 1.5. BullVision Brief (AI) */}
-      <StockBrief ticker={company.ticker} />
+      {/* 1.5. Earnings Calls Transcripts (Em Desenvolvimento) */}
+      <TranscriptsPlaceholder />
 
       {/* 2. Fundamentals Snapshot */}
       <div>
@@ -118,6 +120,12 @@ export default async function StockPage({
 
       {/* 5. Insider Activity (SEC Form 4) */}
       <InsiderActivity ticker={company.ticker} />
+
+      {/* 6. Company News */}
+      <StockNews ticker={company.ticker} />
+
+      {/* 7. Company Profile */}
+      <CompanyProfile company={company} />
     </div>
   )
 }

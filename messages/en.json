@@ -23,20 +23,36 @@
     }
   },
   "insider": {
-    "title": "Insider Activity",
-    "subtitle": "Share buys and sells by executives and directors (SEC Form 4).",
-    "buysWindow": "{n} buys · {days}d",
-    "sellsWindow": "{n} sells · {days}d",
-    "emptyTitle": "No insider transactions",
-    "emptyDesc": "No Form 4 filings recorded for this company yet. Data refreshes weekly.",
-    "type": { "buy": "Buy", "sell": "Sell", "other": "Other" },
+    "title": "Company Insider Trading",
+    "subtitle": "Form 4 filings by directors, officers, and 10% owners.",
+    "emptyTitle": "No Activity",
+    "emptyDesc": "No recent insider transactions detected for this company.",
+    "showMore": "Show {n} more transactions",
+    "showLess": "Show less",
+    "buysWindow": "{n} Buys ({days}d)",
+    "sellsWindow": "{n} Sells ({days}d)",
     "col": {
-      "insider": "Insider",
+      "insider": "Name",
       "type": "Type",
-      "shares": "Shares",
+      "shares": "Transacted",
       "price": "Price",
       "value": "Value",
       "date": "Date"
+    },
+    "type": {
+      "buy": "BUY",
+      "sell": "SELL",
+      "other": "OTHER"
+    },
+    "codes": {
+      "P": "P - Open Market Purchase",
+      "S": "S - Open Market Sale",
+      "A": "A - Grant or Award",
+      "M": "M - Option Exercise",
+      "F": "F - Tax Withholding (In Kind)",
+      "G": "G - Gift",
+      "J": "J - Other",
+      "unknown": "SEC Code: {code}"
     }
   },
   "dashboard": {
@@ -170,7 +186,18 @@
         "bullish": "Bullish",
         "bearish": "Bearish",
         "neutral": "Neutral"
-      }
+      },
+      "expand": "Read {n} more developments",
+      "collapse": "Collapse"
+    },
+    "profile": {
+      "title": "Company Profile",
+      "website": "Website",
+      "sector": "Sector",
+      "industry": "Industry",
+      "employees": "Full Time Employees",
+      "country": "Country",
+      "exchange": "Exchange"
     },
     "snapshotTitle": "Snapshot",
     "chart": {
@@ -284,5 +311,21 @@
     "summary": "{count} earnings in this period",
     "legendBmo": "Before open",
     "legendAmc": "After close"
+  },
+  "news": {
+    "title": "Company News",
+    "subtitle": "Latest articles from the past 30 days.",
+    "source": "via Finnhub",
+    "emptyTitle": "No Recent News",
+    "emptyDesc": "No recent news articles found for this company.",
+    "showMore": "Show {n} more articles",
+    "showLess": "Show less"
+  },
+  "transcripts": {
+    "title": "Earnings Calls Transcripts",
+    "subtitle": "Read and search through quarterly earnings conference calls.",
+    "inDevelopment": "In Development",
+    "placeholderTitle": "Transcripts Coming Soon",
+    "placeholderDesc": "We are finalizing our data provider integration. This feature will be available shortly."
   }
 }

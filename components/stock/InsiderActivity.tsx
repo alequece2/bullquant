@@ -5,12 +5,14 @@ import { useTranslations } from "next-intl";
 import { ArrowDownRight, ArrowUpRight, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatLargeNumber } from "@/lib/finance/format";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 interface InsiderTxn {
   id: string;
   insiderName: string;
   title: string | null;
   type: "BUY" | "SELL" | "OTHER";
+  transactionCode: string | null;
   shares: number;
   price: number | null;
   value: number | null;
@@ -29,6 +31,9 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
   const t = useTranslations("insider");
   const [txns, setTxns] = useState<InsiderTxn[] | null>(null);
   const [summary, setSummary] = useState<InsiderSummary | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const DEFAULT_LIMIT = 5;
 
   useEffect(() => {
     let active = true;
@@ -36,7 +41,36 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
       .then((r) => r.json())
       .then((d) => {
         if (!active) return;
-        setTxns(d.transactions ?? []);
+        
+        // Group transactions by Person + Date + Type
+        const rawTxns: InsiderTxn[] = d.transactions ?? [];
+        const groups: Record<string, InsiderTxn> = {};
+        
+        for (const tx of rawTxns) {
+          const key = `${tx.insiderName}_${tx.transactionDate}_${tx.type}`;
+          if (!groups[key]) {
+            groups[key] = { ...tx };
+          } else {
+            const existing = groups[key];
+            existing.shares += tx.shares;
+            // Prefer a more specific SEC code over blank/null
+            if (!existing.transactionCode && tx.transactionCode) {
+              existing.transactionCode = tx.transactionCode;
+            }
+            if (existing.value !== null && tx.value !== null) {
+              existing.value += tx.value;
+              existing.price = existing.shares > 0 ? existing.value / existing.shares : null;
+            } else if (tx.value !== null) {
+              existing.value = tx.value;
+            }
+          }
+        }
+        
+        const groupedTxns = Object.values(groups).sort(
+          (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
+        );
+
+        setTxns(groupedTxns);
         setSummary(d.summary ?? null);
       })
       .catch(() => active && setTxns([]));
@@ -99,7 +133,7 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {txns.map((tx) => {
+              {txns.slice(0, isExpanded ? undefined : DEFAULT_LIMIT).map((tx) => {
                 const isBuy = tx.type === "BUY";
                 const isSell = tx.type === "SELL";
                 return (
@@ -111,7 +145,24 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
                       )}
                     </td>
                     <td className="hidden px-4 py-2.5 sm:table-cell">
-                      <TypeBadge type={tx.type} label={t(`type.${tx.type.toLowerCase()}`)} />
+                      <TooltipProvider delay={200}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="cursor-help">
+                              <TypeBadge type={tx.type} label={t(`type.${tx.type.toLowerCase()}`)} />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {tx.transactionCode 
+                                ? (['P', 'S', 'A', 'M', 'F', 'G', 'J'].includes(tx.transactionCode) 
+                                    ? t(`codes.${tx.transactionCode}` as any) 
+                                    : t("codes.unknown", { code: tx.transactionCode }))
+                                : "Código SEC não disponível"}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </td>
                     <td
                       className={cn(
@@ -137,6 +188,17 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
               })}
             </tbody>
           </table>
+        )}
+
+        {txns && txns.length > DEFAULT_LIMIT && (
+          <div className="border-t border-border bg-muted/20 px-4 py-3 text-center">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              {isExpanded ? t("showLess") : t("showMore", { n: txns.length - DEFAULT_LIMIT })}
+            </button>
+          </div>
         )}
       </div>
     </div>
