@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SearchCode, Castle } from "lucide-react"
+import { SearchCode, Castle, FlaskConical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -23,8 +23,8 @@ interface ScreenerFiltersProps {
 
 const SECTORS = [
   "ALL",
-  "Technology",
-  "Healthcare",
+  "Information Technology",
+  "Health Care",
   "Financials",
   "Consumer Discretionary",
   "Communication Services",
@@ -58,25 +58,47 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
       <div className="space-y-3 pb-4 border-b border-border">
         <Label className="text-muted-foreground">{t("filters.guruStrategies")}</Label>
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start gap-2 bg-primary/5 hover:bg-primary/10 hover:text-primary transition-colors border-primary/20"
-                onClick={() => onChange({
-                  ...filters,
-                  minGrossMargin: 0.4,
-                  minRoic: 0.15
-                })}
-              >
-                <Castle className="h-4 w-4 text-primary" />
-                {t("filters.moatCompounders")}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <p className="max-w-[200px] text-xs">{t("filters.moatTooltip")}</p>
-            </TooltipContent>
-          </Tooltip>
+          <div className="space-y-2">
+            <Tooltip>
+              <TooltipTrigger>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start gap-2 bg-primary/5 hover:bg-primary/10 hover:text-primary transition-colors border-primary/20"
+                  onClick={() => onChange({
+                    ...filters,
+                    minGrossMargin: 0.4,
+                    minRoic: 0.15
+                  })}
+                >
+                  <Castle className="h-4 w-4 text-primary" />
+                  {t("filters.moatCompounders")}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p className="max-w-[200px] text-xs">{t("filters.moatTooltip")}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start gap-2 bg-primary/5 hover:bg-primary/10 hover:text-primary transition-colors border-primary/20"
+                  onClick={() => onChange({
+                    ...filters,
+                    minGrossMargin: 0,
+                    minRoic: 0.20
+                  })}
+                >
+                  <FlaskConical className="h-4 w-4 text-primary" />
+                  {t("filters.magicFormula")}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p className="max-w-[200px] text-xs">{t("filters.magicTooltip")}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </TooltipProvider>
       </div>
 

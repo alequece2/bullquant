@@ -376,6 +376,8 @@
       "guruStrategies": "Guru Strategies",
       "moatCompounders": "Moat Compounders (Buffett)",
       "moatTooltip": "Companies with massive pricing power (Margin > 40%) and high capital efficiency (ROIC > 15%).",
+      "magicFormula": "Magic Formula (Test)",
+      "magicTooltip": "Joel Greenblatt's Strategy (Testing Phase). Focuses on high ROIC (Capital Efficiency), ignoring absolute margins.",
       "sector": "Sector",
       "sectorPlaceholder": "All Sectors",
       "allSectors": "All Sectors",

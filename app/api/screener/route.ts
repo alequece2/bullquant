@@ -18,15 +18,15 @@ export async function POST(request: Request) {
       whereClause.company.sector = sector
     }
 
-    if (minGrossMargin !== undefined) {
+    if (minGrossMargin !== undefined && minGrossMargin > 0) {
       whereClause.grossMargin = { gte: minGrossMargin }
     }
 
-    if (minRoic !== undefined) {
+    if (minRoic !== undefined && minRoic > 0) {
       whereClause.roic = { gte: minRoic }
     }
 
-    if (minRevenue !== undefined) {
+    if (minRevenue !== undefined && minRevenue > 0) {
       whereClause.revenue = { gte: minRevenue }
     }
 
