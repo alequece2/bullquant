@@ -1,6 +1,16 @@
 """
 ingest_ceos.py — Extrai o nome do CEO das empresas do S&P 500 via yfinance e atualiza a BD.
 Corre mensalmente via GitHub Actions (1 de cada mês às 02:00 UTC).
+
+⚠️ EXCEÇÃO DELIBERADA ao CLAUDE.md §9 (que proíbe yfinance por causa dos ToS do Yahoo).
+   Decisão consciente (Costa, 2026-06-29) de manter yfinance APENAS para o nome do CEO,
+   depois de avaliadas e rejeitadas as alternativas legais e gratuitas:
+     - Finnhub free: campo CEO inexistente (/stock/executive é premium).
+     - SEC Form 4 <officerTitle>: falsos positivos graves (apanha CEOs de divisões,
+       ex.: "CEO CCB" na JPM em vez do CEO da empresa) + lacunas de cobertura.
+     - Wikidata (P169): WDQS instável + modelação de tickers inconsistente.
+   Risco assumido: ToS do Yahoo proíbem uso comercial. Revisitar se surgir fonte legal
+   (ou orçamento para API paga de perfis). NÃO replicar yfinance para outros dados.
 """
 
 import os
