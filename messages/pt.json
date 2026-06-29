@@ -156,13 +156,39 @@
     "clearAll": "Limpar Tudo"
   },
   "settings": {
-    "title": "A Minha Conta",
-    "subtitle": "Gere os teus dados pessoais e definições.",
-    "planFree": "Plano FREE",
-    "subscriptionTitle": "Detalhes da Subscrição",
-    "subscriptionDesc": "Atualmente estás a usar a versão gratuita do BullVision. O plano gratuito inclui acesso ao motor de pesquisa de empresas e snapshots básicos de fundamentais.",
-    "premiumSoonTitle": "🚀 Funcionalidades Premium em breve!",
-    "premiumSoonDesc": "Alertas de preço, screener avançado e relatórios em PDF estão a ser desenvolvidos."
+    "title": "Configurações",
+    "subtitle": "Gere o teu perfil, preferências e subscrição num só lugar.",
+    "planFree": "Plano Gratuito",
+    "saveSuccess": "Perfil atualizado com sucesso!",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferências",
+      "subscription": "Subscrição"
+    },
+    "profile": {
+      "title": "Os Teus Dados",
+      "email": "Endereço de Email",
+      "name": "Nome de Apresentação",
+      "namePlaceholder": "Como queres ser chamado",
+      "save": "Guardar Alterações",
+      "dangerZone": "Zona de Perigo",
+      "logoutDesc": "Termina a tua sessão atual no BullQuant com segurança.",
+      "logoutBtn": "Sair da Conta"
+    },
+    "preferences": {
+      "title": "Preferências de Utilização",
+      "language": "Idioma da Interface",
+      "languageDesc": "Escolhe a língua em que queres usar o BullQuant.",
+      "theme": "Tema Visual",
+      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light)."
+    },
+    "subscription": {
+      "title": "O Teu Plano Atual",
+      "desc": "Estás atualmente no plano gratuito. Tens acesso ilimitado a cotações, mas o número de análises de IA e DCF diárias é limitado.",
+      "premiumSoonTitle": "Acesso Premium em Breve",
+      "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
+      "upgradeBtn": "Fazer Upgrade para PRO"
+    }
   },
   "portfolio": {
     "loginRequired": "Precisas de iniciar sessão para aceder à tua Watchlist.",

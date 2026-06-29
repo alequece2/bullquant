@@ -156,13 +156,39 @@
     "clearAll": "Clear All"
   },
   "settings": {
-    "title": "My Account",
-    "subtitle": "Manage your personal data and settings.",
-    "planFree": "FREE Plan",
-    "subscriptionTitle": "Subscription Details",
-    "subscriptionDesc": "You are currently on the BullVision free tier. This includes access to the search engine and basic fundamental snapshots.",
-    "premiumSoonTitle": "🚀 Premium features coming soon!",
-    "premiumSoonDesc": "Price alerts, advanced screeners, and PDF reports are under development."
+    "title": "Settings",
+    "subtitle": "Manage your profile, preferences, and subscription in one place.",
+    "planFree": "Free Plan",
+    "saveSuccess": "Profile updated successfully!",
+    "tabs": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "subscription": "Subscription"
+    },
+    "profile": {
+      "title": "Your Details",
+      "email": "Email Address",
+      "name": "Display Name",
+      "namePlaceholder": "How you want to be called",
+      "save": "Save Changes",
+      "dangerZone": "Danger Zone",
+      "logoutDesc": "Securely sign out of your BullQuant session.",
+      "logoutBtn": "Sign Out"
+    },
+    "preferences": {
+      "title": "App Preferences",
+      "language": "Interface Language",
+      "languageDesc": "Choose the language you want to use in BullQuant.",
+      "theme": "Visual Theme",
+      "themeDesc": "Switch between Dark and Light mode."
+    },
+    "subscription": {
+      "title": "Your Current Plan",
+      "desc": "You are currently on the free plan. You have unlimited access to quotes, but daily AI analyses and DCFs are limited.",
+      "premiumSoonTitle": "Premium Access Coming Soon",
+      "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
+      "upgradeBtn": "Upgrade to PRO"
+    }
   },
   "portfolio": {
     "loginRequired": "You need to sign in to access your Watchlist.",
