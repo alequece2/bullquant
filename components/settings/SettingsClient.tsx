@@ -154,8 +154,11 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pt">Português (PT)</SelectItem>
                     <SelectItem value="en">English (EN)</SelectItem>
+                    <SelectItem value="pt">Português (PT)</SelectItem>
+                    <SelectItem value="es">Español (ES)</SelectItem>
+                    <SelectItem value="fr">Français (FR)</SelectItem>
+                    <SelectItem value="de">Deutsch (DE)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
