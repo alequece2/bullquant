@@ -87,13 +87,15 @@
     "calendar": "Calendar",
     "dcf": "DCF Calculator",
     "transcripts": "Transcripts",
+    "screener": "Stock Screener",
     "recentSearches": "Recent Searches",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
       "portfolio": "The companies you follow and their live prices",
-      "calendar": "Earnings calendar with estimates",
-      "dcf": "Calculate the intrinsic value of a stock",
-      "transcripts": "Read through quarterly earnings call transcripts"
+      "calendar": "Upcoming earnings reports for US companies",
+      "dcf": "Evaluate the fair price of any stock using cash flows",
+      "transcripts": "Read full investor meeting transcripts",
+      "screener": "Find companies using advanced filters"
     }
   },
   "login": {
@@ -361,5 +363,31 @@
     "inDevelopment": "In Development",
     "placeholderTitle": "Transcripts Coming Soon",
     "placeholderDesc": "We are finalizing our data provider integration. This feature will be available shortly."
+  },
+  "screener": {
+    "title": "Stock Screener",
+    "subtitle": "Find high-quality companies based on your own criteria.",
+    "filters": {
+      "title": "Criteria",
+      "sector": "Sector",
+      "sectorPlaceholder": "All Sectors",
+      "allSectors": "All Sectors",
+      "minGrossMargin": "Gross Margin",
+      "minRoic": "ROIC (Efficiency)",
+      "minRevenue": "Annual Revenue"
+    },
+    "results": {
+      "count": "{count} companies found",
+      "loading": "Searching database...",
+      "empty": "No companies found.",
+      "emptyDesc": "Try adjusting your filters to broaden the search.",
+      "company": "Company",
+      "sector": "Sector",
+      "revenue": "Revenue",
+      "grossMargin": "Gross Margin",
+      "roic": "ROIC",
+      "action": "View",
+      "viewStock": "View Analysis"
+    }
   }
 }
