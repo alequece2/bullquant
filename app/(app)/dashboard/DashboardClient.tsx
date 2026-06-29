@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Briefcase, Calculator, CalendarDays, Sparkles, ArrowUpRight, LucideIcon } from "lucide-react";
+import { Briefcase, Calculator, CalendarDays, MessageSquareText, ArrowUpRight, LucideIcon } from "lucide-react";
 import { StockCard } from "@/components/stock/StockCard";
 import { ScreenerCompany, ScreenerCategory } from "@/lib/finance/screener";
 import { cn } from "@/lib/utils";
@@ -87,7 +87,7 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
           <QuickAction href="/portfolio" icon={Briefcase} title={t("actions.portfolio")} desc={t("actions.portfolioDesc")} />
           <QuickAction href="/dcf" icon={Calculator} title={t("actions.dcf")} desc={t("actions.dcfDesc")} />
           <QuickAction href="/calendar" icon={CalendarDays} title={t("actions.calendar")} desc={t("actions.calendarDesc")} />
-          <QuickAction href="/ai-insights" icon={Sparkles} title={t("actions.ai")} desc={t("actions.aiDesc")} />
+          <QuickAction href="/transcripts" icon={MessageSquareText} title={t("actions.transcripts")} desc={t("actions.transcriptsDesc")} />
         </div>
       </div>
 

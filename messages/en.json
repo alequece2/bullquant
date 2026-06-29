@@ -17,8 +17,8 @@
         "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
       },
       "ai": {
-        "title": "AI Insights",
-        "desc": "Moat, catalysts and risks summarized by AI — never investment advice."
+        "title": "AI Brief",
+        "desc": "An AI summary of each company's recent developments, classified by sentiment — never investment advice."
       }
     }
   },
@@ -69,8 +69,8 @@
       "dcfDesc": "Estimate a stock's intrinsic value",
       "calendar": "Earnings calendar",
       "calendarDesc": "Upcoming earnings and who beat estimates",
-      "ai": "AI Insights",
-      "aiDesc": "AI-generated qualitative analysis"
+      "transcripts": "Earnings transcripts",
+      "transcriptsDesc": "Quarterly earnings call transcripts"
     },
     "tabs": {
       "sp500": "S&P 500",
@@ -162,12 +162,44 @@
     "premiumSoonTitle": "🚀 Premium features coming soon!",
     "premiumSoonDesc": "Price alerts, advanced screeners, and PDF reports are under development."
   },
+  "portfolio": {
+    "loginRequired": "You need to sign in to access your Watchlist.",
+    "loginButton": "Sign In",
+    "title": "My Portfolio",
+    "subtitle": "Track your favourite companies in real time.",
+    "positions": "Positions",
+    "upToday": "Up Today",
+    "emptyState": {
+      "title": "Your Watchlist is empty",
+      "description": "Start adding companies to track their performance in real time, or explore some of the popular options below.",
+      "quickAdd": "Add",
+      "adding": "Adding..."
+    },
+    "suggestions": {
+      "title": "Suggestions to add"
+    },
+    "landing": {
+      "title": "BullVision Alpha",
+      "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
+      "testExample": "Try Example",
+      "createAccount": "Create Free Account"
+    },
+    "card": {
+      "currentPrice": "Current Price"
+    },
+    "lastUpdate": "Last update:"
+  },
   "stock": {
     "underConstruction": "Under construction",
     "buildingMessage": "The stock page will be built here.",
     "backHome": "Back Home",
     "updatedAt": "Updated at",
     "priceUnavailable": "Price unavailable",
+    "header": {
+      "followed": "Following",
+      "addToPortfolio": "Add to Portfolio",
+      "updating": "Updating..."
+    },
     "savedValuations": {
       "title": "My Saved Valuations",
       "openCalculator": "Open in Calculator",
@@ -320,7 +352,8 @@
     "emptyTitle": "No Recent News",
     "emptyDesc": "No recent news articles found for this company.",
     "showMore": "Show {n} more articles",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "readMore": "Read full article"
   },
   "transcripts": {
     "title": "Earnings Calls Transcripts",

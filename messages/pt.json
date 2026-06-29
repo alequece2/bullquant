@@ -17,8 +17,8 @@
         "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
       },
       "ai": {
-        "title": "AI Insights",
-        "desc": "Moat, catalisadores e riscos resumidos por IA — sempre em português, nunca conselho de investimento."
+        "title": "AI Brief",
+        "desc": "Resumo por IA dos desenvolvimentos recentes de cada empresa, classificados por sentimento — nunca conselho de investimento."
       }
     }
   },
@@ -69,8 +69,8 @@
       "dcfDesc": "Calcula o valor intrínseco de uma ação",
       "calendar": "Calendário de resultados",
       "calendarDesc": "Próximos earnings e quem bateu estimativas",
-      "ai": "AI Insights",
-      "aiDesc": "Análise qualitativa gerada por IA"
+      "transcripts": "Transcrições de resultados",
+      "transcriptsDesc": "Transcrições das calls de resultados trimestrais"
     },
     "tabs": {
       "sp500": "S&P 500",
@@ -352,7 +352,8 @@
     "emptyTitle": "Sem Notícias Recentes",
     "emptyDesc": "Não foram encontradas notícias recentes para esta empresa.",
     "showMore": "Mostrar mais {n} artigos",
-    "showLess": "Ver menos"
+    "showLess": "Ver menos",
+    "readMore": "Ler artigo completo"
   },
   "transcripts": {
     "title": "Earnings Calls Transcripts",

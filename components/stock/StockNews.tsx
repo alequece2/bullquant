@@ -40,6 +40,7 @@ function NewsCardSkeleton({ withImage }: { withImage: boolean }) {
 }
 
 function NewsCard({ article }: { article: NewsArticle }) {
+  const t = useTranslations("news");
   const hasImage = Boolean(article.image);
 
   return (
@@ -96,7 +97,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
         {/* Read more hint — only visible on hover */}
         <div className="flex items-center gap-1 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
           <ExternalLink className="h-3 w-3" />
-          <span>Ler artigo completo</span>
+          <span>{t("readMore")}</span>
         </div>
       </div>
     </a>
