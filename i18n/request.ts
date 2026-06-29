@@ -1,7 +1,7 @@
 import { getRequestConfig } from 'next-intl/server'
 import { cookies, headers } from 'next/headers'
 
-const SUPPORTED_LOCALES = ['en', 'pt', 'es', 'fr', 'de']
+const SUPPORTED_LOCALES = ['en', 'pt', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'nl']
 const DEFAULT_LOCALE = 'en'
 
 export default getRequestConfig(async () => {
@@ -20,6 +20,10 @@ export default getRequestConfig(async () => {
       else if (['ES', 'MX', 'AR', 'CO', 'CL', 'PE', 'VE', 'EC', 'GT', 'CU', 'BO', 'DO', 'HN', 'PY', 'SV', 'NI', 'CR', 'PA', 'UY'].includes(c)) locale = 'es'
       else if (['FR', 'BE', 'CH', 'CA', 'SN', 'CI', 'CM', 'ML', 'NE', 'BF', 'MG', 'GN', 'RW', 'BI', 'BJ', 'HT', 'TG'].includes(c)) locale = 'fr'
       else if (['DE', 'AT', 'LI', 'LU'].includes(c)) locale = 'de'
+      else if (['IT', 'SM', 'VA'].includes(c)) locale = 'it'
+      else if (['CN', 'TW', 'HK', 'MO', 'SG'].includes(c)) locale = 'zh'
+      else if (['JP'].includes(c)) locale = 'ja'
+      else if (['NL', 'SR', 'AW', 'CW', 'SX'].includes(c)) locale = 'nl'
     }
     
     // 2. Fallback para o idioma configurado no browser (Accept-Language)
