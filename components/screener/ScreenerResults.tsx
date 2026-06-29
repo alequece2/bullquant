@@ -23,6 +23,7 @@ type ScreenerCompany = {
   grossMargin: number | null
   roic: number | null
   dividendPerShare: number | null
+  earningsYield?: number | null
 }
 
 interface ScreenerResultsProps {
@@ -75,6 +76,7 @@ export function ScreenerResults({ companies, isLoading }: ScreenerResultsProps) 
             <TableHead className="text-right">{t("results.revenue")}</TableHead>
             <TableHead className="text-right">{t("results.grossMargin")}</TableHead>
             <TableHead className="text-right">{t("results.roic")}</TableHead>
+            <TableHead className="text-right">{t("results.earningsYield")}</TableHead>
             <TableHead className="text-right">{t("results.action")}</TableHead>
           </TableRow>
         </TableHeader>
@@ -126,6 +128,13 @@ export function ScreenerResults({ companies, isLoading }: ScreenerResultsProps) 
                   </span>
                 ) : (
                   formatPercent(company.roic)
+                )}
+              </TableCell>
+              <TableCell className="text-right font-mono">
+                {company.earningsYield !== undefined && company.earningsYield !== null && company.earningsYield > 0.05 ? (
+                  <span className="text-emerald-500 font-semibold">{formatPercent(company.earningsYield)}</span>
+                ) : (
+                  formatPercent(company.earningsYield ?? null)
                 )}
               </TableCell>
               <TableCell className="text-right">

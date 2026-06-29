@@ -14,6 +14,7 @@ export type ScreenerFiltersType = {
   minRoic: number
   minRevenue: number
   minDividendYield: number
+  minEarningsYield: number
 }
 
 interface ScreenerFiltersProps {
@@ -87,7 +88,8 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
                   onClick={() => onChange({
                     ...filters,
                     minGrossMargin: 0,
-                    minRoic: 0.20
+                    minRoic: 0.20,
+                    minEarningsYield: 0.05
                   })}
                 >
                   <FlaskConical className="h-4 w-4 text-primary" />
@@ -141,6 +143,19 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
             value={[filters.minRoic]}
             onValueChange={(val) => handleSliderChange("minRoic", val)}
             max={0.5}
+            step={0.01}
+          />
+        </div>
+
+        <div className="space-y-3 pt-2">
+          <div className="flex justify-between">
+            <Label>{t("filters.minEarningsYield")} <span className="text-xs text-muted-foreground ml-1">(Em Teste)</span></Label>
+            <span className="text-sm text-muted-foreground">{(filters.minEarningsYield * 100).toFixed(0)}%</span>
+          </div>
+          <Slider
+            value={[filters.minEarningsYield]}
+            onValueChange={(val) => handleSliderChange("minEarningsYield", val)}
+            max={0.25}
             step={0.01}
           />
         </div>

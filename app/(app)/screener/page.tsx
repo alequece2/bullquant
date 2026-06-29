@@ -18,6 +18,7 @@ export default function ScreenerPage() {
     minRoic: 0,
     minRevenue: 0,
     minDividendYield: 0,
+    minEarningsYield: 0,
   })
 
   // Debounce the entire filter object so we don't spam the API while dragging sliders

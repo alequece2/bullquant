@@ -383,7 +383,8 @@
       "allSectors": "Todos os Setores",
       "minGrossMargin": "Margem Bruta (Gross Margin)",
       "minRoic": "ROIC (Eficiência)",
-      "minRevenue": "Receita Anual"
+      "minRevenue": "Receita Anual",
+      "minEarningsYield": "Earnings Yield"
     },
     "results": {
       "count": "{count} empresas encontradas",
@@ -395,6 +396,7 @@
       "revenue": "Receita",
       "grossMargin": "Margem Bruta",
       "roic": "ROIC",
+      "earningsYield": "Yield de Lucro",
       "action": "Ver",
       "viewStock": "Ver Análise"
     }

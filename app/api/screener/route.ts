@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { sector, minGrossMargin, minRoic, minRevenue, minDividendYield } = body
+    const { sector, minGrossMargin, minRoic, minRevenue, minDividendYield, minEarningsYield } = body
 
     // We only want the latest ANNUAL fundamentals.
     const whereClause: any = {
@@ -47,23 +47,55 @@ export async function POST(request: Request) {
         { periodEnd: 'desc' }
       ],
       include: {
-        company: true
+        company: {
+          include: {
+            prices: {
+              orderBy: { date: 'desc' },
+              take: 1
+            }
+          }
+        }
       },
       take: 100, // Limit results for performance
     })
 
     // Map to a cleaner format for the frontend
-    const companies = results.map(fund => ({
-      id: fund.company.id,
-      ticker: fund.company.ticker,
-      name: fund.company.name,
-      logoUrl: fund.company.logoUrl,
-      sector: fund.company.sector,
-      revenue: fund.revenue ? Number(fund.revenue) : null,
-      grossMargin: fund.grossMargin ? Number(fund.grossMargin) : null,
-      roic: fund.roic ? Number(fund.roic) : null,
-      dividendPerShare: fund.dividendPerShare ? Number(fund.dividendPerShare) : null,
-    }))
+    let companies = results.map(fund => {
+      let earningsYield = null
+      let ev = null
+      let marketCap = null
+
+      const latestPrice = fund.company.prices?.[0]?.close
+      if (latestPrice && fund.sharesOutstanding) {
+        marketCap = Number(latestPrice) * Number(fund.sharesOutstanding)
+        
+        const debt = Number(fund.totalDebt || 0)
+        const cash = Number(fund.cash || 0)
+        ev = marketCap + debt - cash
+
+        const ebit = Number(fund.operatingIncome || 0)
+        if (ev > 0 && ebit !== 0) {
+          earningsYield = ebit / ev
+        }
+      }
+
+      return {
+        id: fund.company.id,
+        ticker: fund.company.ticker,
+        name: fund.company.name,
+        logoUrl: fund.company.logoUrl,
+        sector: fund.company.sector,
+        revenue: fund.revenue ? Number(fund.revenue) : null,
+        grossMargin: fund.grossMargin ? Number(fund.grossMargin) : null,
+        roic: fund.roic ? Number(fund.roic) : null,
+        dividendPerShare: fund.dividendPerShare ? Number(fund.dividendPerShare) : null,
+        earningsYield: earningsYield
+      }
+    })
+
+    if (minEarningsYield !== undefined && minEarningsYield > 0) {
+      companies = companies.filter(c => c.earningsYield !== null && c.earningsYield >= minEarningsYield)
+    }
 
     // Optionally sort by something like revenue desc in memory
     companies.sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
