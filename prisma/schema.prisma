@@ -296,13 +296,17 @@ model ManagementProfile {
   companyId String @unique
 
   ceoName                 String
-  tenure                  String
+  tenure_en               String
+  tenure_pt               String
   isFamilyRun             Boolean
-  familyInfluence         String? @db.Text
+  familyInfluence_en      String? @db.Text
+  familyInfluence_pt      String? @db.Text
   capitalAllocationRating String
-  capitalAllocationSummary String @db.Text
+  capitalAllocationSummary_en String @db.Text
+  capitalAllocationSummary_pt String @db.Text
   skinInTheGame           String
-  analysis                String @db.Text
+  analysis_en             String @db.Text
+  analysis_pt             String @db.Text
 
   modelVersion String
   generatedAt  DateTime @default(now())

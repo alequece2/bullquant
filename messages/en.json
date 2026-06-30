@@ -172,7 +172,13 @@
       "namePlaceholder": "How you want to be called",
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
-      "logoutDesc": "Securely sign out of your BullQuant session.",
+      "logoutDesc": "Securely sign out of your Bullmetrics session.",
+      "settings": "Settings",
+      "settingsDesc": "Manage your profile, subscription, and app preferences.",
+      "language": "Language",
+      "languageDesc": "Choose the language you want to use in Bullmetrics.",
+      "theme": "Visual Theme",
+      "themeDesc": "Switch between Dark and Light mode.",
       "logoutBtn": "Sign Out"
     },
     "preferences": {

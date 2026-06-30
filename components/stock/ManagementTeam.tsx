@@ -2,18 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Crown, CheckCircle2, AlertTriangle, XCircle, ChevronRight, Briefcase } from 'lucide-react'
+import { Users, Crown, CheckCircle2, AlertTriangle, XCircle, ChevronRight, Briefcase, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { useLocale } from 'next-intl'
 
 type ManagementProfile = {
   ceoName: string
-  tenure: string
+  tenure_en: string
+  tenure_pt: string
   isFamilyRun: boolean
-  familyInfluence: string | null
+  familyInfluence_en: string | null
+  familyInfluence_pt: string | null
   capitalAllocationRating: 'POOR' | 'AVERAGE' | 'EXCELLENT'
-  capitalAllocationSummary: string
+  capitalAllocationSummary_en: string
+  capitalAllocationSummary_pt: string
   skinInTheGame: 'LOW' | 'MODERATE' | 'HIGH'
-  analysis: string
+  analysis_en: string
+  analysis_pt: string
   generatedAt: string
 }
 
@@ -33,16 +38,19 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
   const [profile, setProfile] = useState<ManagementProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const locale = useLocale()
 
   useEffect(() => {
     async function fetchManagement() {
       try {
         const res = await fetch(`/api/management/${ticker}`)
-        if (!res.ok) throw new Error('Failed to fetch')
         const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data.message || data.error || 'Failed to fetch')
+        }
         setProfile(data.profile)
-      } catch (e) {
-        setError("Não foi possível obter os dados da equipa de gestão.")
+      } catch (e: any) {
+        setError(e.message || "Não foi possível obter os dados da equipa de gestão.")
       } finally {
         setLoading(false)
       }
@@ -68,7 +76,32 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
     )
   }
 
-  if (error || !profile) return null
+  if (error || !profile) {
+    return (
+      <Card className="border-ink-700 bg-ink-900 overflow-hidden relative">
+        <CardHeader className="border-b border-ink-800 pb-4">
+          <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
+            <Users className="h-5 w-5 text-gold-500" />
+            Equipa de Gestão
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="bg-bear/10 border border-bear/20 rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-bear shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-bold text-bear">Aviso</h4>
+              <p className="text-sm text-grey-400 mt-1">{error || "Perfil não encontrado."}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const tenure = locale === 'pt' ? profile.tenure_pt : profile.tenure_en
+  const familyInfluence = locale === 'pt' ? profile.familyInfluence_pt : profile.familyInfluence_en
+  const capitalAllocationSummary = locale === 'pt' ? profile.capitalAllocationSummary_pt : profile.capitalAllocationSummary_en
+  const analysis = locale === 'pt' ? profile.analysis_pt : profile.analysis_en
 
   return (
     <Card className="border-ink-700 bg-ink-900 overflow-hidden relative group">
@@ -76,10 +109,19 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
       
       <CardHeader className="border-b border-ink-800 pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
-            <Users className="h-5 w-5 text-gold-500" />
-            Equipa de Gestão
-          </CardTitle>
+          <div className="flex items-center gap-3">
+            <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
+              <Users className="h-5 w-5 text-gold-500" />
+              Equipa de Gestão
+            </CardTitle>
+            <div 
+              className="flex items-center gap-1 text-[10px] bg-ink-800/50 text-grey-400 px-2 py-0.5 rounded-full border border-ink-700 cursor-help"
+              title={locale === 'pt' ? 'Tradução gerada automaticamente por IA (Disponível em EN e PT)' : 'Translation generated automatically by AI (Available in EN and PT)'}
+            >
+              <Info className="h-3 w-3" />
+              <span>{locale === 'pt' ? 'PT/EN' : 'EN/PT'}</span>
+            </div>
+          </div>
           <span className="text-xs text-grey-400">
             Powered by AI
           </span>
@@ -98,7 +140,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
               <div>
                 <h3 className="text-lg font-bold text-parchment-100">{profile.ceoName}</h3>
                 <p className="text-sm text-grey-400 flex items-center gap-1.5 mt-1">
-                  CEO <ChevronRight className="h-3 w-3" /> {profile.tenure}
+                  CEO <ChevronRight className="h-3 w-3" /> {tenure}
                 </p>
               </div>
             </div>
@@ -110,10 +152,12 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <Crown className="h-4 w-4 text-gold-500" />
-                  <span className="text-sm font-semibold text-gold-500">Founders Control / Negócio Familiar</span>
+                  <span className="text-sm font-semibold text-gold-500">
+                    {locale === 'pt' ? 'Controlo Familiar / Fundadores' : 'Founders Control / Family Business'}
+                  </span>
                 </div>
                 <p className="text-sm text-grey-400 relative z-10">
-                  {profile.familyInfluence}
+                  {familyInfluence}
                 </p>
               </div>
             )}
@@ -135,14 +179,16 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
           <div className="space-y-5">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-parchment-100">Alocação de Capital</span>
+                <span className="text-sm font-medium text-parchment-100">
+                  {locale === 'pt' ? 'Alocação de Capital' : 'Capital Allocation'}
+                </span>
                 <Badge variant="outline" className={RatingColor({ rating: profile.capitalAllocationRating })}>
                   <RatingIcon rating={profile.capitalAllocationRating} type="capital" />
                   <span className="ml-1.5">{profile.capitalAllocationRating}</span>
                 </Badge>
               </div>
               <p className="text-sm text-grey-400 leading-relaxed">
-                {profile.capitalAllocationSummary}
+                {capitalAllocationSummary}
               </p>
             </div>
 
@@ -150,7 +196,9 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-parchment-100">Skin in the Game (Alinhamento)</span>
+                <span className="text-sm font-medium text-parchment-100">
+                  {locale === 'pt' ? 'Skin in the Game (Alinhamento)' : 'Skin in the Game (Alignment)'}
+                </span>
                 <Badge variant="outline" className={RatingColor({ rating: profile.skinInTheGame })}>
                   <RatingIcon rating={profile.skinInTheGame} type="skin" />
                   <span className="ml-1.5">{profile.skinInTheGame}</span>
@@ -160,7 +208,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
 
             <div className="bg-ink-800/30 rounded-lg p-4 border border-ink-800">
               <p className="text-sm text-parchment-100 leading-relaxed italic">
-                &quot;{profile.analysis}&quot;
+                &quot;{analysis}&quot;
               </p>
             </div>
           </div>

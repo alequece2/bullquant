@@ -6,11 +6,21 @@ import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { PlanToggle } from '@/components/dev/PlanToggle';
 
 export async function AppHeader() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const t = await getTranslations('header');
+
+  let dbUser = null;
+  if (user) {
+    dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { plan: true },
+    });
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -29,6 +39,9 @@ export async function AppHeader() {
         <div className="flex items-center gap-2 shrink-0 ml-auto">
           {user && (
             <div className="flex items-center gap-2">
+              {process.env.NODE_ENV === 'development' && dbUser && (
+                <PlanToggle initialPlan={dbUser.plan} />
+              )}
               <Link 
                 href="/settings" 
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-muted"

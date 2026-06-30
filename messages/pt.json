@@ -172,13 +172,15 @@
       "namePlaceholder": "Como queres ser chamado",
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
-      "logoutDesc": "Termina a tua sessão atual no BullQuant com segurança.",
+      "logoutDesc": "Termina a tua sessão atual no Bullmetrics com segurança.",
       "logoutBtn": "Sair da Conta"
     },
     "preferences": {
       "title": "Preferências de Utilização",
-      "language": "Idioma da Interface",
-      "languageDesc": "Escolhe a língua em que queres usar o BullQuant.",
+      "settings": "Definições",
+      "settingsDesc": "Gere o teu perfil, subscrição e preferências da app.",
+      "language": "Idioma",
+      "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
       "theme": "Tema Visual",
       "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light)."
     },

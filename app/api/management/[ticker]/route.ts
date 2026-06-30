@@ -80,15 +80,27 @@ export async function GET(
       model: google(modelName),
       schema: z.object({
         ceoName: z.string(),
-        tenure: z.string().describe("How long the CEO has been in charge, e.g., 'Since 2014' or 'Since foundation'"),
-        isFamilyRun: z.boolean().describe("True if the founding family or founders still control or have significant influence over the company"),
-        familyInfluence: z.string().nullable().describe("Briefly explain how they control it (e.g. dual-class shares) or null if false"),
-        capitalAllocationRating: z.enum(['POOR', 'AVERAGE', 'EXCELLENT']).describe("Grade their capital allocation skills"),
-        capitalAllocationSummary: z.string().describe("1-2 sentences summarizing their dividend, buyback, and M&A discipline"),
-        skinInTheGame: z.enum(['LOW', 'MODERATE', 'HIGH']).describe("Grade shareholder alignment and insider ownership"),
-        analysis: z.string().describe("A professional 1-paragraph summary of the management team's track record and shareholder alignment")
+        tenure: z.object({
+          en: z.string().describe("e.g. 'Since 2014'"),
+          pt: z.string().describe("e.g. 'Desde 2014'")
+        }).describe("How long the CEO has been in charge"),
+        isFamilyRun: z.boolean().describe("True if founding family controls it"),
+        familyInfluence: z.object({
+          en: z.string(),
+          pt: z.string()
+        }).nullable().describe("Briefly explain control, or null"),
+        capitalAllocationRating: z.enum(['POOR', 'AVERAGE', 'EXCELLENT']).describe("Grade their capital allocation"),
+        capitalAllocationSummary: z.object({
+          en: z.string(),
+          pt: z.string()
+        }).describe("1-2 sentences summarizing dividend, buyback, M&A"),
+        skinInTheGame: z.enum(['LOW', 'MODERATE', 'HIGH']).describe("Grade shareholder alignment"),
+        analysis: z.object({
+          en: z.string(),
+          pt: z.string()
+        }).describe("1 paragraph summary of track record")
       }),
-      system: "You are a senior Wall Street value investor analyzing the management team of a public company. Your focus is strictly on capital allocation (how they spend free cash flow), skin in the game (do they own shares?), and structural advantages (is it founder-led or family-controlled?). Be highly critical, concise, and professional.",
+      system: "You are a senior Wall Street value investor analyzing a management team. You MUST provide all textual descriptions in BOTH English ('en') and European Portuguese ('pt', strictly pt-PT, avoid Brazilian Portuguese). Be highly critical, concise, and professional.",
       prompt: `Analyze the management team and CEO of ${company.name} (${company.ticker}). Identify the current CEO, whether it is a family/founder-run business, their capital allocation history, and their skin in the game.`
     })
 
@@ -96,17 +108,32 @@ export async function GET(
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 30)
 
+    const profileData = {
+      ceoName: object.ceoName,
+      isFamilyRun: object.isFamilyRun,
+      capitalAllocationRating: object.capitalAllocationRating,
+      skinInTheGame: object.skinInTheGame,
+      tenure_en: object.tenure.en,
+      tenure_pt: object.tenure.pt,
+      familyInfluence_en: object.familyInfluence?.en || null,
+      familyInfluence_pt: object.familyInfluence?.pt || null,
+      capitalAllocationSummary_en: object.capitalAllocationSummary.en,
+      capitalAllocationSummary_pt: object.capitalAllocationSummary.pt,
+      analysis_en: object.analysis.en,
+      analysis_pt: object.analysis.pt,
+    }
+
     const profile = await prisma.managementProfile.upsert({
       where: { companyId: company.id },
       update: {
-        ...object,
+        ...profileData,
         expiresAt,
         modelVersion: modelName,
         generatedAt: new Date()
       },
       create: {
         companyId: company.id,
-        ...object,
+        ...profileData,
         expiresAt,
         modelVersion: modelName
       }
@@ -119,8 +146,9 @@ export async function GET(
 
     return NextResponse.json({ profile })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Management AI Error:', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    require('fs').appendFileSync('api-debug.log', String(error) + '\\n' + (error.stack || '') + '\\n')
+    return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 })
   }
 }
