@@ -112,7 +112,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join thousands of investors on BullVision.",
+    "subtitle": "Join BullVision..",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -207,7 +207,7 @@
       "title": "Suggestions to add"
     },
     "landing": {
-      "title": "BullVision Alpha",
+      "title": "BullVision",
       "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
       "testExample": "Try Example",
       "createAccount": "Create Free Account"

@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   try {
+    // Auth check — screener executes heavy DB queries; require a logged-in user
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { sector, minGrossMargin, minRoic, minRevenue, minDividendYield, minEarningsYield } = body
 
@@ -30,10 +38,9 @@ export async function POST(request: Request) {
       whereClause.revenue = { gte: minRevenue }
     }
 
-    if (minDividendYield !== undefined && minDividendYield > 0) {
-      // Filter companies that have any dividend (absolute proxy since we store dividendPerShare, not yield)
-      whereClause.dividendPerShare = { gt: 0 }
-    }
+    // Note: minDividendYield filter is applied in-memory after we compute earningsYield
+    // because dividend yield requires price data (dividendPerShare / currentPrice) which
+    // is not available at DB query time. The in-memory filter below handles it.
 
     const results = await prisma.fundamental.findMany({
       where: whereClause,
@@ -75,6 +82,7 @@ export async function POST(request: Request) {
         }
       }
 
+      const currentPrice = latestPrice ? Number(latestPrice) : null
       return {
         id: fund.company.id,
         ticker: fund.company.ticker,
@@ -85,12 +93,23 @@ export async function POST(request: Request) {
         grossMargin: fund.grossMargin ? Number(fund.grossMargin) : null,
         roic: fund.roic ? Number(fund.roic) : null,
         dividendPerShare: fund.dividendPerShare ? Number(fund.dividendPerShare) : null,
-        earningsYield: earningsYield
+        earningsYield: earningsYield,
+        // Internal field for dividend yield filter — not sent to frontend
+        _currentPrice: currentPrice,
       }
     })
 
     if (minEarningsYield !== undefined && minEarningsYield > 0) {
       companies = companies.filter(c => c.earningsYield !== null && c.earningsYield >= minEarningsYield)
+    }
+
+    // Dividend yield filter — applied in-memory using real yield = dividendPerShare / currentPrice
+    if (minDividendYield !== undefined && minDividendYield > 0) {
+      companies = companies.filter(c => {
+        if (!c.dividendPerShare || !c._currentPrice) return false
+        const yld = c.dividendPerShare / c._currentPrice
+        return yld >= minDividendYield
+      })
     }
 
     // Optionally sort by something like revenue desc in memory
