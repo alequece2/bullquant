@@ -11,6 +11,7 @@ import { InsiderActivity } from '@/components/stock/InsiderActivity'
 
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
+import { ManagementTeam } from '@/components/stock/ManagementTeam'
 
 export default async function StockPage({
   params,
@@ -123,7 +124,10 @@ export default async function StockPage({
       {/* 6. Company News */}
       <StockNews ticker={company.ticker} />
 
-      {/* 7. Company Profile */}
+      {/* 7. Management Team Assessment */}
+      <ManagementTeam ticker={company.ticker} />
+
+      {/* 8. Company Profile */}
       <CompanyProfile company={company} />
     </div>
   )

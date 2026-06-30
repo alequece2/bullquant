@@ -64,6 +64,7 @@ model Company {
   dcfAnalyses    DcfAnalysis[]
   insiderTxns    InsiderTransaction[]
   companyBrief   CompanyBrief?
+  managementProfile ManagementProfile?
 
   @@index([ticker])
   @@index([exchange])
@@ -287,6 +288,30 @@ model CompanyBrief {
 
   @@index([companyId, expiresAt])
   @@map("company_brief")
+}
+
+// ── MANAGEMENT PROFILE (AI ASSESSED) ──────────
+model ManagementProfile {
+  id        String @id @default(cuid())
+  companyId String @unique
+
+  ceoName                 String
+  tenure                  String
+  isFamilyRun             Boolean
+  familyInfluence         String? @db.Text
+  capitalAllocationRating String
+  capitalAllocationSummary String @db.Text
+  skinInTheGame           String
+  analysis                String @db.Text
+
+  modelVersion String
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("management_profile")
 }
 
 // ── CONTROLO DE USO DE AI ─────────────────────

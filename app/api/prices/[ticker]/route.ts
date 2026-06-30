@@ -20,13 +20,13 @@ export async function GET(
     }
     const take = periodMap[period] ?? 1260
     
-    // Fetch historical prices for the ticker, ordered by date ascending
+    // Fetch historical prices for the ticker, ordered by date descending to get the latest
     const prices = await prisma.price.findMany({
       where: {
         ticker: ticker.toUpperCase(),
       },
       orderBy: {
-        date: 'asc',
+        date: 'desc',
       },
       take,
       select: {
@@ -34,6 +34,9 @@ export async function GET(
         close: true,
       }
     })
+    
+    // Reverse to chronological order (asc) for the chart
+    prices.reverse()
 
     if (!prices || prices.length === 0) {
       return NextResponse.json({ error: "No price history found" }, { status: 404 })
