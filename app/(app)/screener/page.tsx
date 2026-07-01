@@ -4,20 +4,19 @@ import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { SearchCode } from "lucide-react"
 import { ScreenerFilters, ScreenerFiltersType } from "@/components/screener/ScreenerFilters"
-import { ScreenerResults } from "@/components/screener/ScreenerResults"
+import { ScreenerResults, ScreenerCompany } from "@/components/screener/ScreenerResults"
 import { useDebounce } from "@/hooks/useDebounce"
 
 export default function ScreenerPage() {
   const t = useTranslations("screener")
   const [isLoading, setIsLoading] = useState(true)
-  const [results, setResults] = useState([])
-  
+  const [results, setResults] = useState<ScreenerCompany[]>([])
+
   const [filters, setFilters] = useState<ScreenerFiltersType>({
     sector: "ALL",
     minGrossMargin: 0,
     minRoic: 0,
     minRevenue: 0,
-    minDividendYield: 0,
     minEarningsYield: 0,
   })
 
