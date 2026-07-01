@@ -146,9 +146,8 @@ export async function GET(
 
     return NextResponse.json({ profile })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Management AI Error:', error)
-    require('fs').appendFileSync('api-debug.log', String(error) + '\\n' + (error.stack || '') + '\\n')
-    return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 })
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
