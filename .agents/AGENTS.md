@@ -6,7 +6,7 @@
 - **Formatação de Moeda:** Valores de variação financeira devem SEMPRE conter o símbolo da moeda e formatação limpa (ex: `+$45.23` ou `-$45.23`). Usar `Math.abs()` para evitar sinais duplos.
 ### 🛡️ Regras de Robustez e Qualidade de Código
 
-- **[BD] Prisma Migrations:** NUNCA saltar migrations em produção ou desenvolvimento se houver alterações no `schema.prisma`. O comando correto é SEMPRE `npx prisma migrate dev`. A utilização de `db push` para contornar problemas de *drift* é expressamente proibida.
+- **[BD] Prisma Migrations:** NUNCA saltar migrations em produção ou desenvolvimento se houver alterações no `schema.prisma`. Para mudanças aditivas enquanto existir drift na BD (tabelas criadas com `db push` sem migration correspondente), usar `prisma db push`. Ver CLAUDE.md §10 para contexto e processo de baseline.
 - **[i18n] Next-Intl Fallbacks:** A biblioteca `next-intl` NÃO suporta a sintaxe `{ fallback: 'texto' }` para definir valores por defeito em traduções ausentes. Esse segundo argumento serve apenas para interpolação de variáveis. Não inventar funcionalidades da biblioteca.
 - **[i18n] Chaves Órfãs:** Ao adicionar chaves de tradução aos ficheiros `.json` (ex: `pt.json`, `en.json`), validar sempre se o componente consome efetivamente essas chaves. Não inserir chaves de forma especulativa (ex: `1d`, `3m`) criando "dead code".
 - **[TS] Tipagem Prisma Decimal:** Em rotas de API e serializações, NUNCA usar `any` nem a verificação `constructor.name === 'Decimal'` (que falha em minificação). A abordagem aprovada e estrita é verificar `typeof val === 'object' && 'toNumber' in val` e usar type assertions como `(val as { toNumber(): number }).toNumber()`.

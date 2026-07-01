@@ -13,7 +13,6 @@ export type ScreenerFiltersType = {
   minGrossMargin: number
   minRoic: number
   minRevenue: number
-  minDividendYield: number
   minEarningsYield: number
 }
 
@@ -62,13 +61,13 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
           <div className="space-y-2">
             <Tooltip>
               <TooltipTrigger>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start gap-2 bg-primary/5 hover:bg-primary/10 hover:text-primary transition-colors border-primary/20"
                   onClick={() => onChange({
                     ...filters,
                     minGrossMargin: 0.4,
-                    minRoic: 0.15
+                    minRoic: 0.15,
                   })}
                 >
                   <Castle className="h-4 w-4 text-primary" />
@@ -82,14 +81,14 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
 
             <Tooltip>
               <TooltipTrigger>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start gap-2 bg-primary/5 hover:bg-primary/10 hover:text-primary transition-colors border-primary/20"
                   onClick={() => onChange({
                     ...filters,
                     minGrossMargin: 0,
                     minRoic: 0.20,
-                    minEarningsYield: 0.05
+                    minEarningsYield: 0.05,
                   })}
                 >
                   <FlaskConical className="h-4 w-4 text-primary" />
@@ -170,11 +169,10 @@ export function ScreenerFilters({ filters, onChange }: ScreenerFiltersProps) {
           <Slider
             value={[filters.minRevenue]}
             onValueChange={(val) => handleSliderChange("minRevenue", val)}
-            max={100_000_000_000} // 100B
-            step={1_000_000_000} // 1B
+            max={100_000_000_000}
+            step={1_000_000_000}
           />
         </div>
-
       </div>
     </div>
   )

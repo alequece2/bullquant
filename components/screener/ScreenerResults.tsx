@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table"
 import { ExternalLink, TrendingUp, TrendingDown } from "lucide-react"
 
-type ScreenerCompany = {
+export type ScreenerCompany = {
   id: string
   ticker: string
   name: string
